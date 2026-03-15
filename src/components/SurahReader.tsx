@@ -69,9 +69,14 @@ const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
                 <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold shrink-0 mt-2">
                   {ayah.numberInSurah}
                 </span>
-                <p className="font-arabic text-2xl leading-[2.2] text-foreground text-right flex-1" dir="rtl">
-                  {ayah.text}
-                </p>
+                <div className="flex-1 space-y-3">
+                  <p className="font-arabic text-2xl leading-[2.2] text-foreground text-right" dir="rtl">
+                    {ayah.text}
+                  </p>
+                  <p className="text-muted-foreground text-sm leading-relaxed border-t border-border/50 pt-3">
+                    {ayah.translation}
+                  </p>
+                </div>
               </div>
             </motion.div>
           ))}
