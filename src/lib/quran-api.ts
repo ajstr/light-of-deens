@@ -18,6 +18,18 @@ export interface Ayah {
   numberInSurah: number;
 }
 
+export interface WordByWord {
+  arabic: string;
+  translation: string;
+  transliteration: string;
+  position: number;
+}
+
+export interface AyahWords {
+  verseNumber: number;
+  words: WordByWord[];
+}
+
 export interface SurahDetail {
   number: number;
   name: string;
