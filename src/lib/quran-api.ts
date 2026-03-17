@@ -78,6 +78,34 @@ export async function fetchSurahs(): Promise<Surah[]> {
   }));
 }
 
+// Word-by-word translation via Quran.com API v4
+const WBW_API = "https://api.quran.com/api/v4/verses/by_chapter";
+const wbwCache = new Map<number, AyahWords[]>();
+
+export async function fetchWordByWord(surahNumber: number): Promise<AyahWords[]> {
+  if (wbwCache.has(surahNumber)) return wbwCache.get(surahNumber)!;
+
+  const res = await fetch(
+    `${WBW_API}/${surahNumber}?language=en&words=true&word_fields=text_uthmani,translation&per_page=300`
+  );
+  const json = await res.json();
+
+  const result: AyahWords[] = json.verses.map((v: any) => ({
+    verseNumber: v.verse_number,
+    words: v.words
+      .filter((w: any) => w.char_type_name === "word")
+      .map((w: any) => ({
+        arabic: w.text_uthmani,
+        translation: w.translation?.text || "",
+        transliteration: w.transliteration?.text || "",
+        position: w.position,
+      })),
+  }));
+
+  wbwCache.set(surahNumber, result);
+  return result;
+}
+
 export async function fetchSurah(number: number): Promise<SurahDetail> {
   const data = await loadData();
   const s = data[number - 1];
