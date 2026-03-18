@@ -105,14 +105,26 @@ export async function fetchAudioUrls(
   const key = `${reciterId}-${surahNumber}`;
   if (audioCache.has(key)) return audioCache.get(key)!;
 
-  const res = await fetch(
-    `https://api.quran.com/api/v4/recitations/${reciterId}/by_chapter/${surahNumber}`
-  );
-  const json = await res.json();
+  const allFiles: any[] = [];
+  let page = 1;
+  let totalPages = 1;
 
-  const urls: string[] = json.audio_files.map(
-    (f: any) => `https://verses.quran.com/${f.url}`
-  );
+  while (page <= totalPages) {
+    const res = await fetch(
+      `https://api.quran.com/api/v4/recitations/${reciterId}/by_chapter/${surahNumber}?per_page=50&page=${page}`
+    );
+    const json = await res.json();
+    allFiles.push(...json.audio_files);
+    totalPages = json.pagination.total_pages;
+    page++;
+  }
+
+  const urls: string[] = allFiles.map((f: any) => {
+    const url: string = f.url;
+    if (url.startsWith("//")) return `https:${url}`;
+    if (url.startsWith("http")) return url;
+    return `https://verses.quran.com/${url}`;
+  });
   audioCache.set(key, urls);
   return urls;
 }
