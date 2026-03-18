@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
@@ -6,6 +6,7 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import AudioPlayer from "@/components/AudioPlayer";
 
 interface SurahReaderProps {
   surah: Surah;
