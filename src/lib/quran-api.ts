@@ -157,21 +157,46 @@ export async function fetchWordByWord(surahNumber: number): Promise<AyahWords[]>
   return result;
 }
 
+const surahCache = new Map<number, SurahDetail>();
+
 export async function fetchSurah(number: number): Promise<SurahDetail> {
+  if (surahCache.has(number)) return surahCache.get(number)!;
+
+  // Get surah metadata from the lightweight JSON
   const data = await loadData();
   const s = data[number - 1];
 
-  return {
+  // Fetch verified Uthmani text + Sahih International translation from Quran.com API v4
+  const VERSES_API = "https://api.quran.com/api/v4/verses/by_chapter";
+  const allVerses: any[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  while (page <= totalPages) {
+    const res = await fetch(
+      `${VERSES_API}/${number}?language=en&translations=20&fields=text_uthmani&per_page=50&page=${page}`
+    );
+    const json = await res.json();
+    allVerses.push(...json.verses);
+    totalPages = json.pagination.total_pages;
+    page++;
+  }
+
+  const result: SurahDetail = {
     number: s.id,
     name: s.name,
     englishName: s.transliteration,
     englishNameTranslation: s.translation,
     revelationType: s.type.charAt(0).toUpperCase() + s.type.slice(1),
-    ayahs: s.verses.map((v, i) => ({
-      number: i + 1,
-      text: v.text,
-      translation: v.translation,
-      numberInSurah: v.id,
+    ayahs: allVerses.map((v: any) => ({
+      number: v.verse_number,
+      text: v.text_uthmani,
+      translation:
+        v.translations?.[0]?.text?.replace(/<[^>]*>/g, "") || "",
+      numberInSurah: v.verse_number,
     })),
   };
+
+  surahCache.set(number, result);
+  return result;
 }
