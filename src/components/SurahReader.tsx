@@ -15,6 +15,15 @@ interface SurahReaderProps {
 
 const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
+  const [currentAyah, setCurrentAyah] = useState(0);
+  const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    ayahRefs.current[currentAyah]?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [currentAyah]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["surah", surah.number],
