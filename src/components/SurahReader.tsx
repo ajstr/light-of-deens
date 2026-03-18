@@ -100,10 +100,13 @@ const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
             return (
               <motion.div
                 key={ayah.number}
+                ref={(el) => (ayahRefs.current[i] = el)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: Math.min(i * 0.03, 1) }}
-                className="bg-card rounded-lg p-6 group"
+                className={`bg-card rounded-lg p-6 group transition-colors ${
+                  currentAyah === i ? "ring-2 ring-primary/30" : ""
+                }`}
               >
                 <div className="flex items-start gap-4">
                   <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold shrink-0 mt-2">
