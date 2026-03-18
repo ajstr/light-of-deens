@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
@@ -6,6 +6,7 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import AudioPlayer from "@/components/AudioPlayer";
 
 interface SurahReaderProps {
   surah: Surah;
@@ -14,6 +15,15 @@ interface SurahReaderProps {
 
 const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
+  const [currentAyah, setCurrentAyah] = useState(0);
+  const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    ayahRefs.current[currentAyah]?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [currentAyah]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["surah", surah.number],
@@ -90,10 +100,13 @@ const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
             return (
               <motion.div
                 key={ayah.number}
+                ref={(el) => (ayahRefs.current[i] = el)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: Math.min(i * 0.03, 1) }}
-                className="bg-card rounded-lg p-6 group"
+                className={`bg-card rounded-lg p-6 group transition-colors ${
+                  currentAyah === i ? "ring-2 ring-primary/30" : ""
+                }`}
               >
                 <div className="flex items-start gap-4">
                   <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold shrink-0 mt-2">
@@ -141,6 +154,14 @@ const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
             );
           })}
         </div>
+      )}
+      {data && (
+        <AudioPlayer
+          surahNumber={surah.number}
+          totalAyahs={surah.numberOfAyahs}
+          currentAyah={currentAyah}
+          onAyahChange={setCurrentAyah}
+        />
       )}
     </div>
   );

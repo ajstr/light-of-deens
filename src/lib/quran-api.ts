@@ -78,6 +78,45 @@ export async function fetchSurahs(): Promise<Surah[]> {
   }));
 }
 
+// Reciter types and API
+export interface Reciter {
+  id: number;
+  reciter_name: string;
+  style: string | null;
+  translated_name: { name: string; language_name: string };
+}
+
+let cachedReciters: Reciter[] | null = null;
+
+export async function fetchReciters(): Promise<Reciter[]> {
+  if (cachedReciters) return cachedReciters;
+  const res = await fetch("https://api.quran.com/api/v4/resources/recitations?language=en");
+  const json = await res.json();
+  cachedReciters = json.recitations;
+  return cachedReciters!;
+}
+
+const audioCache = new Map<string, string[]>();
+
+export async function fetchAudioUrls(
+  surahNumber: number,
+  reciterId: number
+): Promise<string[]> {
+  const key = `${reciterId}-${surahNumber}`;
+  if (audioCache.has(key)) return audioCache.get(key)!;
+
+  const res = await fetch(
+    `https://api.quran.com/api/v4/recitations/${reciterId}/by_chapter/${surahNumber}`
+  );
+  const json = await res.json();
+
+  const urls: string[] = json.audio_files.map(
+    (f: any) => `https://verses.quran.com/${f.url}`
+  );
+  audioCache.set(key, urls);
+  return urls;
+}
+
 // Word-by-word translation via Quran.com API v4
 const WBW_API = "https://api.quran.com/api/v4/verses/by_chapter";
 const wbwCache = new Map<number, AyahWords[]>();
