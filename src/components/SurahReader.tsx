@@ -155,6 +155,14 @@ const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
           })}
         </div>
       )}
+      {data && (
+        <AudioPlayer
+          surahNumber={surah.number}
+          totalAyahs={surah.numberOfAyahs}
+          currentAyah={currentAyah}
+          onAyahChange={setCurrentAyah}
+        />
+      )}
     </div>
   );
 };
