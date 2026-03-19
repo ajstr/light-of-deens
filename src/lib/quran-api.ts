@@ -1,6 +1,7 @@
-// Quran data sourced from Tanzil.net (https://tanzil.net)
-// Arabic text (Uthmani) + English translation (Saheeh International)
-// via quran-json npm package on jsdelivr CDN
+import { fetchTanzilSurahAyahs } from "@/lib/tanzil-uthmani";
+
+// Quran metadata + English translation sourced from quran-json on jsDelivr
+// Arabic verse text sourced from Tanzil Uthmani text
 
 export interface Surah {
   number: number;
@@ -162,25 +163,9 @@ const surahCache = new Map<number, SurahDetail>();
 export async function fetchSurah(number: number): Promise<SurahDetail> {
   if (surahCache.has(number)) return surahCache.get(number)!;
 
-  // Get surah metadata from the lightweight JSON
   const data = await loadData();
   const s = data[number - 1];
-
-  // Fetch verified Uthmani text + Sahih International translation from Quran.com API v4
-  const VERSES_API = "https://api.quran.com/api/v4/verses/by_chapter";
-  const allVerses: any[] = [];
-  let page = 1;
-  let totalPages = 1;
-
-  while (page <= totalPages) {
-    const res = await fetch(
-      `${VERSES_API}/${number}?language=en&translations=20&fields=text_uthmani&per_page=50&page=${page}`
-    );
-    const json = await res.json();
-    allVerses.push(...json.verses);
-    totalPages = json.pagination.total_pages;
-    page++;
-  }
+  const arabicAyahs = await fetchTanzilSurahAyahs(number);
 
   const result: SurahDetail = {
     number: s.id,
@@ -188,12 +173,11 @@ export async function fetchSurah(number: number): Promise<SurahDetail> {
     englishName: s.transliteration,
     englishNameTranslation: s.translation,
     revelationType: s.type.charAt(0).toUpperCase() + s.type.slice(1),
-    ayahs: allVerses.map((v: any) => ({
-      number: v.verse_number,
-      text: v.text_uthmani,
-      translation:
-        v.translations?.[0]?.text?.replace(/<[^>]*>/g, "") || "",
-      numberInSurah: v.verse_number,
+    ayahs: s.verses.map((v, index) => ({
+      number: index + 1,
+      text: arabicAyahs[index] ?? v.text,
+      translation: v.translation.replace(/<[^>]*>/g, ""),
+      numberInSurah: index + 1,
     })),
   };
 
