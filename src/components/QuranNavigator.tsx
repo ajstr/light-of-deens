@@ -125,7 +125,7 @@ const QuranNavigator = ({
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {HIZB_DATA.map((h) => (
-              <SelectItem key={h.hizb} value={String(h.hizb)} className="text-xs">
+              <SelectItem key={h.hizb} value={String(h.hizb)} className="text-xs cursor-pointer">
                 Hizb {h.hizb} — Surah {h.startSurah}:{h.startAyah}
               </SelectItem>
             ))}
