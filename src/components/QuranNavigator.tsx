@@ -89,7 +89,7 @@ const QuranNavigator = ({
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {Array.from({ length: surah.numberOfAyahs }, (_, i) => (
-              <SelectItem key={i + 1} value={String(i + 1)} className="text-xs">
+              <SelectItem key={i + 1} value={String(i + 1)} className="text-xs cursor-pointer">
                 Ayah {i + 1}
               </SelectItem>
             ))}
