@@ -7,16 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import AudioPlayer from "@/components/AudioPlayer";
+import QuranNavigator from "@/components/QuranNavigator";
 
 interface SurahReaderProps {
   surah: Surah;
   onBack: () => void;
+  onSurahChange?: (surahNumber: number, ayah: number) => void;
+  initialAyah?: number;
 }
 
-const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
+const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
-  const [currentAyah, setCurrentAyah] = useState(0);
+  const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Reset ayah when surah changes
+  useEffect(() => {
+    setCurrentAyah(initialAyah);
+  }, [surah.number, initialAyah]);
 
   useEffect(() => {
     ayahRefs.current[currentAyah]?.scrollIntoView({
@@ -36,9 +44,15 @@ const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
     enabled: wbwEnabled,
   });
 
+  const handleSurahChange = (surahNumber: number, ayah: number) => {
+    if (onSurahChange) {
+      onSurahChange(surahNumber, ayah);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
           onClick={onBack}
@@ -59,6 +73,16 @@ const SurahReader = ({ surah, onBack }: SurahReaderProps) => {
             onCheckedChange={setWbwEnabled}
           />
         </div>
+      </div>
+
+      {/* Navigation */}
+      <div className="mb-6">
+        <QuranNavigator
+          surah={surah}
+          currentAyah={currentAyah}
+          onAyahChange={setCurrentAyah}
+          onSurahChange={handleSurahChange}
+        />
       </div>
 
       <motion.div
