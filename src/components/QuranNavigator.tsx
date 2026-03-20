@@ -89,7 +89,7 @@ const QuranNavigator = ({
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {Array.from({ length: surah.numberOfAyahs }, (_, i) => (
-              <SelectItem key={i + 1} value={String(i + 1)} className="text-xs cursor-pointer">
+              <SelectItem key={i + 1} value={String(i + 1)} className="text-xs">
                 Ayah {i + 1}
               </SelectItem>
             ))}
@@ -107,7 +107,7 @@ const QuranNavigator = ({
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {JUZ_DATA.map((j) => (
-              <SelectItem key={j.juz} value={String(j.juz)} className="text-xs cursor-pointer">
+              <SelectItem key={j.juz} value={String(j.juz)} className="text-xs">
                 Juz {j.juz} — Surah {j.startSurah}:{j.startAyah}
               </SelectItem>
             ))}
@@ -125,7 +125,7 @@ const QuranNavigator = ({
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {HIZB_DATA.map((h) => (
-              <SelectItem key={h.hizb} value={String(h.hizb)} className="text-xs cursor-pointer">
+              <SelectItem key={h.hizb} value={String(h.hizb)} className="text-xs">
                 Hizb {h.hizb} — Surah {h.startSurah}:{h.startAyah}
               </SelectItem>
             ))}
