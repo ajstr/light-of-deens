@@ -70,16 +70,35 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           Back to Surahs
         </Button>
 
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-muted-foreground" />
-          <Label htmlFor="wbw-toggle" className="text-sm text-muted-foreground cursor-pointer">
-            Word by Word
-          </Label>
-          <Switch
-            id="wbw-toggle"
-            checked={wbwEnabled}
-            onCheckedChange={setWbwEnabled}
-          />
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Palette className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="tajweed-toggle" className="text-sm text-muted-foreground cursor-pointer">
+              Tajweed
+            </Label>
+            <Switch
+              id="tajweed-toggle"
+              checked={tajweedEnabled}
+              onCheckedChange={(v) => {
+                setTajweedEnabled(v);
+                if (v) setWbwEnabled(false);
+              }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="wbw-toggle" className="text-sm text-muted-foreground cursor-pointer">
+              Word by Word
+            </Label>
+            <Switch
+              id="wbw-toggle"
+              checked={wbwEnabled}
+              onCheckedChange={(v) => {
+                setWbwEnabled(v);
+                if (v) setTajweedEnabled(false);
+              }}
+            />
+          </div>
         </div>
       </div>
 
