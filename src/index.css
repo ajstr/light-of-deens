@@ -69,3 +69,11 @@
   background: linear-gradient(90deg, transparent, hsl(var(--gold)) 20%, hsl(var(--gold)) 80%, transparent);
   height: 1px;
 }
+
+.tajweed-text {
+  color: hsl(var(--foreground));
+}
+
+.tajweed-text span {
+  font-weight: inherit;
+}
