@@ -46,7 +46,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
     enabled: wbwEnabled,
   });
 
-  const { data: tajweedData } = useQuery({
+  const { data: tajweedData, isLoading: tajweedLoading } = useQuery({
     queryKey: ["tajweed", surah.number],
     queryFn: () => fetchTajweedText(surah.number),
     enabled: tajweedEnabled,
@@ -192,6 +192,8 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                         ))}
                       </div>
                     ) : wbwEnabled && wbwLoading ? (
+                      <div className="h-16 bg-muted animate-pulse rounded-md" />
+                    ) : tajweedEnabled && tajweedLoading ? (
                       <div className="h-16 bg-muted animate-pulse rounded-md" />
                     ) : tajweedEnabled && tajweedData?.[i] ? (
                       <p

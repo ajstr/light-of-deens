@@ -173,7 +173,13 @@ export async function fetchTajweedText(surahNumber: number): Promise<string[]> {
       `https://api.quran.com/api/v4/verses/by_chapter/${surahNumber}?fields=text_uthmani_tajweed&per_page=50&page=${page}`
     );
     const json = await res.json();
-    json.verses.forEach((v: any) => allVerses.push(v.text_uthmani_tajweed));
+    json.verses.forEach((v: any) => {
+      // Convert <tajweed class="X"> to <span class="tajweed-X"> for proper browser rendering
+      const html = (v.text_uthmani_tajweed || "")
+        .replace(/<tajweed\s+class=([^>]+)>/g, (_: string, cls: string) => `<span class="tj-${cls}">`)
+        .replace(/<\/tajweed>/g, "</span>");
+      allVerses.push(html);
+    });
     totalPages = json.pagination.total_pages;
     page++;
   }
