@@ -112,6 +112,13 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
         />
       </div>
 
+      {/* Tajweed Legend */}
+      {tajweedEnabled && (
+        <div className="mb-6">
+          <TajweedLegend />
+        </div>
+      )}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
