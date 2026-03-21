@@ -19,6 +19,7 @@ interface SurahReaderProps {
 
 const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
+  const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
