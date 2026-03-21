@@ -158,6 +158,30 @@ export async function fetchWordByWord(surahNumber: number): Promise<AyahWords[]>
   return result;
 }
 
+// Tajweed color-coded text via Quran.com API v4
+const tajweedCache = new Map<number, string[]>();
+
+export async function fetchTajweedText(surahNumber: number): Promise<string[]> {
+  if (tajweedCache.has(surahNumber)) return tajweedCache.get(surahNumber)!;
+
+  const allVerses: string[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  while (page <= totalPages) {
+    const res = await fetch(
+      `https://api.quran.com/api/v4/verses/by_chapter/${surahNumber}?fields=text_uthmani_tajweed&per_page=50&page=${page}`
+    );
+    const json = await res.json();
+    json.verses.forEach((v: any) => allVerses.push(v.text_uthmani_tajweed));
+    totalPages = json.pagination.total_pages;
+    page++;
+  }
+
+  tajweedCache.set(surahNumber, allVerses);
+  return allVerses;
+}
+
 const surahCache = new Map<number, SurahDetail>();
 
 export async function fetchSurah(number: number): Promise<SurahDetail> {

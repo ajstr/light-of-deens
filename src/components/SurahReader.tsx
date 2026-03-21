@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSurah, fetchWordByWord, Surah } from "@/lib/quran-api";
+import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import AudioPlayer from "@/components/AudioPlayer";
 import QuranNavigator from "@/components/QuranNavigator";
+import TajweedLegend from "@/components/TajweedLegend";
 
 interface SurahReaderProps {
   surah: Surah;
@@ -18,6 +19,7 @@ interface SurahReaderProps {
 
 const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
+  const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -44,6 +46,12 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
     enabled: wbwEnabled,
   });
 
+  const { data: tajweedData } = useQuery({
+    queryKey: ["tajweed", surah.number],
+    queryFn: () => fetchTajweedText(surah.number),
+    enabled: tajweedEnabled,
+  });
+
   const handleSurahChange = (surahNumber: number, ayah: number) => {
     if (onSurahChange) {
       onSurahChange(surahNumber, ayah);
@@ -62,16 +70,35 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           Back to Surahs
         </Button>
 
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-muted-foreground" />
-          <Label htmlFor="wbw-toggle" className="text-sm text-muted-foreground cursor-pointer">
-            Word by Word
-          </Label>
-          <Switch
-            id="wbw-toggle"
-            checked={wbwEnabled}
-            onCheckedChange={setWbwEnabled}
-          />
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Palette className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="tajweed-toggle" className="text-sm text-muted-foreground cursor-pointer">
+              Tajweed
+            </Label>
+            <Switch
+              id="tajweed-toggle"
+              checked={tajweedEnabled}
+              onCheckedChange={(v) => {
+                setTajweedEnabled(v);
+                if (v) setWbwEnabled(false);
+              }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="wbw-toggle" className="text-sm text-muted-foreground cursor-pointer">
+              Word by Word
+            </Label>
+            <Switch
+              id="wbw-toggle"
+              checked={wbwEnabled}
+              onCheckedChange={(v) => {
+                setWbwEnabled(v);
+                if (v) setTajweedEnabled(false);
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -84,6 +111,13 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           onSurahChange={handleSurahChange}
         />
       </div>
+
+      {/* Tajweed Legend */}
+      {tajweedEnabled && (
+        <div className="mb-6">
+          <TajweedLegend />
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -159,6 +193,12 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                       </div>
                     ) : wbwEnabled && wbwLoading ? (
                       <div className="h-16 bg-muted animate-pulse rounded-md" />
+                    ) : tajweedEnabled && tajweedData?.[i] ? (
+                      <p
+                        className="font-arabic text-2xl leading-[2.2] text-right tajweed-text"
+                        dir="rtl"
+                        dangerouslySetInnerHTML={{ __html: tajweedData[i] }}
+                      />
                     ) : (
                       <p
                         className="font-arabic text-2xl leading-[2.2] text-foreground text-right"
