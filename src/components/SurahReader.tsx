@@ -46,6 +46,12 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
     enabled: wbwEnabled,
   });
 
+  const { data: tajweedData } = useQuery({
+    queryKey: ["tajweed", surah.number],
+    queryFn: () => fetchTajweedText(surah.number),
+    enabled: tajweedEnabled,
+  });
+
   const handleSurahChange = (surahNumber: number, ayah: number) => {
     if (onSurahChange) {
       onSurahChange(surahNumber, ayah);
