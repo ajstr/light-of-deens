@@ -74,6 +74,78 @@
   color: hsl(var(--foreground));
 }
 
-.tajweed-text span {
+.tajweed-text tajweed {
   font-weight: inherit;
+}
+
+.tajweed-text tajweed.ham_wasl {
+  color: #AAAAAA;
+}
+
+.tajweed-text tajweed.laam_shamsiyah {
+  color: #AAAAAA;
+}
+
+.tajweed-text tajweed.madda_normal {
+  color: #537FFF;
+}
+
+.tajweed-text tajweed.madda_permissible {
+  color: #9400A8;
+}
+
+.tajweed-text tajweed.madda_obligatory {
+  color: #000EBC;
+}
+
+.tajweed-text tajweed.madda_munfasil {
+  color: #9400A8;
+}
+
+.tajweed-text tajweed.madda_muttasil {
+  color: #000EBC;
+}
+
+.tajweed-text tajweed.qalaqalah {
+  color: #DD0008;
+}
+
+.tajweed-text tajweed.ghunnah {
+  color: #FF7E1E;
+}
+
+.tajweed-text tajweed.ikhafa {
+  color: #D500B2;
+}
+
+.tajweed-text tajweed.ikhafa_shafawi {
+  color: #D500B2;
+}
+
+.tajweed-text tajweed.idgham_ghunnah {
+  color: #169200;
+}
+
+.tajweed-text tajweed.idgham_no_ghunnah {
+  color: #169200;
+}
+
+.tajweed-text tajweed.idgham_shafawi {
+  color: #169200;
+}
+
+.tajweed-text tajweed.idgham_mutajanisayn {
+  color: #169200;
+}
+
+.tajweed-text tajweed.idgham_mutaqaribayn {
+  color: #169200;
+}
+
+.tajweed-text tajweed.iqlab {
+  color: #26BFFD;
+}
+
+.tajweed-text tajweed.silent {
+  color: #AAAAAA;
 }
