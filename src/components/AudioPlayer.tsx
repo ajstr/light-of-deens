@@ -25,6 +25,7 @@ const AudioPlayer = ({
   totalAyahs,
   currentAyah,
   onAyahChange,
+  playTrigger,
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(7); // Mishari Rashid al-Afasy
   const [isPlaying, setIsPlaying] = useState(false);
