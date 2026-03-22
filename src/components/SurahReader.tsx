@@ -179,9 +179,18 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold shrink-0 mt-2">
-                    {ayah.numberInSurah}
-                  </span>
+                  <div className="flex flex-col items-center gap-1 shrink-0 mt-2">
+                    <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+                      {ayah.numberInSurah}
+                    </span>
+                    <button
+                      onClick={() => setPlayTrigger(prev => prev === i ? -(i + 1) : i)}
+                      className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center transition-colors"
+                      title={`Play Ayah ${ayah.numberInSurah}`}
+                    >
+                      <Play className="w-3 h-3 ml-0.5" />
+                    </button>
+                  </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
                     {wbwEnabled && verseWords ? (
