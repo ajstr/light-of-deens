@@ -240,6 +240,24 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           onAyahChange={setCurrentAyah}
         />
       )}
+
+      {/* Back to Top */}
+      {showBackToTop && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed bottom-24 right-6 z-50"
+        >
+          <Button
+            onClick={scrollToTop}
+            size="icon"
+            className="rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-12"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
+        </motion.div>
+      )}
     </div>
   );
 };
