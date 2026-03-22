@@ -22,6 +22,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
