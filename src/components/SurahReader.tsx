@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUp, BookOpen, Palette } from "lucide-react";
+import { ArrowLeft, ArrowUp, BookOpen, Palette, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -178,9 +179,18 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold shrink-0 mt-2">
-                    {ayah.numberInSurah}
-                  </span>
+                  <div className="flex flex-col items-center gap-1 shrink-0 mt-2">
+                    <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+                      {ayah.numberInSurah}
+                    </span>
+                    <button
+                      onClick={() => setPlayTrigger(prev => prev === i ? -(i + 1) : i)}
+                      className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center transition-colors"
+                      title={`Play Ayah ${ayah.numberInSurah}`}
+                    >
+                      <Play className="w-3 h-3 ml-0.5" />
+                    </button>
+                  </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
                     {wbwEnabled && verseWords ? (
@@ -238,6 +248,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           totalAyahs={surah.numberOfAyahs}
           currentAyah={currentAyah}
           onAyahChange={setCurrentAyah}
+          playTrigger={playTrigger}
         />
       )}
 

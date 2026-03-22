@@ -17,6 +17,7 @@ interface AudioPlayerProps {
   totalAyahs: number;
   currentAyah: number;
   onAyahChange: (ayah: number) => void;
+  playTrigger?: number | null; // ayah index to play, set externally
 }
 
 const AudioPlayer = ({
@@ -24,6 +25,7 @@ const AudioPlayer = ({
   totalAyahs,
   currentAyah,
   onAyahChange,
+  playTrigger,
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(7); // Mishari Rashid al-Afasy
   const [isPlaying, setIsPlaying] = useState(false);
@@ -85,6 +87,15 @@ const AudioPlayer = ({
     setIsPlaying(false);
     setProgress(0);
   }, [reciterId]);
+
+  // External play trigger (tap on ayah)
+  useEffect(() => {
+    if (playTrigger !== null && playTrigger !== undefined && audioUrls) {
+      const idx = playTrigger < 0 ? -(playTrigger + 1) : playTrigger;
+      playAyah(idx);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playTrigger]);
 
   const togglePlay = () => {
     if (isPlaying) {
