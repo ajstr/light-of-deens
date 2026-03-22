@@ -88,6 +88,14 @@ const AudioPlayer = ({
     setProgress(0);
   }, [reciterId]);
 
+  // External play trigger (tap on ayah)
+  useEffect(() => {
+    if (playTrigger !== null && playTrigger !== undefined && audioUrls) {
+      playAyah(playTrigger);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playTrigger]);
+
   const togglePlay = () => {
     if (isPlaying) {
       audioRef.current?.pause();
