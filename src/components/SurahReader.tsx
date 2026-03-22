@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, Palette } from "lucide-react";
+import { ArrowLeft, ArrowUp, BookOpen, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,18 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [currentAyah, setCurrentAyah] = useState(initialAyah);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const handleScroll = () => setShowBackToTop(window.scrollY > 400);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Reset ayah when surah changes
   useEffect(() => {
@@ -228,6 +239,24 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           currentAyah={currentAyah}
           onAyahChange={setCurrentAyah}
         />
+      )}
+
+      {/* Back to Top */}
+      {showBackToTop && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed bottom-24 right-6 z-50"
+        >
+          <Button
+            onClick={scrollToTop}
+            size="icon"
+            className="rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-12"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
+        </motion.div>
       )}
     </div>
   );
