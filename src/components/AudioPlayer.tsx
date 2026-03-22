@@ -91,7 +91,8 @@ const AudioPlayer = ({
   // External play trigger (tap on ayah)
   useEffect(() => {
     if (playTrigger !== null && playTrigger !== undefined && audioUrls) {
-      playAyah(playTrigger);
+      const idx = playTrigger < 0 ? -(playTrigger + 1) : playTrigger;
+      playAyah(idx);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playTrigger]);
