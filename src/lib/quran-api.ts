@@ -62,7 +62,7 @@ interface QuranJsonSurah {
 const DATA_URL = "https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/quran_en.json";
 
 let cachedData: QuranJsonSurah[] | null = null;
-const arabicDisplayCache = new Map<number, string[]>();
+const arabicDisplayCache = new Map<number, string[]>(); // v2 - cleared dots
 
 async function loadData(): Promise<QuranJsonSurah[]> {
   if (cachedData) return cachedData;
