@@ -71,7 +71,10 @@ const Index = () => {
           />
         );
       case "settings":
-        return <SettingsPage />;
+        return <SettingsPage onTabChange={handleTabChange} onSurahChange={(surahNum, ayah) => {
+          handleSurahChange(surahNum, ayah);
+          setActiveTab("read");
+        }} />;
       default:
         return <SurahList onSelect={handleSelect} />;
     }
