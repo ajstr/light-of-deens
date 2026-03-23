@@ -268,6 +268,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           currentAyah={currentAyah}
           onAyahChange={setCurrentAyah}
           playTrigger={playTrigger}
+          onPlayingChange={setIsAudioPlaying}
         />
       )}
 

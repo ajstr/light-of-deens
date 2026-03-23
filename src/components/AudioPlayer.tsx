@@ -30,8 +30,11 @@ const AudioPlayer = ({
   onPlayingChange,
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(7); // Mishari Rashid al-Afasy
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [isPlaying, setIsPlayingRaw] = useState(false);
+  const setIsPlaying = useCallback((v: boolean) => {
+    setIsPlayingRaw(v);
+    onPlayingChange?.(v);
+  }, [onPlayingChange]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const { data: reciters } = useQuery({
