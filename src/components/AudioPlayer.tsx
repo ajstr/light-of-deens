@@ -30,7 +30,7 @@ const AudioPlayer = ({
   playTrigger,
   onPlayingChange,
 }: AudioPlayerProps) => {
-  const [reciterId, setReciterId] = useState<number>(7); // Mishari Rashid al-Afasy
+  const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [isPlaying, setIsPlayingRaw] = useState(false);
   const setIsPlaying = useCallback((v: boolean) => {
     setIsPlayingRaw(v);
