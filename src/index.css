@@ -5,6 +5,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 @font-face {
+  font-family: 'KFGQPC Hafs';
+  src: url('/fonts/kfgqpc-hafs.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Kitab';
   src: url('/fonts/kitab.woff2') format('woff2');
   font-weight: 400;
