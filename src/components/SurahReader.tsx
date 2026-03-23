@@ -10,6 +10,7 @@ import AudioPlayer from "@/components/AudioPlayer";
 import QuranNavigator from "@/components/QuranNavigator";
 import TajweedLegend from "@/components/TajweedLegend";
 import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings } from "@/lib/storage";
+import { getFontClass } from "@/components/FontPreview";
 
 interface SurahReaderProps {
   surah: Surah;

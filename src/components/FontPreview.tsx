@@ -51,5 +51,9 @@ const FontPreview = ({ selected, onSelect }: FontPreviewProps) => {
   );
 };
 
+export function getFontClass(fontId: string): string {
+  return FONTS.find((f) => f.id === fontId)?.cssClass ?? "font-arabic";
+}
+
 export { FONTS };
 export default FontPreview;
