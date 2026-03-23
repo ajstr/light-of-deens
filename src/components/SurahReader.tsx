@@ -241,6 +241,17 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                         <Play className="w-3 h-3 ml-0.5" />
                       )}
                     </button>
+                    <button
+                      onClick={() => toggleBookmark(ayah.numberInSurah)}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                        bookmarkedAyahs.has(ayah.numberInSurah)
+                          ? "bg-accent/20 text-accent"
+                          : "bg-primary/10 hover:bg-primary/20 text-primary"
+                      }`}
+                      title={bookmarkedAyahs.has(ayah.numberInSurah) ? "Remove bookmark" : "Bookmark this ayah"}
+                    >
+                      <Bookmark className={`w-3 h-3 ${bookmarkedAyahs.has(ayah.numberInSurah) ? "fill-current" : ""}`} />
+                    </button>
                   </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
