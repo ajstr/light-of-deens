@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass } from "lucide-react";
+import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush } from "lucide-react";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchSurahs, Reciter, Surah } from "@/lib/quran-api";
 import { getSettings, saveSettings, AppSettings } from "@/lib/storage";
 import QuranNavigator from "@/components/QuranNavigator";
+import FontPreview, { FontId } from "@/components/FontPreview";
 
 const fontSizeLabels = ["Small", "Medium", "Large", "Extra Large"];
 const fontSizeClasses = ["text-xl", "text-2xl", "text-3xl", "text-4xl"];
@@ -114,7 +115,22 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
             </p>
           </div>
 
-          {/* Default Reciter */}
+          {/* Arabic Font Style */}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <div className="flex items-center gap-3 mb-3">
+              <Paintbrush className="w-5 h-5 text-primary" />
+              <div>
+                <Label className="text-foreground font-medium">Arabic Font Style</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Choose your preferred Quran text style
+                </p>
+              </div>
+            </div>
+            <FontPreview
+              selected={settings.arabicFont}
+              onSelect={(fontId: FontId) => update({ arabicFont: fontId })}
+            />
+          </div>
           <div className="bg-card rounded-lg p-4 border border-border">
             <div className="flex items-center gap-3 mb-3">
               <Volume2 className="w-5 h-5 text-primary" />

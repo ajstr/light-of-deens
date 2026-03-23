@@ -17,6 +17,7 @@ export interface AppSettings {
   fontSize: number; // 1=small, 2=medium, 3=large, 4=xlarge
   theme: "light" | "dark";
   defaultReciterId: number;
+  arabicFont: string;
 }
 
 const BOOKMARKS_KEY = "quran-bookmarks";
@@ -76,6 +77,7 @@ const defaultSettings: AppSettings = {
   fontSize: 2,
   theme: "light",
   defaultReciterId: 7,
+  arabicFont: "kfgqpc",
 };
 
 export function getSettings(): AppSettings {
