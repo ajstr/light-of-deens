@@ -10,6 +10,7 @@ import AudioPlayer from "@/components/AudioPlayer";
 import QuranNavigator from "@/components/QuranNavigator";
 import TajweedLegend from "@/components/TajweedLegend";
 import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings } from "@/lib/storage";
+import { getFontClass } from "@/components/FontPreview";
 
 interface SurahReaderProps {
   surah: Surah;
@@ -30,6 +31,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const settings = getSettings();
 
   const fontSizeClass = ["text-xl", "text-2xl", "text-3xl", "text-4xl"][settings.fontSize - 1] || "text-2xl";
+  const arabicFontClass = getFontClass(settings.arabicFont);
 
   useEffect(() => {
     const handleScroll = () => setShowBackToTop(window.scrollY > 400);
@@ -173,7 +175,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-10"
       >
-        <h2 className="font-arabic text-4xl text-primary mb-2">{surah.name}</h2>
+        <h2 className={`${arabicFontClass} text-4xl text-primary mb-2`}>{surah.name}</h2>
         <h3 className="font-display text-2xl font-semibold text-foreground mb-1">
           {surah.englishName}
         </h3>
@@ -186,7 +188,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
 
       {/* Bismillah */}
       {surah.number !== 1 && surah.number !== 9 && (
-        <p className="font-arabic text-3xl text-center text-primary mb-8 leading-loose">
+        <p className={`${arabicFontClass} text-3xl text-center text-primary mb-8 leading-loose`}>
           بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
         </p>
       )}
@@ -262,7 +264,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                             key={wi}
                             className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-md bg-primary/5 hover:bg-primary/10 transition-colors min-w-[60px]"
                           >
-                            <span className="font-arabic text-xl text-foreground leading-relaxed">
+                            <span className={`${arabicFontClass} text-xl text-foreground leading-relaxed`}>
                               {word.arabic}
                             </span>
                             <span className="text-[10px] text-muted-foreground italic" dir="ltr">
@@ -280,13 +282,13 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                       <div className="h-16 bg-muted animate-pulse rounded-md" />
                     ) : tajweedEnabled && tajweedData?.[i] ? (
                       <p
-                        className={`font-arabic ${fontSizeClass} leading-[2.2] text-right tajweed-text`}
+                        className={`${arabicFontClass} ${fontSizeClass} leading-[2.2] text-right tajweed-text`}
                         dir="rtl"
                         dangerouslySetInnerHTML={{ __html: tajweedData[i] }}
                       />
                     ) : (
                       <p
-                        className={`font-arabic ${fontSizeClass} leading-[2.2] text-foreground text-right`}
+                        className={`${arabicFontClass} ${fontSizeClass} leading-[2.2] text-foreground text-right`}
                         dir="rtl"
                       >
                         {ayah.text}
