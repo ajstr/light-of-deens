@@ -1,5 +1,6 @@
 import { fetchTanzilSurahAyahs } from "@/lib/tanzil-uthmani";
 import { normalizeDisplayedArabicText } from "@/lib/arabic-text";
+import DOMPurify from "dompurify";
 
 // Quran metadata + English translation sourced from quran-json on jsDelivr
 // Arabic verse text for the main reader sourced from Quran.com Imlaei text,
@@ -209,8 +210,12 @@ export async function fetchTajweedText(surahNumber: number): Promise<string[]> {
     page++;
   }
 
-  tajweedCache.set(surahNumber, allVerses);
-  return allVerses;
+  const sanitized = allVerses.map((html) =>
+    DOMPurify.sanitize(html, { ALLOWED_TAGS: ["span"], ALLOWED_ATTR: ["class"] })
+  );
+
+  tajweedCache.set(surahNumber, sanitized);
+  return sanitized;
 }
 
 const surahCache = new Map<number, SurahDetail>();
