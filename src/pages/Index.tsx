@@ -63,16 +63,15 @@ const Index = () => {
         return <SurahList onSelect={handleSelect} />;
       case "bookmarks":
         return (
-          <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-            <p className="text-muted-foreground font-display text-lg">Bookmarks coming soon</p>
-          </div>
+          <BookmarksPage
+            onNavigate={(surahNumber, ayahIndex) => {
+              handleSurahChange(surahNumber, ayahIndex);
+              setActiveTab("read");
+            }}
+          />
         );
       case "settings":
-        return (
-          <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-            <p className="text-muted-foreground font-display text-lg">Settings coming soon</p>
-          </div>
-        );
+        return <SettingsPage />;
       default:
         return <SurahList onSelect={handleSelect} />;
     }
