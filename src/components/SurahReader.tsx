@@ -185,13 +185,31 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                       {ayah.numberInSurah}
                     </span>
                     <button
-                      onClick={() => setPlayTrigger(prev => prev === i ? -(i + 1) : i)}
-                      className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center transition-colors"
-                      title={`Play Ayah ${ayah.numberInSurah}`}
+                      onClick={() => {
+                        if (isAudioPlaying && currentAyah === i) {
+                          // Stop: trigger a null to pause
+                          setPlayTrigger(null);
+                          // We need to stop the audio player - set trigger to a special value
+                          const audioEl = document.querySelector('audio');
+                          if (audioEl) audioEl.pause();
+                          setIsAudioPlaying(false);
+                        } else {
+                          setPlayTrigger(prev => prev === i ? -(i + 1) : i);
+                        }
+                      }}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                        isAudioPlaying && currentAyah === i
+                          ? "bg-destructive/15 hover:bg-destructive/25 text-destructive"
+                          : "bg-primary/10 hover:bg-primary/20 text-primary"
+                      }`}
+                      title={isAudioPlaying && currentAyah === i ? `Stop Ayah ${ayah.numberInSurah}` : `Play Ayah ${ayah.numberInSurah}`}
                     >
-                      <Play className="w-3 h-3 ml-0.5" />
+                      {isAudioPlaying && currentAyah === i ? (
+                        <Square className="w-3 h-3" />
+                      ) : (
+                        <Play className="w-3 h-3 ml-0.5" />
+                      )}
                     </button>
-                  </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
                     {wbwEnabled && verseWords ? (
