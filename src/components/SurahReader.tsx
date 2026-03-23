@@ -2,13 +2,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square } from "lucide-react";
+import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import AudioPlayer from "@/components/AudioPlayer";
 import QuranNavigator from "@/components/QuranNavigator";
 import TajweedLegend from "@/components/TajweedLegend";
+import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings } from "@/lib/storage";
 
 interface SurahReaderProps {
   surah: Surah;
@@ -24,7 +25,11 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const settings = getSettings();
+
+  const fontSizeClass = ["text-xl", "text-2xl", "text-3xl", "text-4xl"][settings.fontSize - 1] || "text-2xl";
 
   useEffect(() => {
     const handleScroll = () => setShowBackToTop(window.scrollY > 400);
@@ -36,10 +41,41 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Reset ayah when surah changes
+  // Reset ayah and bookmarks when surah changes
   useEffect(() => {
     setCurrentAyah(initialAyah);
+    // Load bookmarked state for this surah
+    const marked = new Set<number>();
+    for (let i = 1; i <= surah.numberOfAyahs; i++) {
+      if (isBookmarked(surah.number, i)) marked.add(i);
+    }
+    setBookmarkedAyahs(marked);
   }, [surah.number, initialAyah]);
+
+  // Save last read position
+  useEffect(() => {
+    saveLastRead(surah.number, currentAyah);
+  }, [surah.number, currentAyah]);
+
+  const toggleBookmark = (ayahNumberInSurah: number) => {
+    if (bookmarkedAyahs.has(ayahNumberInSurah)) {
+      removeBookmark(surah.number, ayahNumberInSurah);
+      setBookmarkedAyahs((prev) => {
+        const next = new Set(prev);
+        next.delete(ayahNumberInSurah);
+        return next;
+      });
+    } else {
+      addBookmark({
+        surahNumber: surah.number,
+        surahName: surah.name,
+        surahEnglishName: surah.englishName,
+        ayahNumber: ayahNumberInSurah,
+        timestamp: Date.now(),
+      });
+      setBookmarkedAyahs((prev) => new Set(prev).add(ayahNumberInSurah));
+    }
+  };
 
   useEffect(() => {
     ayahRefs.current[currentAyah]?.scrollIntoView({
@@ -205,6 +241,17 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                         <Play className="w-3 h-3 ml-0.5" />
                       )}
                     </button>
+                    <button
+                      onClick={() => toggleBookmark(ayah.numberInSurah)}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                        bookmarkedAyahs.has(ayah.numberInSurah)
+                          ? "bg-accent/20 text-accent"
+                          : "bg-primary/10 hover:bg-primary/20 text-primary"
+                      }`}
+                      title={bookmarkedAyahs.has(ayah.numberInSurah) ? "Remove bookmark" : "Bookmark this ayah"}
+                    >
+                      <Bookmark className={`w-3 h-3 ${bookmarkedAyahs.has(ayah.numberInSurah) ? "fill-current" : ""}`} />
+                    </button>
                   </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
@@ -233,13 +280,13 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                       <div className="h-16 bg-muted animate-pulse rounded-md" />
                     ) : tajweedEnabled && tajweedData?.[i] ? (
                       <p
-                        className="font-arabic text-2xl leading-[2.2] text-right tajweed-text"
+                        className={`font-arabic ${fontSizeClass} leading-[2.2] text-right tajweed-text`}
                         dir="rtl"
                         dangerouslySetInnerHTML={{ __html: tajweedData[i] }}
                       />
                     ) : (
                       <p
-                        className="font-arabic text-2xl leading-[2.2] text-foreground text-right"
+                        className={`font-arabic ${fontSizeClass} leading-[2.2] text-foreground text-right`}
                         dir="rtl"
                       >
                         {ayah.text}

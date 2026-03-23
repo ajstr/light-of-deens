@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
+import { getSettings } from "@/lib/storage";
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,7 @@ const AudioPlayer = ({
   playTrigger,
   onPlayingChange,
 }: AudioPlayerProps) => {
-  const [reciterId, setReciterId] = useState<number>(7); // Mishari Rashid al-Afasy
+  const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [isPlaying, setIsPlayingRaw] = useState(false);
   const setIsPlaying = useCallback((v: boolean) => {
     setIsPlayingRaw(v);

@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 import { Book } from "lucide-react";
 import SurahList from "@/components/SurahList";
 import SurahReader from "@/components/SurahReader";
+import BookmarksPage from "@/components/BookmarksPage";
+import SettingsPage from "@/components/SettingsPage";
 import BottomTabBar from "@/components/BottomTabBar";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
+import { saveLastRead } from "@/lib/storage";
 
 const Index = () => {
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
@@ -60,16 +63,15 @@ const Index = () => {
         return <SurahList onSelect={handleSelect} />;
       case "bookmarks":
         return (
-          <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-            <p className="text-muted-foreground font-display text-lg">Bookmarks coming soon</p>
-          </div>
+          <BookmarksPage
+            onNavigate={(surahNumber, ayahIndex) => {
+              handleSurahChange(surahNumber, ayahIndex);
+              setActiveTab("read");
+            }}
+          />
         );
       case "settings":
-        return (
-          <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-            <p className="text-muted-foreground font-display text-lg">Settings coming soon</p>
-          </div>
-        );
+        return <SettingsPage />;
       default:
         return <SurahList onSelect={handleSelect} />;
     }
