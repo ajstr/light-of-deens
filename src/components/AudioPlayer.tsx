@@ -17,7 +17,8 @@ interface AudioPlayerProps {
   totalAyahs: number;
   currentAyah: number;
   onAyahChange: (ayah: number) => void;
-  playTrigger?: number | null; // ayah index to play, set externally
+  playTrigger?: number | null;
+  onPlayingChange?: (playing: boolean) => void;
 }
 
 const AudioPlayer = ({
