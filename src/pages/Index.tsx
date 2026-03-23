@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 import { Book } from "lucide-react";
 import SurahList from "@/components/SurahList";
 import SurahReader from "@/components/SurahReader";
+import BookmarksPage from "@/components/BookmarksPage";
+import SettingsPage from "@/components/SettingsPage";
 import BottomTabBar from "@/components/BottomTabBar";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
+import { saveLastRead } from "@/lib/storage";
 
 const Index = () => {
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
