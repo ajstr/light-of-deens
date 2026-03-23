@@ -31,6 +31,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const settings = getSettings();
 
   const fontSizeClass = ["text-xl", "text-2xl", "text-3xl", "text-4xl"][settings.fontSize - 1] || "text-2xl";
+  const arabicFontClass = getFontClass(settings.arabicFont);
 
   useEffect(() => {
     const handleScroll = () => setShowBackToTop(window.scrollY > 400);
