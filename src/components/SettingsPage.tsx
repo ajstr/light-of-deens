@@ -141,6 +141,68 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Quick Links */}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <div className="flex items-center gap-3 mb-3">
+              <Compass className="w-5 h-5 text-primary" />
+              <Label className="text-foreground font-medium">Quick Navigation</Label>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: "home", label: "Home", icon: Home },
+                { id: "read", label: "Read", icon: BookOpen },
+                { id: "bookmarks", label: "Bookmarks", icon: Bookmark },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => onTabChange?.(item.id)}
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border bg-background hover:bg-accent transition-colors"
+                >
+                  <item.icon className="w-5 h-5 text-primary" />
+                  <span className="text-xs font-medium text-foreground">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Quran Navigator */}
+          {currentNavSurah && (
+            <div className="bg-card rounded-lg p-4 border border-border space-y-3">
+              <div className="flex items-center gap-3 mb-1">
+                <BookOpen className="w-5 h-5 text-primary" />
+                <Label className="text-foreground font-medium">Jump to Location</Label>
+              </div>
+              <Select
+                value={String(navSurahNumber)}
+                onValueChange={(v) => { setNavSurahNumber(Number(v)); setNavAyah(0); }}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Select Surah" />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  {surahs?.map((s) => (
+                    <SelectItem key={s.number} value={String(s.number)} className="text-xs">
+                      {s.number}. {s.englishName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <QuranNavigator
+                surah={currentNavSurah}
+                currentAyah={navAyah}
+                onAyahChange={(ayah) => {
+                  setNavAyah(ayah);
+                  onSurahChange?.(navSurahNumber, ayah);
+                }}
+                onSurahChange={(surahNum, ayah) => {
+                  setNavSurahNumber(surahNum);
+                  setNavAyah(ayah);
+                  onSurahChange?.(surahNum, ayah);
+                }}
+              />
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
