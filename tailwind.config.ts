@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        arabic: ['Amiri', 'serif'],
+        arabic: ['"Scheherazade New"', 'Amiri', 'serif'],
         display: ['Playfair Display', 'serif'],
         sans: ['Inter', 'sans-serif'],
       },
