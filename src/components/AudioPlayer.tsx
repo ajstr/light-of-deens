@@ -35,6 +35,7 @@ const AudioPlayer = ({
     setIsPlayingRaw(v);
     onPlayingChange?.(v);
   }, [onPlayingChange]);
+  const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const { data: reciters } = useQuery({
