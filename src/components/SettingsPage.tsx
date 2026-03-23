@@ -32,6 +32,16 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
     queryFn: fetchReciters,
   });
 
+  const { data: surahs } = useQuery({
+    queryKey: ["surahs"],
+    queryFn: fetchSurahs,
+  });
+
+  const [navSurahNumber, setNavSurahNumber] = useState(1);
+  const [navAyah, setNavAyah] = useState(0);
+
+  const currentNavSurah = surahs?.find((s) => s.number === navSurahNumber) ?? null;
+
   useEffect(() => {
     saveSettings(settings);
     // Apply theme
