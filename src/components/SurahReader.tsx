@@ -286,7 +286,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                       />
                     ) : (
                       <p
-                        className="font-arabic text-2xl leading-[2.2] text-foreground text-right"
+                        className={`font-arabic ${fontSizeClass} leading-[2.2] text-foreground text-right`}
                         dir="rtl"
                       >
                         {ayah.text}
