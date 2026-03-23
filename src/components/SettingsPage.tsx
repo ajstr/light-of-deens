@@ -115,7 +115,22 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
             </p>
           </div>
 
-          {/* Default Reciter */}
+          {/* Arabic Font Style */}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <div className="flex items-center gap-3 mb-3">
+              <Paintbrush className="w-5 h-5 text-primary" />
+              <div>
+                <Label className="text-foreground font-medium">Arabic Font Style</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Choose your preferred Quran text style
+                </p>
+              </div>
+            </div>
+            <FontPreview
+              selected={settings.arabicFont}
+              onSelect={(fontId: FontId) => update({ arabicFont: fontId })}
+            />
+          </div>
           <div className="bg-card rounded-lg p-4 border border-border">
             <div className="flex items-center gap-3 mb-3">
               <Volume2 className="w-5 h-5 text-primary" />
