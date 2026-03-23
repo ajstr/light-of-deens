@@ -264,7 +264,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                             key={wi}
                             className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-md bg-primary/5 hover:bg-primary/10 transition-colors min-w-[60px]"
                           >
-                            <span className="font-arabic text-xl text-foreground leading-relaxed">
+                            <span className={`${arabicFontClass} text-xl text-foreground leading-relaxed`}>
                               {word.arabic}
                             </span>
                             <span className="text-[10px] text-muted-foreground italic" dir="ltr">
