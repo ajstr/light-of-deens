@@ -112,6 +112,30 @@
 }
 
 .font-arabic {
+  font-family: 'KFGQPC Hafs', 'Amiri', serif;
+}
+
+.font-arabic-kfgqpc {
+  font-family: 'KFGQPC Hafs', serif;
+}
+
+.font-arabic-amiri-quran {
+  font-family: 'Amiri Quran', serif;
+}
+
+.font-arabic-scheherazade {
+  font-family: 'Scheherazade New', serif;
+}
+
+.font-arabic-noto {
+  font-family: 'Noto Naskh Arabic', sans-serif;
+}
+
+.font-arabic-kitab {
+  font-family: 'Kitab', serif;
+}
+
+.font-arabic-amiri {
   font-family: 'Amiri', serif;
 }
 
