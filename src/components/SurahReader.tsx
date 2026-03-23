@@ -41,10 +41,41 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Reset ayah when surah changes
+  // Reset ayah and bookmarks when surah changes
   useEffect(() => {
     setCurrentAyah(initialAyah);
+    // Load bookmarked state for this surah
+    const marked = new Set<number>();
+    for (let i = 1; i <= surah.numberOfAyahs; i++) {
+      if (isBookmarked(surah.number, i)) marked.add(i);
+    }
+    setBookmarkedAyahs(marked);
   }, [surah.number, initialAyah]);
+
+  // Save last read position
+  useEffect(() => {
+    saveLastRead(surah.number, currentAyah);
+  }, [surah.number, currentAyah]);
+
+  const toggleBookmark = (ayahNumberInSurah: number) => {
+    if (bookmarkedAyahs.has(ayahNumberInSurah)) {
+      removeBookmark(surah.number, ayahNumberInSurah);
+      setBookmarkedAyahs((prev) => {
+        const next = new Set(prev);
+        next.delete(ayahNumberInSurah);
+        return next;
+      });
+    } else {
+      addBookmark({
+        surahNumber: surah.number,
+        surahName: surah.name,
+        surahEnglishName: surah.englishName,
+        ayahNumber: ayahNumberInSurah,
+        timestamp: Date.now(),
+      });
+      setBookmarkedAyahs((prev) => new Set(prev).add(ayahNumberInSurah));
+    }
+  };
 
   useEffect(() => {
     ayahRefs.current[currentAyah]?.scrollIntoView({
