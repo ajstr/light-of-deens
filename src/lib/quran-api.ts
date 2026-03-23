@@ -240,7 +240,7 @@ export async function fetchSurah(number: number): Promise<SurahDetail> {
     revelationType: s.type.charAt(0).toUpperCase() + s.type.slice(1),
     ayahs: s.verses.map((v, index) => ({
       number: index + 1,
-      text: arabicAyahs[index] ?? v.text,
+      text: (arabicAyahs[index] ?? v.text).replace(/[\u06D6-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "").replace(/\s{2,}/g, " ").trim(),
       translation: v.translation.replace(/<[^>]*>/g, ""),
       numberInSurah: index + 1,
     })),
