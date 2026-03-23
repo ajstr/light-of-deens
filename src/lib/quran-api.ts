@@ -62,7 +62,7 @@ interface QuranJsonSurah {
 const DATA_URL = "https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/quran_en.json";
 
 let cachedData: QuranJsonSurah[] | null = null;
-const arabicDisplayCache = new Map<number, string[]>();
+const arabicDisplayCache = new Map<number, string[]>(); // v2 - cleared dots
 
 async function loadData(): Promise<QuranJsonSurah[]> {
   if (cachedData) return cachedData;
@@ -86,7 +86,10 @@ async function fetchDisplayArabicAyahs(surahNumber: number): Promise<string[]> {
 
   const json = await res.json();
   const verses = (json.verses || []).map((verse: any) =>
-    (verse.text_uthmani || "").replace(/\s*۝\s*/g, "").trim()
+    (verse.text_uthmani || "")
+      .replace(/[\u06D6-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim()
   );
 
   arabicDisplayCache.set(surahNumber, verses);
@@ -237,7 +240,7 @@ export async function fetchSurah(number: number): Promise<SurahDetail> {
     revelationType: s.type.charAt(0).toUpperCase() + s.type.slice(1),
     ayahs: s.verses.map((v, index) => ({
       number: index + 1,
-      text: arabicAyahs[index] ?? v.text,
+      text: (arabicAyahs[index] ?? v.text).replace(/[\u06D6-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "").replace(/\s{2,}/g, " ").trim(),
       translation: v.translation.replace(/<[^>]*>/g, ""),
       numberInSurah: index + 1,
     })),
