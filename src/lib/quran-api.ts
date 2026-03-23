@@ -77,16 +77,16 @@ async function fetchDisplayArabicAyahs(surahNumber: number): Promise<string[]> {
   }
 
   const res = await fetch(
-    `https://api.quran.com/api/v4/verses/by_chapter/${surahNumber}?fields=text_imlaei&per_page=300`
+    `https://api.quran.com/api/v4/verses/by_chapter/${surahNumber}?fields=text_uthmani&per_page=300`
   );
 
   if (!res.ok) {
-    throw new Error("Failed to load simplified Arabic verses");
+    throw new Error("Failed to load Uthmani Arabic verses");
   }
 
   const json = await res.json();
   const verses = (json.verses || []).map((verse: any) =>
-    normalizeDisplayedArabicText(verse.text_imlaei || "")
+    verse.text_uthmani || ""
   );
 
   arabicDisplayCache.set(surahNumber, verses);
