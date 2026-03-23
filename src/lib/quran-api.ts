@@ -205,7 +205,6 @@ export async function fetchTajweedText(surahNumber: number): Promise<string[]> {
         .replace(/<tajweed\s+class=([^>]+)>/g, (_: string, cls: string) => `<span class="tj-${cls}">`)
         .replace(/<\/tajweed>/g, "</span>");
       allVerses.push(html);
-      // Sanitize removed – replaced below
     });
     totalPages = json.pagination.total_pages;
     page++;
