@@ -188,7 +188,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
 
       {/* Bismillah */}
       {surah.number !== 1 && surah.number !== 9 && (
-        <p className="font-arabic text-3xl text-center text-primary mb-8 leading-loose">
+        <p className={`${arabicFontClass} text-3xl text-center text-primary mb-8 leading-loose`}>
           بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
         </p>
       )}
