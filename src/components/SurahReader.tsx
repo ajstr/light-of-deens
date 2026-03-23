@@ -175,7 +175,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-10"
       >
-        <h2 className="font-arabic text-4xl text-primary mb-2">{surah.name}</h2>
+        <h2 className={`${arabicFontClass} text-4xl text-primary mb-2`}>{surah.name}</h2>
         <h3 className="font-display text-2xl font-semibold text-foreground mb-1">
           {surah.englishName}
         </h3>
