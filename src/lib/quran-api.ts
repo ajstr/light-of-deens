@@ -1,7 +1,9 @@
 import { fetchTanzilSurahAyahs } from "@/lib/tanzil-uthmani";
+import { normalizeDisplayedArabicText } from "@/lib/arabic-text";
 
 // Quran metadata + English translation sourced from quran-json on jsDelivr
-// Arabic verse text sourced from Tanzil Uthmani text
+// Arabic verse text for the main reader sourced from Quran.com Imlaei text,
+// normalized for a simpler display, with Tanzil Uthmani as fallback.
 
 export interface Surah {
   number: number;
@@ -59,12 +61,35 @@ interface QuranJsonSurah {
 const DATA_URL = "https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/quran_en.json";
 
 let cachedData: QuranJsonSurah[] | null = null;
+const arabicDisplayCache = new Map<number, string[]>();
 
 async function loadData(): Promise<QuranJsonSurah[]> {
   if (cachedData) return cachedData;
   const res = await fetch(DATA_URL);
   cachedData = await res.json();
   return cachedData!;
+}
+
+async function fetchDisplayArabicAyahs(surahNumber: number): Promise<string[]> {
+  if (arabicDisplayCache.has(surahNumber)) {
+    return arabicDisplayCache.get(surahNumber)!;
+  }
+
+  const res = await fetch(
+    `https://api.quran.com/api/v4/verses/by_chapter/${surahNumber}?fields=text_imlaei&per_page=300`
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to load simplified Arabic verses");
+  }
+
+  const json = await res.json();
+  const verses = (json.verses || []).map((verse: any) =>
+    normalizeDisplayedArabicText(verse.text_imlaei || "")
+  );
+
+  arabicDisplayCache.set(surahNumber, verses);
+  return verses;
 }
 
 export async function fetchSurahs(): Promise<Surah[]> {
@@ -195,7 +220,9 @@ export async function fetchSurah(number: number): Promise<SurahDetail> {
 
   const data = await loadData();
   const s = data[number - 1];
-  const arabicAyahs = await fetchTanzilSurahAyahs(number);
+  const arabicAyahs = await fetchDisplayArabicAyahs(number).catch(() =>
+    fetchTanzilSurahAyahs(number)
+  );
 
   const result: SurahDetail = {
     number: s.id,
