@@ -77,6 +77,7 @@ const defaultSettings: AppSettings = {
   fontSize: 2,
   theme: "light",
   defaultReciterId: 7,
+  arabicFont: "kfgqpc",
 };
 
 export function getSettings(): AppSettings {
