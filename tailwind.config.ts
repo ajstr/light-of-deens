@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        arabic: ['Kitab', '"Scheherazade New"', 'Amiri', 'serif'],
+        arabic: ['"KFGQPC Hafs"', 'Kitab', '"Scheherazade New"', 'Amiri', 'serif'],
         display: ['Playfair Display', 'serif'],
         sans: ['Inter', 'sans-serif'],
       },
