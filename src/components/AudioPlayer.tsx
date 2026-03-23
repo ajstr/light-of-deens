@@ -17,7 +17,8 @@ interface AudioPlayerProps {
   totalAyahs: number;
   currentAyah: number;
   onAyahChange: (ayah: number) => void;
-  playTrigger?: number | null; // ayah index to play, set externally
+  playTrigger?: number | null;
+  onPlayingChange?: (playing: boolean) => void;
 }
 
 const AudioPlayer = ({
@@ -26,9 +27,14 @@ const AudioPlayer = ({
   currentAyah,
   onAyahChange,
   playTrigger,
+  onPlayingChange,
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(7); // Mishari Rashid al-Afasy
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlayingRaw] = useState(false);
+  const setIsPlaying = useCallback((v: boolean) => {
+    setIsPlayingRaw(v);
+    onPlayingChange?.(v);
+  }, [onPlayingChange]);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 

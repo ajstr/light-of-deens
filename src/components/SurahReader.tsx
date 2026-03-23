@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUp, BookOpen, Palette, Play } from "lucide-react";
+import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -184,11 +185,30 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                       {ayah.numberInSurah}
                     </span>
                     <button
-                      onClick={() => setPlayTrigger(prev => prev === i ? -(i + 1) : i)}
-                      className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center transition-colors"
-                      title={`Play Ayah ${ayah.numberInSurah}`}
+                      onClick={() => {
+                        if (isAudioPlaying && currentAyah === i) {
+                          // Stop: trigger a null to pause
+                          setPlayTrigger(null);
+                          // We need to stop the audio player - set trigger to a special value
+                          const audioEl = document.querySelector('audio');
+                          if (audioEl) audioEl.pause();
+                          setIsAudioPlaying(false);
+                        } else {
+                          setPlayTrigger(prev => prev === i ? -(i + 1) : i);
+                        }
+                      }}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                        isAudioPlaying && currentAyah === i
+                          ? "bg-destructive/15 hover:bg-destructive/25 text-destructive"
+                          : "bg-primary/10 hover:bg-primary/20 text-primary"
+                      }`}
+                      title={isAudioPlaying && currentAyah === i ? `Stop Ayah ${ayah.numberInSurah}` : `Play Ayah ${ayah.numberInSurah}`}
                     >
-                      <Play className="w-3 h-3 ml-0.5" />
+                      {isAudioPlaying && currentAyah === i ? (
+                        <Square className="w-3 h-3" />
+                      ) : (
+                        <Play className="w-3 h-3 ml-0.5" />
+                      )}
                     </button>
                   </div>
                   <div className="flex-1 space-y-3">
@@ -249,6 +269,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
           currentAyah={currentAyah}
           onAyahChange={setCurrentAyah}
           playTrigger={playTrigger}
+          onPlayingChange={setIsAudioPlaying}
         />
       )}
 
