@@ -280,7 +280,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                       <div className="h-16 bg-muted animate-pulse rounded-md" />
                     ) : tajweedEnabled && tajweedData?.[i] ? (
                       <p
-                        className="font-arabic text-2xl leading-[2.2] text-right tajweed-text"
+                        className={`font-arabic ${fontSizeClass} leading-[2.2] text-right tajweed-text`}
                         dir="rtl"
                         dangerouslySetInnerHTML={{ __html: tajweedData[i] }}
                       />
