@@ -86,7 +86,7 @@ async function fetchDisplayArabicAyahs(surahNumber: number): Promise<string[]> {
 
   const json = await res.json();
   const verses = (json.verses || []).map((verse: any) =>
-    verse.text_uthmani || ""
+    (verse.text_uthmani || "").replace(/\s*۝\s*/g, "").trim()
   );
 
   arabicDisplayCache.set(surahNumber, verses);
