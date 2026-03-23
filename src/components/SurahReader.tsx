@@ -25,7 +25,11 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const settings = getSettings();
+
+  const fontSizeClass = ["text-xl", "text-2xl", "text-3xl", "text-4xl"][settings.fontSize - 1] || "text-2xl";
 
   useEffect(() => {
     const handleScroll = () => setShowBackToTop(window.scrollY > 400);
