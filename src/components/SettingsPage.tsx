@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchSurahs, Reciter, Surah } from "@/lib/quran-api";
 import { getSettings, saveSettings, AppSettings } from "@/lib/storage";
 import QuranNavigator from "@/components/QuranNavigator";
+import FontPreview, { FontId } from "@/components/FontPreview";
 
 const fontSizeLabels = ["Small", "Medium", "Large", "Extra Large"];
 const fontSizeClasses = ["text-xl", "text-2xl", "text-3xl", "text-4xl"];
