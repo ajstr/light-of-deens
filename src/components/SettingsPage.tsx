@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Settings, Sun, Moon, Type, Volume2 } from "lucide-react";
+import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass } from "lucide-react";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -12,13 +12,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { fetchReciters, Reciter } from "@/lib/quran-api";
+import { fetchReciters, fetchSurahs, Reciter, Surah } from "@/lib/quran-api";
 import { getSettings, saveSettings, AppSettings } from "@/lib/storage";
+import QuranNavigator from "@/components/QuranNavigator";
 
 const fontSizeLabels = ["Small", "Medium", "Large", "Extra Large"];
 const fontSizeClasses = ["text-xl", "text-2xl", "text-3xl", "text-4xl"];
 
-const SettingsPage = () => {
+interface SettingsPageProps {
+  onTabChange?: (tab: string) => void;
+  onSurahChange?: (surahNumber: number, ayah: number) => void;
+}
+
+const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
   const [settings, setSettings] = useState<AppSettings>(getSettings);
 
   const { data: reciters } = useQuery({
