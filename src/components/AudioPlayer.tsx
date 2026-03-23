@@ -96,6 +96,13 @@ const AudioPlayer = ({
 
   // External play trigger (tap on ayah)
   useEffect(() => {
+    if (playTrigger === -Infinity) {
+      // Stop signal
+      audioRef.current?.pause();
+      setIsPlaying(false);
+      setProgress(0);
+      return;
+    }
     if (playTrigger !== null && playTrigger !== undefined && audioUrls) {
       const idx = playTrigger < 0 ? -(playTrigger + 1) : playTrigger;
       playAyah(idx);

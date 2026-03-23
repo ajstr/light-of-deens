@@ -187,12 +187,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                     <button
                       onClick={() => {
                         if (isAudioPlaying && currentAyah === i) {
-                          // Stop: trigger a null to pause
-                          setPlayTrigger(null);
-                          // We need to stop the audio player - set trigger to a special value
-                          const audioEl = document.querySelector('audio');
-                          if (audioEl) audioEl.pause();
-                          setIsAudioPlaying(false);
+                          setPlayTrigger(-Infinity); // signal stop
                         } else {
                           setPlayTrigger(prev => prev === i ? -(i + 1) : i);
                         }
