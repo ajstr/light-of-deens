@@ -210,6 +210,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                         <Play className="w-3 h-3 ml-0.5" />
                       )}
                     </button>
+                  </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
                     {wbwEnabled && verseWords ? (
