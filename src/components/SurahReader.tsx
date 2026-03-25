@@ -26,7 +26,7 @@ interface SurahReaderProps {
 const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAyah, onAyahChange, playTrigger, onPlayTriggerChange, isAudioPlaying }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
-  const [translationEnabled, setTranslationEnabled] = useState(true);
+  const [translationEnabled, setTranslationEnabled] = useState(settings.showTranslation);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
