@@ -152,6 +152,17 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
               }}
             />
           </div>
+          <div className="flex items-center gap-2">
+            <Languages className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="translation-toggle" className="text-sm text-muted-foreground cursor-pointer">
+              Translation
+            </Label>
+            <Switch
+              id="translation-toggle"
+              checked={translationEnabled}
+              onCheckedChange={setTranslationEnabled}
+            />
+          </div>
         </div>
       </div>
 
