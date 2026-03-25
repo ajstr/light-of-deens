@@ -69,6 +69,8 @@ const AudioPlayer = ({
   // "none" | "surah" | "ayah"
   const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
   const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
+  const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState("");
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
