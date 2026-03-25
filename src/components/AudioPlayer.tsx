@@ -30,6 +30,7 @@ interface AudioPlayerProps {
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
+const SLEEP_OPTIONS = [5, 10, 15, 30, 60, 90]; // minutes
 
 const formatTime = (seconds: number) => {
   if (!seconds || !isFinite(seconds)) return "0:00";
