@@ -226,9 +226,9 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                     <button
                       onClick={() => {
                         if (isAudioPlaying && currentAyah === i) {
-                          setPlayTrigger(-Infinity); // signal stop
+                          onPlayTriggerChange(-Infinity); // signal stop
                         } else {
-                          setPlayTrigger(prev => prev === i ? -(i + 1) : i);
+                          onPlayTriggerChange(playTrigger === i ? -(i + 1) : i);
                         }
                       }}
                       className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
