@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark } from "lucide-react";
+import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
