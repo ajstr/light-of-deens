@@ -1,4 +1,4 @@
-import { Home, BookOpen, Bookmark, Settings, HardDriveDownload } from "lucide-react";
+import { Home, BookOpen, Bookmark, Settings, HardDriveDownload, HandHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BottomTabBarProps {
