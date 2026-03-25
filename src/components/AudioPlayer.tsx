@@ -20,6 +20,7 @@ interface AudioPlayerProps {
   onAyahChange: (ayah: number) => void;
   playTrigger?: number | null;
   onPlayingChange?: (playing: boolean) => void;
+  surahName?: string;
 }
 
 const AudioPlayer = ({
