@@ -380,27 +380,66 @@ const AudioPlayer = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Download current ayah */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 text-xs gap-1"
-            onClick={() => {
-              if (!audioUrls || !audioUrls[currentAyah]) return;
-              const link = document.createElement("a");
-              link.href = audioUrls[currentAyah];
-              link.download = `surah-${surahNumber}-ayah-${currentAyah + 1}.mp3`;
-              link.target = "_blank";
-              link.rel = "noopener noreferrer";
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
-            title={`Download Ayah ${currentAyah + 1}`}
-          >
-            <Download className="w-3 h-3" />
-            Download
-          </Button>
+          {/* Download dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs gap-1"
+                disabled={downloading}
+              >
+                {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                {downloading ? downloadProgress : "Download"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="min-w-[140px]">
+              <DropdownMenuItem
+                className="text-xs"
+                onClick={() => {
+                  if (!audioUrls || !audioUrls[currentAyah]) return;
+                  const link = document.createElement("a");
+                  link.href = audioUrls[currentAyah];
+                  link.download = `surah-${surahNumber}-ayah-${currentAyah + 1}.mp3`;
+                  link.target = "_blank";
+                  link.rel = "noopener noreferrer";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                Current Ayah
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-xs"
+                disabled={downloading}
+                onClick={async () => {
+                  if (!audioUrls || downloading) return;
+                  setDownloading(true);
+                  try {
+                    const zip = new JSZip();
+                    for (let i = 0; i < audioUrls.length; i++) {
+                      setDownloadProgress(`${i + 1}/${audioUrls.length}`);
+                      const res = await fetch(audioUrls[i]);
+                      const blob = await res.blob();
+                      zip.file(`ayah-${String(i + 1).padStart(3, "0")}.mp3`, blob);
+                    }
+                    setDownloadProgress("Zipping…");
+                    const content = await zip.generateAsync({ type: "blob" });
+                    const reciterName = reciters?.find(r => r.id === reciterId)?.reciter_name || "reciter";
+                    saveAs(content, `surah-${surahNumber}-${reciterName.replace(/\s+/g, "-")}.zip`);
+                  } catch (e) {
+                    console.error("Download failed", e);
+                  } finally {
+                    setDownloading(false);
+                    setDownloadProgress("");
+                  }
+                }}
+              >
+                Entire Surah (ZIP)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Repeat mode */}
           <Button
