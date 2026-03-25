@@ -159,7 +159,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
         <QuranNavigator
           surah={surah}
           currentAyah={currentAyah}
-          onAyahChange={setCurrentAyah}
+          onAyahChange={onAyahChange}
           onSurahChange={handleSurahChange}
         />
       </div>
