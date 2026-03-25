@@ -277,7 +277,7 @@ const AudioPlayer = ({
           </Select>
         </div>
 
-        {/* Controls */}
+        {/* Controls row 1: playback */}
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prev}>
             <SkipBack className="w-4 h-4" />
@@ -298,7 +298,6 @@ const AudioPlayer = ({
             <SkipForward className="w-4 h-4" />
           </Button>
 
-          {/* Timer */}
           <span className="text-xs text-muted-foreground min-w-[65px] text-center tabular-nums">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
@@ -316,6 +315,13 @@ const AudioPlayer = ({
             }}
           />
 
+          <span className="text-xs text-muted-foreground min-w-[60px] text-right">
+            Ayah {currentAyah + 1}/{totalAyahs}
+          </span>
+        </div>
+
+        {/* Controls row 2: speed, sleep, repeat */}
+        <div className="flex items-center justify-center gap-3">
           {/* Speed control */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -324,7 +330,7 @@ const AudioPlayer = ({
                 {playbackSpeed}x
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[80px]">
+            <DropdownMenuContent align="center" className="min-w-[80px]">
               {SPEED_OPTIONS.map((speed) => (
                 <DropdownMenuItem
                   key={speed}
@@ -343,13 +349,13 @@ const AudioPlayer = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className={`h-7 px-2 text-xs gap-1 ${sleepMinutesLeft !== null ? "text-primary" : ""}`}
+                className={`h-7 px-2 text-xs gap-1 ${sleepMinutesLeft !== null ? "text-primary font-semibold" : ""}`}
               >
                 <Timer className="w-3 h-3" />
-                {sleepMinutesLeft !== null ? `${sleepMinutesLeft}m` : ""}
+                {sleepMinutesLeft !== null ? `${sleepMinutesLeft}m` : "Sleep"}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[100px]">
+            <DropdownMenuContent align="center" className="min-w-[100px]">
               {SLEEP_OPTIONS.map((mins) => (
                 <DropdownMenuItem
                   key={mins}
@@ -374,17 +380,13 @@ const AudioPlayer = ({
           <Button
             variant="ghost"
             size="sm"
-            className={`h-7 px-2 text-xs gap-1 ${repeatMode !== "none" ? "text-primary" : ""}`}
+            className={`h-7 px-2 text-xs gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
             onClick={cycleRepeatMode}
             title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
           >
             {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
-            {repeatMode !== "none" && <span>{repeatMode === "surah" ? "Surah" : "Ayah"}</span>}
+            {repeatMode === "none" ? "Repeat" : repeatMode === "surah" ? "Surah" : "Ayah"}
           </Button>
-
-          <span className="text-xs text-muted-foreground min-w-[60px] text-right">
-            Ayah {currentAyah + 1}/{totalAyahs}
-          </span>
         </div>
       </div>
     </div>
