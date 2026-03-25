@@ -9,6 +9,7 @@ import DownloadsPage from "@/components/DownloadsPage";
 import SettingsPage from "@/components/SettingsPage";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
+import InstallPrompt from "@/components/InstallPrompt";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
 import { saveLastRead } from "@/lib/storage";
 
@@ -125,6 +126,7 @@ const Index = () => {
         />
       )}
 
+      <InstallPrompt />
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
