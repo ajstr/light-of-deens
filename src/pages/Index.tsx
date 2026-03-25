@@ -80,6 +80,8 @@ const Index = () => {
             }}
           />
         );
+      case "downloads":
+        return <DownloadsPage />;
       case "settings":
         return <SettingsPage onTabChange={handleTabChange} onSurahChange={(surahNum, ayah) => {
           handleSurahChange(surahNum, ayah);
