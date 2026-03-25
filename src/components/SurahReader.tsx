@@ -46,7 +46,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
 
   // Reset ayah and bookmarks when surah changes
   useEffect(() => {
-    setCurrentAyah(initialAyah);
+    onAyahChange(initialAyah);
     // Load bookmarked state for this surah
     const marked = new Set<number>();
     for (let i = 1; i <= surah.numberOfAyahs; i++) {
