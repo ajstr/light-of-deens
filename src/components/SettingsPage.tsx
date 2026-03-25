@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { fetchReciters, fetchSurahs, Reciter, Surah } from "@/lib/quran-api";
+import { fetchReciters, fetchSurahs, Reciter, Surah, TRANSLATIONS } from "@/lib/quran-api";
 import { getSettings, saveSettings, AppSettings } from "@/lib/storage";
 import QuranNavigator from "@/components/QuranNavigator";
 import FontPreview, { FontId } from "@/components/FontPreview";
@@ -106,6 +106,36 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
               />
             </div>
           </div>
+
+          {/* Translation Edition */}
+          {settings.showTranslation && (
+            <div className="bg-card rounded-lg p-4 border border-border">
+              <div className="flex items-center gap-3 mb-3">
+                <Languages className="w-5 h-5 text-primary" />
+                <div>
+                  <Label className="text-foreground font-medium">Translation Edition</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Choose your preferred English translation
+                  </p>
+                </div>
+              </div>
+              <Select
+                value={String(settings.translationId)}
+                onValueChange={(v) => update({ translationId: Number(v) })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select translation" />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  {TRANSLATIONS.map((t) => (
+                    <SelectItem key={t.id} value={String(t.id)} className="text-sm">
+                      {t.name} — {t.author}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Font Size */}
           <div className="bg-card rounded-lg p-4 border border-border">

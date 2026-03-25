@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
+import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah, TRANSLATIONS } from "@/lib/quran-api";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -89,8 +89,8 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   }, [currentAyah]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["surah", surah.number],
-    queryFn: () => fetchSurah(surah.number),
+    queryKey: ["surah", surah.number, settings.translationId],
+    queryFn: () => fetchSurah(surah.number, settings.translationId),
   });
 
   const { data: wbwData, isLoading: wbwLoading } = useQuery({

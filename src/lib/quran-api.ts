@@ -61,6 +61,24 @@ interface QuranJsonSurah {
 
 const DATA_URL = "https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/quran_en.json";
 
+// Available English translations (Quran.com API resource IDs)
+export interface TranslationOption {
+  id: number; // 0 = bundled Sahih International
+  name: string;
+  author: string;
+}
+
+export const TRANSLATIONS: TranslationOption[] = [
+  { id: 0, name: "Sahih International", author: "Sahih International" },
+  { id: 131, name: "Sahih International (API)", author: "Sahih International" },
+  { id: 20, name: "Saheeh International", author: "Saheeh International" },
+  { id: 203, name: "The Clear Quran", author: "Dr. Mustafa Khattab" },
+  { id: 85, name: "Yusuf Ali", author: "Abdullah Yusuf Ali" },
+  { id: 84, name: "Maududi", author: "Abul Ala Maududi" },
+  { id: 95, name: "Muhammad Pickthall", author: "Muhammad Marmaduke Pickthall" },
+  { id: 22, name: "Muhsin Khan", author: "Muhammad Muhsin Khan" },
+];
+
 let cachedData: QuranJsonSurah[] | null = null;
 const arabicDisplayCache = new Map<number, string[]>(); // v2 - cleared dots
 
@@ -221,16 +239,54 @@ export async function fetchTajweedText(surahNumber: number): Promise<string[]> {
   return sanitized;
 }
 
-const surahCache = new Map<number, SurahDetail>();
+const surahCache = new Map<string, SurahDetail>();
+const translationCache = new Map<string, string[]>();
 
-export async function fetchSurah(number: number): Promise<SurahDetail> {
-  if (surahCache.has(number)) return surahCache.get(number)!;
+// Fetch translation text from Quran.com API
+async function fetchApiTranslation(surahNumber: number, translationId: number): Promise<string[]> {
+  const key = `${translationId}-${surahNumber}`;
+  if (translationCache.has(key)) return translationCache.get(key)!;
+
+  const allTranslations: string[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  while (page <= totalPages) {
+    const res = await fetch(
+      `https://api.quran.com/api/v4/verses/by_chapter/${surahNumber}?translations=${translationId}&per_page=50&page=${page}`
+    );
+    const json = await res.json();
+    json.verses.forEach((v: any) => {
+      const t = v.translations?.[0]?.text || "";
+      allTranslations.push(t.replace(/<[^>]*>/g, "").replace(/<sup[^>]*>.*?<\/sup>/g, ""));
+    });
+    totalPages = json.pagination.total_pages;
+    page++;
+  }
+
+  translationCache.set(key, allTranslations);
+  return allTranslations;
+}
+
+export async function fetchSurah(number: number, translationId: number = 0): Promise<SurahDetail> {
+  const cacheKey = `${number}-${translationId}`;
+  if (surahCache.has(cacheKey)) return surahCache.get(cacheKey)!;
 
   const data = await loadData();
   const s = data[number - 1];
   const arabicAyahs = await fetchDisplayArabicAyahs(number).catch(() =>
     fetchTanzilSurahAyahs(number)
   );
+
+  // Get translations - use bundled for id=0, otherwise fetch from API
+  let translations: string[] | null = null;
+  if (translationId > 0) {
+    try {
+      translations = await fetchApiTranslation(number, translationId);
+    } catch {
+      // Fall back to bundled
+    }
+  }
 
   const result: SurahDetail = {
     number: s.id,
@@ -241,11 +297,11 @@ export async function fetchSurah(number: number): Promise<SurahDetail> {
     ayahs: s.verses.map((v, index) => ({
       number: index + 1,
       text: (arabicAyahs[index] ?? v.text).replace(/[\u06D6-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "").replace(/\s{2,}/g, " ").trim(),
-      translation: v.translation.replace(/<[^>]*>/g, ""),
+      translation: translations?.[index] ?? v.translation.replace(/<[^>]*>/g, ""),
       numberInSurah: index + 1,
     })),
   };
 
-  surahCache.set(number, result);
+  surahCache.set(cacheKey, result);
   return result;
 }
