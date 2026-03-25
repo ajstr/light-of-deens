@@ -88,6 +88,25 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
             </div>
           </div>
 
+          {/* Translation Toggle */}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Languages className="w-5 h-5 text-primary" />
+                <div>
+                  <Label className="text-foreground font-medium">Show Translation</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {settings.showTranslation ? "English translation visible" : "Translation hidden"}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={settings.showTranslation}
+                onCheckedChange={(v) => update({ showTranslation: v })}
+              />
+            </div>
+          </div>
+
           {/* Font Size */}
           <div className="bg-card rounded-lg p-4 border border-border">
             <div className="flex items-center gap-3 mb-4">
