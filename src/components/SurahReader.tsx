@@ -160,7 +160,10 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
             <Switch
               id="translation-toggle"
               checked={translationEnabled}
-              onCheckedChange={setTranslationEnabled}
+              onCheckedChange={(v) => {
+                setTranslationEnabled(v);
+                saveSettings({ ...settings, showTranslation: v });
+              }}
             />
           </div>
         </div>
