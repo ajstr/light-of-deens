@@ -323,6 +323,39 @@ const AudioPlayer = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Sleep timer */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-7 px-2 text-xs gap-1 ${sleepMinutesLeft !== null ? "text-primary" : ""}`}
+              >
+                <Timer className="w-3 h-3" />
+                {sleepMinutesLeft !== null ? `${sleepMinutesLeft}m` : ""}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[100px]">
+              {SLEEP_OPTIONS.map((mins) => (
+                <DropdownMenuItem
+                  key={mins}
+                  onClick={() => startSleepTimer(mins)}
+                  className="text-xs justify-center"
+                >
+                  {mins} min
+                </DropdownMenuItem>
+              ))}
+              {sleepMinutesLeft !== null && (
+                <DropdownMenuItem
+                  onClick={cancelSleepTimer}
+                  className="text-xs justify-center text-destructive"
+                >
+                  Cancel timer
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <span className="text-xs text-muted-foreground min-w-[60px] text-right">
             Ayah {currentAyah + 1}/{totalAyahs}
           </span>
