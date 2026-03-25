@@ -16,6 +16,11 @@ interface SurahReaderProps {
   onBack: () => void;
   onSurahChange?: (surahNumber: number, ayah: number) => void;
   initialAyah?: number;
+  currentAyah: number;
+  onAyahChange: (ayah: number) => void;
+  playTrigger: number | null;
+  onPlayTriggerChange: (trigger: number | null) => void;
+  isAudioPlaying: boolean;
 }
 
 const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahReaderProps) => {
