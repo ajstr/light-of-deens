@@ -81,6 +81,7 @@ const defaultSettings: AppSettings = {
   defaultReciterId: 7,
   arabicFont: "kfgqpc",
   showTranslation: true,
+  translationId: 0, // 0 = bundled Sahih International
 };
 
 export function getSettings(): AppSettings {

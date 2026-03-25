@@ -61,6 +61,24 @@ interface QuranJsonSurah {
 
 const DATA_URL = "https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/quran_en.json";
 
+// Available English translations (Quran.com API resource IDs)
+export interface TranslationOption {
+  id: number; // 0 = bundled Sahih International
+  name: string;
+  author: string;
+}
+
+export const TRANSLATIONS: TranslationOption[] = [
+  { id: 0, name: "Sahih International", author: "Sahih International" },
+  { id: 131, name: "Sahih International (API)", author: "Sahih International" },
+  { id: 20, name: "Saheeh International", author: "Saheeh International" },
+  { id: 203, name: "The Clear Quran", author: "Dr. Mustafa Khattab" },
+  { id: 85, name: "Yusuf Ali", author: "Abdullah Yusuf Ali" },
+  { id: 84, name: "Maududi", author: "Abul Ala Maududi" },
+  { id: 95, name: "Muhammad Pickthall", author: "Muhammad Marmaduke Pickthall" },
+  { id: 22, name: "Muhsin Khan", author: "Muhammad Muhsin Khan" },
+];
+
 let cachedData: QuranJsonSurah[] | null = null;
 const arabicDisplayCache = new Map<number, string[]>(); // v2 - cleared dots
 
