@@ -19,6 +19,7 @@ export interface AppSettings {
   defaultReciterId: number;
   arabicFont: string;
   showTranslation: boolean;
+  translationId: number; // Quran.com translation resource ID
 }
 
 const BOOKMARKS_KEY = "quran-bookmarks";
