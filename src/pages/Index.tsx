@@ -7,6 +7,7 @@ import SurahReader from "@/components/SurahReader";
 import BookmarksPage from "@/components/BookmarksPage";
 import SettingsPage from "@/components/SettingsPage";
 import BottomTabBar from "@/components/BottomTabBar";
+import AudioPlayer from "@/components/AudioPlayer";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
 import { saveLastRead } from "@/lib/storage";
 
