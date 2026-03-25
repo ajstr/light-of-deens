@@ -2,7 +2,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
-import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer, Repeat, Repeat1, Download } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer, Repeat, Repeat1, Download, Loader2 } from "lucide-react";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import {
   Select,
