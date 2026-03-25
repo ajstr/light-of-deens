@@ -376,6 +376,28 @@ const AudioPlayer = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Download current ayah */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs gap-1"
+            onClick={() => {
+              if (!audioUrls || !audioUrls[currentAyah]) return;
+              const link = document.createElement("a");
+              link.href = audioUrls[currentAyah];
+              link.download = `surah-${surahNumber}-ayah-${currentAyah + 1}.mp3`;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+            title={`Download Ayah ${currentAyah + 1}`}
+          >
+            <Download className="w-3 h-3" />
+            Download
+          </Button>
+
           {/* Repeat mode */}
           <Button
             variant="ghost"
