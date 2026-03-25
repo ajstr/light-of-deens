@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -12,6 +12,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AudioPlayerProps {
   surahNumber: number;
@@ -22,6 +28,15 @@ interface AudioPlayerProps {
   onPlayingChange?: (playing: boolean) => void;
   surahName?: string;
 }
+
+const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
+
+const formatTime = (seconds: number) => {
+  if (!seconds || !isFinite(seconds)) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+};
 
 const AudioPlayer = ({
   surahNumber,
@@ -39,8 +54,12 @@ const AudioPlayer = ({
     onPlayingChange?.(v);
   }, [onPlayingChange]);
   const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const togglePlayRef = useRef<() => void>(() => {});
+  const speedRef = useRef(1);
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
@@ -59,9 +78,16 @@ const AudioPlayer = ({
         audioRef.current.pause();
       }
       const audio = new Audio(audioUrls[index]);
+      audio.playbackRate = speedRef.current;
       audioRef.current = audio;
+      audio.addEventListener("loadedmetadata", () => {
+        setDuration(audio.duration);
+      });
       audio.addEventListener("timeupdate", () => {
-        if (audio.duration) setProgress((audio.currentTime / audio.duration) * 100);
+        if (audio.duration) {
+          setProgress((audio.currentTime / audio.duration) * 100);
+          setCurrentTime(audio.currentTime);
+        }
       });
       audio.addEventListener("ended", () => {
         if (index + 1 < audioUrls.length) {
@@ -69,13 +95,14 @@ const AudioPlayer = ({
         } else {
           setIsPlaying(false);
           setProgress(0);
+          setCurrentTime(0);
+          setDuration(0);
         }
       });
       audio.play();
       setIsPlaying(true);
       onAyahChange(index);
 
-      // Media Session API for background playback
       if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: `Ayah ${index + 1}`,
@@ -113,20 +140,21 @@ const AudioPlayer = ({
     };
   }, []);
 
-  // Stop when reciter changes
   useEffect(() => {
     audioRef.current?.pause();
     setIsPlaying(false);
     setProgress(0);
+    setCurrentTime(0);
+    setDuration(0);
   }, [reciterId]);
 
-  // External play trigger (tap on ayah)
   useEffect(() => {
     if (playTrigger === -Infinity) {
-      // Stop signal
       audioRef.current?.pause();
       setIsPlaying(false);
       setProgress(0);
+      setCurrentTime(0);
+      setDuration(0);
       return;
     }
     if (playTrigger !== null && playTrigger !== undefined && audioUrls) {
@@ -149,6 +177,14 @@ const AudioPlayer = ({
   useEffect(() => {
     togglePlayRef.current = togglePlay;
   }, [togglePlay]);
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+    speedRef.current = speed;
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  };
 
   const prev = () => {
     if (currentAyah > 0) {
@@ -208,6 +244,12 @@ const AudioPlayer = ({
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={next}>
             <SkipForward className="w-4 h-4" />
           </Button>
+
+          {/* Timer */}
+          <span className="text-xs text-muted-foreground min-w-[65px] text-center tabular-nums">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+
           <Slider
             value={[progress]}
             max={100}
@@ -220,6 +262,28 @@ const AudioPlayer = ({
               }
             }}
           />
+
+          {/* Speed control */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
+                <Gauge className="w-3 h-3" />
+                {playbackSpeed}x
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[80px]">
+              {SPEED_OPTIONS.map((speed) => (
+                <DropdownMenuItem
+                  key={speed}
+                  onClick={() => handleSpeedChange(speed)}
+                  className={`text-xs justify-center ${speed === playbackSpeed ? "bg-accent font-semibold" : ""}`}
+                >
+                  {speed}x
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <span className="text-xs text-muted-foreground min-w-[60px] text-right">
             Ayah {currentAyah + 1}/{totalAyahs}
           </span>
