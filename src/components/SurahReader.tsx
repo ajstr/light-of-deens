@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import QuranNavigator from "@/components/QuranNavigator";
 import TajweedLegend from "@/components/TajweedLegend";
-import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings } from "@/lib/storage";
+import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings } from "@/lib/storage";
 import { getFontClass } from "@/components/FontPreview";
 
 interface SurahReaderProps {
