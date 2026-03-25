@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import QuranNavigator from "@/components/QuranNavigator";
 import TajweedLegend from "@/components/TajweedLegend";
-import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings } from "@/lib/storage";
+import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings } from "@/lib/storage";
 import { getFontClass } from "@/components/FontPreview";
 
 interface SurahReaderProps {
@@ -24,13 +24,13 @@ interface SurahReaderProps {
 }
 
 const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAyah, onAyahChange, playTrigger, onPlayTriggerChange, isAudioPlaying }: SurahReaderProps) => {
+  const settings = getSettings();
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
-  const [translationEnabled, setTranslationEnabled] = useState(true);
+  const [translationEnabled, setTranslationEnabled] = useState(settings.showTranslation);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const settings = getSettings();
 
   const fontSizeClass = ["text-xl", "text-2xl", "text-3xl", "text-4xl"][settings.fontSize - 1] || "text-2xl";
   const arabicFontClass = getFontClass(settings.arabicFont);
@@ -160,7 +160,10 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
             <Switch
               id="translation-toggle"
               checked={translationEnabled}
-              onCheckedChange={setTranslationEnabled}
+              onCheckedChange={(v) => {
+                setTranslationEnabled(v);
+                saveSettings({ ...settings, showTranslation: v });
+              }}
             />
           </div>
         </div>
