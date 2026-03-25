@@ -15,6 +15,9 @@ const Index = () => {
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
   const [initialAyah, setInitialAyah] = useState(0);
   const [activeTab, setActiveTab] = useState("home");
+  const [currentAyah, setCurrentAyah] = useState(0);
+  const [playTrigger, setPlayTrigger] = useState<number | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const { data: surahs } = useQuery({
     queryKey: ["surahs"],
