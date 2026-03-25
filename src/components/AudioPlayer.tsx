@@ -40,6 +40,7 @@ const AudioPlayer = ({
   }, [onPlayingChange]);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const togglePlayRef = useRef<() => void>(() => {});
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
