@@ -370,6 +370,18 @@ const AudioPlayer = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Repeat mode */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`h-7 px-2 text-xs gap-1 ${repeatMode !== "none" ? "text-primary" : ""}`}
+            onClick={cycleRepeatMode}
+            title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
+          >
+            {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
+            {repeatMode !== "none" && <span>{repeatMode === "surah" ? "Surah" : "Ayah"}</span>}
+          </Button>
+
           <span className="text-xs text-muted-foreground min-w-[60px] text-right">
             Ayah {currentAyah + 1}/{totalAyahs}
           </span>
