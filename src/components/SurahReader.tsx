@@ -309,9 +309,11 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                     )}
 
                     {/* Full verse translation */}
-                    <p className="text-muted-foreground text-sm leading-relaxed border-t border-border/50 pt-3">
-                      {ayah.translation}
-                    </p>
+                    {translationEnabled && (
+                      <p className="text-muted-foreground text-sm leading-relaxed border-t border-border/50 pt-3">
+                        {ayah.translation}
+                      </p>
+                    )}
                   </div>
                 </div>
               </motion.div>
