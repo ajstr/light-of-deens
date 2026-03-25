@@ -83,6 +83,8 @@ const Index = () => {
             }}
           />
         );
+      case "duas":
+        return <DuaPage />;
       case "downloads":
         return <DownloadsPage />;
       case "settings":
