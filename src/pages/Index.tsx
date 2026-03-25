@@ -7,6 +7,7 @@ import SurahReader from "@/components/SurahReader";
 import BookmarksPage from "@/components/BookmarksPage";
 import SettingsPage from "@/components/SettingsPage";
 import BottomTabBar from "@/components/BottomTabBar";
+import AudioPlayer from "@/components/AudioPlayer";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
 import { saveLastRead } from "@/lib/storage";
 
@@ -14,6 +15,9 @@ const Index = () => {
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
   const [initialAyah, setInitialAyah] = useState(0);
   const [activeTab, setActiveTab] = useState("home");
+  const [currentAyah, setCurrentAyah] = useState(0);
+  const [playTrigger, setPlayTrigger] = useState<number | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const { data: surahs } = useQuery({
     queryKey: ["surahs"],
@@ -57,6 +61,11 @@ const Index = () => {
               }}
               onSurahChange={handleSurahChange}
               initialAyah={initialAyah}
+              currentAyah={currentAyah}
+              onAyahChange={setCurrentAyah}
+              playTrigger={playTrigger}
+              onPlayTriggerChange={setPlayTrigger}
+              isAudioPlaying={isAudioPlaying}
             />
           );
         }
@@ -100,6 +109,18 @@ const Index = () => {
       </header>
 
       {renderContent()}
+
+      {selectedSurah && (
+        <AudioPlayer
+          surahNumber={selectedSurah.number}
+          totalAyahs={selectedSurah.numberOfAyahs}
+          currentAyah={currentAyah}
+          onAyahChange={setCurrentAyah}
+          playTrigger={playTrigger}
+          onPlayingChange={setIsAudioPlaying}
+          surahName={selectedSurah.englishName}
+        />
+      )}
 
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>

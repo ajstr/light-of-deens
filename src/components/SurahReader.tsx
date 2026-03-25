@@ -6,7 +6,6 @@ import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark } from "l
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import AudioPlayer from "@/components/AudioPlayer";
 import QuranNavigator from "@/components/QuranNavigator";
 import TajweedLegend from "@/components/TajweedLegend";
 import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings } from "@/lib/storage";
@@ -17,15 +16,17 @@ interface SurahReaderProps {
   onBack: () => void;
   onSurahChange?: (surahNumber: number, ayah: number) => void;
   initialAyah?: number;
+  currentAyah: number;
+  onAyahChange: (ayah: number) => void;
+  playTrigger: number | null;
+  onPlayTriggerChange: (trigger: number | null) => void;
+  isAudioPlaying: boolean;
 }
 
-const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahReaderProps) => {
+const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAyah, onAyahChange, playTrigger, onPlayTriggerChange, isAudioPlaying }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
-  const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [playTrigger, setPlayTrigger] = useState<number | null>(null);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
   const settings = getSettings();
@@ -45,7 +46,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
 
   // Reset ayah and bookmarks when surah changes
   useEffect(() => {
-    setCurrentAyah(initialAyah);
+    onAyahChange(initialAyah);
     // Load bookmarked state for this surah
     const marked = new Set<number>();
     for (let i = 1; i <= surah.numberOfAyahs; i++) {
@@ -158,7 +159,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
         <QuranNavigator
           surah={surah}
           currentAyah={currentAyah}
-          onAyahChange={setCurrentAyah}
+          onAyahChange={onAyahChange}
           onSurahChange={handleSurahChange}
         />
       </div>
@@ -225,9 +226,9 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
                     <button
                       onClick={() => {
                         if (isAudioPlaying && currentAyah === i) {
-                          setPlayTrigger(-Infinity); // signal stop
+                          onPlayTriggerChange(-Infinity); // signal stop
                         } else {
-                          setPlayTrigger(prev => prev === i ? -(i + 1) : i);
+                          onPlayTriggerChange(playTrigger === i ? -(i + 1) : i);
                         }
                       }}
                       className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
@@ -305,16 +306,6 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahRea
             );
           })}
         </div>
-      )}
-      {data && (
-        <AudioPlayer
-          surahNumber={surah.number}
-          totalAyahs={surah.numberOfAyahs}
-          currentAyah={currentAyah}
-          onAyahChange={setCurrentAyah}
-          playTrigger={playTrigger}
-          onPlayingChange={setIsAudioPlaying}
-        />
       )}
 
       {/* Back to Top */}

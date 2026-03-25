@@ -20,6 +20,7 @@ interface AudioPlayerProps {
   onAyahChange: (ayah: number) => void;
   playTrigger?: number | null;
   onPlayingChange?: (playing: boolean) => void;
+  surahName?: string;
 }
 
 const AudioPlayer = ({
@@ -29,6 +30,7 @@ const AudioPlayer = ({
   onAyahChange,
   playTrigger,
   onPlayingChange,
+  surahName,
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [isPlaying, setIsPlayingRaw] = useState(false);
@@ -38,6 +40,7 @@ const AudioPlayer = ({
   }, [onPlayingChange]);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const togglePlayRef = useRef<() => void>(() => {});
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
@@ -71,8 +74,30 @@ const AudioPlayer = ({
       audio.play();
       setIsPlaying(true);
       onAyahChange(index);
+
+      // Media Session API for background playback
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `Ayah ${index + 1}`,
+          artist: surahName || `Surah ${surahNumber}`,
+          album: "The Noble Quran",
+        });
+        navigator.mediaSession.playbackState = "playing";
+        navigator.mediaSession.setActionHandler("play", () => togglePlayRef.current());
+        navigator.mediaSession.setActionHandler("pause", () => {
+          audioRef.current?.pause();
+          setIsPlaying(false);
+          if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+        });
+        navigator.mediaSession.setActionHandler("previoustrack", () => {
+          if (index > 0) playAyah(index - 1);
+        });
+        navigator.mediaSession.setActionHandler("nexttrack", () => {
+          if (audioUrls && index + 1 < audioUrls.length) playAyah(index + 1);
+        });
+      }
     },
-    [audioUrls, onAyahChange]
+    [audioUrls, onAyahChange, surahName, surahNumber]
   );
 
   useEffect(() => {
@@ -111,14 +136,19 @@ const AudioPlayer = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playTrigger]);
 
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     if (isPlaying) {
       audioRef.current?.pause();
       setIsPlaying(false);
+      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
     } else {
       if (audioUrls) playAyah(currentAyah);
     }
-  };
+  }, [isPlaying, audioUrls, currentAyah, playAyah, setIsPlaying]);
+
+  useEffect(() => {
+    togglePlayRef.current = togglePlay;
+  }, [togglePlay]);
 
   const prev = () => {
     if (currentAyah > 0) {
