@@ -61,6 +61,9 @@ const AudioPlayer = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const togglePlayRef = useRef<() => void>(() => {});
   const speedRef = useRef(1);
+  const [sleepMinutesLeft, setSleepMinutesLeft] = useState<number | null>(null);
+  const sleepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sleepEndRef = useRef<number | null>(null);
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
