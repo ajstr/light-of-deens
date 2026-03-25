@@ -1,4 +1,4 @@
-import { Home, BookOpen, Bookmark, Settings, HardDriveDownload } from "lucide-react";
+import { Home, BookOpen, Bookmark, Settings, HardDriveDownload, HandHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BottomTabBarProps {
@@ -9,6 +9,7 @@ interface BottomTabBarProps {
 const tabs = [
   { id: "home", label: "Home", icon: Home },
   { id: "read", label: "Read", icon: BookOpen },
+  { id: "duas", label: "Duas", icon: HandHeart },
   { id: "downloads", label: "Offline", icon: HardDriveDownload },
   { id: "bookmarks", label: "Bookmarks", icon: Bookmark },
   { id: "settings", label: "Settings", icon: Settings },
