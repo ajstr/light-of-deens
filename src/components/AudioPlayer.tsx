@@ -64,6 +64,9 @@ const AudioPlayer = ({
   const [sleepMinutesLeft, setSleepMinutesLeft] = useState<number | null>(null);
   const sleepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sleepEndRef = useRef<number | null>(null);
+  // "none" | "surah" | "ayah"
+  const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
+  const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
