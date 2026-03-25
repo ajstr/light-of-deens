@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
-import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer, Repeat, Repeat1 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -64,6 +64,9 @@ const AudioPlayer = ({
   const [sleepMinutesLeft, setSleepMinutesLeft] = useState<number | null>(null);
   const sleepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sleepEndRef = useRef<number | null>(null);
+  // "none" | "surah" | "ayah"
+  const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
+  const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
@@ -94,8 +97,13 @@ const AudioPlayer = ({
         }
       });
       audio.addEventListener("ended", () => {
-        if (index + 1 < audioUrls.length) {
+        if (repeatModeRef.current === "ayah") {
+          playAyah(index);
+        } else if (index + 1 < audioUrls.length) {
           onAyahChange(index + 1);
+        } else if (repeatModeRef.current === "surah") {
+          onAyahChange(0);
+          playAyah(0);
         } else {
           setIsPlaying(false);
           setProgress(0);
@@ -231,6 +239,12 @@ const AudioPlayer = ({
     setSleepMinutesLeft(null);
   };
 
+  const cycleRepeatMode = () => {
+    const next = repeatMode === "none" ? "surah" : repeatMode === "surah" ? "ayah" : "none";
+    setRepeatMode(next);
+    repeatModeRef.current = next;
+  };
+
   useEffect(() => {
     return () => {
       if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
@@ -355,6 +369,18 @@ const AudioPlayer = ({
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Repeat mode */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`h-7 px-2 text-xs gap-1 ${repeatMode !== "none" ? "text-primary" : ""}`}
+            onClick={cycleRepeatMode}
+            title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
+          >
+            {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
+            {repeatMode !== "none" && <span>{repeatMode === "surah" ? "Surah" : "Ayah"}</span>}
+          </Button>
 
           <span className="text-xs text-muted-foreground min-w-[60px] text-right">
             Ayah {currentAyah + 1}/{totalAyahs}
