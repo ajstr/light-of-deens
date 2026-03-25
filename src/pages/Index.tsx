@@ -116,6 +116,7 @@ const Index = () => {
         <div className="ornament-divider mt-4 mx-auto max-w-xs" />
       </header>
 
+      {activeTab === "home" && <DailyDua />}
       {renderContent()}
 
       {selectedSurah && (
