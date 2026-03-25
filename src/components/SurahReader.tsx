@@ -89,8 +89,8 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   }, [currentAyah]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["surah", surah.number],
-    queryFn: () => fetchSurah(surah.number),
+    queryKey: ["surah", surah.number, settings.translationId],
+    queryFn: () => fetchSurah(surah.number, settings.translationId),
   });
 
   const { data: wbwData, isLoading: wbwLoading } = useQuery({

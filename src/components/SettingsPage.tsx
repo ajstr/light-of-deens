@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { fetchReciters, fetchSurahs, Reciter, Surah } from "@/lib/quran-api";
+import { fetchReciters, fetchSurahs, Reciter, Surah, TRANSLATIONS } from "@/lib/quran-api";
 import { getSettings, saveSettings, AppSettings } from "@/lib/storage";
 import QuranNavigator from "@/components/QuranNavigator";
 import FontPreview, { FontId } from "@/components/FontPreview";
