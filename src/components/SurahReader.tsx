@@ -23,14 +23,12 @@ interface SurahReaderProps {
   isAudioPlaying: boolean;
 }
 
-const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0 }: SurahReaderProps) => {
+const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAyah, onAyahChange, playTrigger, onPlayTriggerChange, isAudioPlaying }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
-  const [currentAyah, setCurrentAyah] = useState(initialAyah);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [playTrigger, setPlayTrigger] = useState<number | null>(null);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
+  const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
   const settings = getSettings();
 
