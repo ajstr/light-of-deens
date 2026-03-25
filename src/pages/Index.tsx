@@ -7,6 +7,8 @@ import SurahReader from "@/components/SurahReader";
 import BookmarksPage from "@/components/BookmarksPage";
 import DownloadsPage from "@/components/DownloadsPage";
 import SettingsPage from "@/components/SettingsPage";
+import DuaPage from "@/components/DuaPage";
+import DailyDua from "@/components/DailyDua";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
