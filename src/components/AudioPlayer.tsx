@@ -73,8 +73,30 @@ const AudioPlayer = ({
       audio.play();
       setIsPlaying(true);
       onAyahChange(index);
+
+      // Media Session API for background playback
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `Ayah ${index + 1}`,
+          artist: surahName || `Surah ${surahNumber}`,
+          album: "The Noble Quran",
+        });
+        navigator.mediaSession.playbackState = "playing";
+        navigator.mediaSession.setActionHandler("play", () => togglePlayRef.current());
+        navigator.mediaSession.setActionHandler("pause", () => {
+          audioRef.current?.pause();
+          setIsPlaying(false);
+          if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+        });
+        navigator.mediaSession.setActionHandler("previoustrack", () => {
+          if (index > 0) playAyah(index - 1);
+        });
+        navigator.mediaSession.setActionHandler("nexttrack", () => {
+          if (audioUrls && index + 1 < audioUrls.length) playAyah(index + 1);
+        });
+      }
     },
-    [audioUrls, onAyahChange]
+    [audioUrls, onAyahChange, surahName, surahNumber]
   );
 
   useEffect(() => {
