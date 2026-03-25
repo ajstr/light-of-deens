@@ -2,23 +2,22 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
-import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer, Repeat, Repeat1, Download, Loader2 } from "lucide-react";
+import {
+  Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
+  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff
+} from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import {
+  getAudioBlob, downloadSurahForOffline, isSurahDownloaded, deleteSurahAudio
+} from "@/lib/offline-audio";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 interface AudioPlayerProps {
@@ -32,7 +31,7 @@ interface AudioPlayerProps {
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
-const SLEEP_OPTIONS = [5, 10, 15, 30, 60, 90]; // minutes
+const SLEEP_OPTIONS = [5, 10, 15, 30, 60, 90];
 
 const formatTime = (seconds: number) => {
   if (!seconds || !isFinite(seconds)) return "0:00";
@@ -42,13 +41,8 @@ const formatTime = (seconds: number) => {
 };
 
 const AudioPlayer = ({
-  surahNumber,
-  totalAyahs,
-  currentAyah,
-  onAyahChange,
-  playTrigger,
-  onPlayingChange,
-  surahName,
+  surahNumber, totalAyahs, currentAyah, onAyahChange,
+  playTrigger, onPlayingChange, surahName,
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [isPlaying, setIsPlayingRaw] = useState(false);
@@ -66,11 +60,16 @@ const AudioPlayer = ({
   const [sleepMinutesLeft, setSleepMinutesLeft] = useState<number | null>(null);
   const sleepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sleepEndRef = useRef<number | null>(null);
-  // "none" | "surah" | "ayah"
   const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
   const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState("");
+  const [isOfflineAvailable, setIsOfflineAvailable] = useState(false);
+
+  // Check offline availability when surah/reciter changes
+  useEffect(() => {
+    isSurahDownloaded(surahNumber, reciterId).then(setIsOfflineAvailable);
+  }, [surahNumber, reciterId]);
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
@@ -82,18 +81,32 @@ const AudioPlayer = ({
     queryFn: () => fetchAudioUrls(surahNumber, reciterId),
   });
 
+  /** Get audio source — prefer offline cache, fall back to URL */
+  const getAudioSource = useCallback(async (index: number): Promise<string | null> => {
+    if (!audioUrls || index < 0 || index >= audioUrls.length) return null;
+    // Try offline cache first
+    try {
+      const blob = await getAudioBlob(surahNumber, index, reciterId);
+      if (blob) return URL.createObjectURL(blob);
+    } catch {
+      // Fall through to online
+    }
+    return audioUrls[index];
+  }, [audioUrls, surahNumber, reciterId]);
+
   const playAyah = useCallback(
-    (index: number) => {
+    async (index: number) => {
       if (!audioUrls || index < 0 || index >= audioUrls.length) return;
       if (audioRef.current) {
         audioRef.current.pause();
       }
-      const audio = new Audio(audioUrls[index]);
+      const src = await getAudioSource(index);
+      if (!src) return;
+
+      const audio = new Audio(src);
       audio.playbackRate = speedRef.current;
       audioRef.current = audio;
-      audio.addEventListener("loadedmetadata", () => {
-        setDuration(audio.duration);
-      });
+      audio.addEventListener("loadedmetadata", () => setDuration(audio.duration));
       audio.addEventListener("timeupdate", () => {
         if (audio.duration) {
           setProgress((audio.currentTime / audio.duration) * 100);
@@ -101,6 +114,8 @@ const AudioPlayer = ({
         }
       });
       audio.addEventListener("ended", () => {
+        // Revoke blob URL if it was one
+        if (src.startsWith("blob:")) URL.revokeObjectURL(src);
         if (repeatModeRef.current === "ayah") {
           playAyah(index);
         } else if (index + 1 < audioUrls.length) {
@@ -140,7 +155,7 @@ const AudioPlayer = ({
         });
       }
     },
-    [audioUrls, onAyahChange, surahName, surahNumber]
+    [audioUrls, onAyahChange, surahName, surahNumber, getAudioSource]
   );
 
   useEffect(() => {
@@ -151,9 +166,7 @@ const AudioPlayer = ({
   }, [currentAyah]);
 
   useEffect(() => {
-    return () => {
-      audioRef.current?.pause();
-    };
+    return () => { audioRef.current?.pause(); };
   }, []);
 
   useEffect(() => {
@@ -190,29 +203,16 @@ const AudioPlayer = ({
     }
   }, [isPlaying, audioUrls, currentAyah, playAyah, setIsPlaying]);
 
-  useEffect(() => {
-    togglePlayRef.current = togglePlay;
-  }, [togglePlay]);
+  useEffect(() => { togglePlayRef.current = togglePlay; }, [togglePlay]);
 
   const handleSpeedChange = (speed: number) => {
     setPlaybackSpeed(speed);
     speedRef.current = speed;
-    if (audioRef.current) {
-      audioRef.current.playbackRate = speed;
-    }
+    if (audioRef.current) audioRef.current.playbackRate = speed;
   };
 
-  const prev = () => {
-    if (currentAyah > 0) {
-      playAyah(currentAyah - 1);
-    }
-  };
-
-  const next = () => {
-    if (audioUrls && currentAyah < audioUrls.length - 1) {
-      playAyah(currentAyah + 1);
-    }
-  };
+  const prev = () => { if (currentAyah > 0) playAyah(currentAyah - 1); };
+  const next = () => { if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1); };
 
   const startSleepTimer = (minutes: number) => {
     if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
@@ -222,7 +222,6 @@ const AudioPlayer = ({
       const remaining = Math.max(0, Math.ceil(((sleepEndRef.current || 0) - Date.now()) / 60000));
       setSleepMinutesLeft(remaining);
       if (remaining <= 0) {
-        // Stop audio
         audioRef.current?.pause();
         setIsPlaying(false);
         setProgress(0);
@@ -249,10 +248,60 @@ const AudioPlayer = ({
     repeatModeRef.current = next;
   };
 
+  const handleSaveOffline = async () => {
+    if (!audioUrls || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadSurahForOffline(surahNumber, reciterId, audioUrls, (done, total) => {
+        setDownloadProgress(`${done}/${total}`);
+      });
+      setIsOfflineAvailable(true);
+    } catch (e) {
+      console.error("Offline save failed", e);
+    } finally {
+      setDownloading(false);
+      setDownloadProgress("");
+    }
+  };
+
+  const handleRemoveOffline = async () => {
+    try {
+      await deleteSurahAudio(surahNumber, reciterId, totalAyahs);
+      setIsOfflineAvailable(false);
+    } catch (e) {
+      console.error("Delete failed", e);
+    }
+  };
+
+  const handleDownloadZip = async () => {
+    if (!audioUrls || downloading) return;
+    setDownloading(true);
+    try {
+      const zip = new JSZip();
+      for (let i = 0; i < audioUrls.length; i++) {
+        setDownloadProgress(`${i + 1}/${audioUrls.length}`);
+        // Prefer cached blob
+        let blob = await getAudioBlob(surahNumber, i, reciterId);
+        if (!blob) {
+          const res = await fetch(audioUrls[i]);
+          blob = await res.blob();
+        }
+        zip.file(`ayah-${String(i + 1).padStart(3, "0")}.mp3`, blob);
+      }
+      setDownloadProgress("Zipping…");
+      const content = await zip.generateAsync({ type: "blob" });
+      const reciterName = reciters?.find(r => r.id === reciterId)?.reciter_name || "reciter";
+      saveAs(content, `surah-${surahNumber}-${reciterName.replace(/\s+/g, "-")}.zip`);
+    } catch (e) {
+      console.error("Download failed", e);
+    } finally {
+      setDownloading(false);
+      setDownloadProgress("");
+    }
+  };
+
   useEffect(() => {
-    return () => {
-      if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
-    };
+    return () => { if (sleepTimerRef.current) clearInterval(sleepTimerRef.current); };
   }, []);
 
   const displayName = (r: Reciter) =>
@@ -264,10 +313,12 @@ const AudioPlayer = ({
         {/* Reciter selector */}
         <div className="flex items-center gap-3">
           <Volume2 className="w-4 h-4 text-muted-foreground shrink-0" />
-          <Select
-            value={String(reciterId)}
-            onValueChange={(v) => setReciterId(Number(v))}
-          >
+          {isOfflineAvailable && (
+            <span className="flex items-center gap-1 text-[10px] text-primary shrink-0">
+              <WifiOff className="w-3 h-3" /> Offline
+            </span>
+          )}
+          <Select value={String(reciterId)} onValueChange={(v) => setReciterId(Number(v))}>
             <SelectTrigger className="flex-1 h-8 text-xs">
               <SelectValue placeholder="Select reciter" />
             </SelectTrigger>
@@ -286,17 +337,8 @@ const AudioPlayer = ({
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prev}>
             <SkipBack className="w-4 h-4" />
           </Button>
-          <Button
-            variant="default"
-            size="icon"
-            className="h-9 w-9 rounded-full"
-            onClick={togglePlay}
-          >
-            {isPlaying ? (
-              <Pause className="w-4 h-4" />
-            ) : (
-              <Play className="w-4 h-4 ml-0.5" />
-            )}
+          <Button variant="default" size="icon" className="h-9 w-9 rounded-full" onClick={togglePlay}>
+            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={next}>
             <SkipForward className="w-4 h-4" />
@@ -307,10 +349,7 @@ const AudioPlayer = ({
           </span>
 
           <Slider
-            value={[progress]}
-            max={100}
-            step={0.1}
-            className="flex-1"
+            value={[progress]} max={100} step={0.1} className="flex-1"
             onValueChange={([v]) => {
               if (audioRef.current && audioRef.current.duration) {
                 audioRef.current.currentTime = (v / 100) * audioRef.current.duration;
@@ -324,9 +363,8 @@ const AudioPlayer = ({
           </span>
         </div>
 
-        {/* Controls row 2: speed, sleep, repeat */}
+        {/* Controls row 2: speed, sleep, download, repeat */}
         <div className="flex items-center justify-center gap-3">
-          {/* Speed control */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
@@ -347,12 +385,10 @@ const AudioPlayer = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Sleep timer */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="ghost"
-                size="sm"
+                variant="ghost" size="sm"
                 className={`h-7 px-2 text-xs gap-1 ${sleepMinutesLeft !== null ? "text-primary font-semibold" : ""}`}
               >
                 <Timer className="w-3 h-3" />
@@ -361,90 +397,62 @@ const AudioPlayer = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="min-w-[100px]">
               {SLEEP_OPTIONS.map((mins) => (
-                <DropdownMenuItem
-                  key={mins}
-                  onClick={() => startSleepTimer(mins)}
-                  className="text-xs justify-center"
-                >
+                <DropdownMenuItem key={mins} onClick={() => startSleepTimer(mins)} className="text-xs justify-center">
                   {mins} min
                 </DropdownMenuItem>
               ))}
               {sleepMinutesLeft !== null && (
-                <DropdownMenuItem
-                  onClick={cancelSleepTimer}
-                  className="text-xs justify-center text-destructive"
-                >
+                <DropdownMenuItem onClick={cancelSleepTimer} className="text-xs justify-center text-destructive">
                   Cancel timer
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Download dropdown */}
+          {/* Download & Offline */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs gap-1"
+                variant="ghost" size="sm"
+                className={`h-7 px-2 text-xs gap-1 ${isOfflineAvailable ? "text-primary font-semibold" : ""}`}
                 disabled={downloading}
               >
                 {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                {downloading ? downloadProgress : "Download"}
+                {downloading ? downloadProgress : isOfflineAvailable ? "Saved" : "Download"}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="min-w-[140px]">
-              <DropdownMenuItem
-                className="text-xs"
-                onClick={() => {
-                  if (!audioUrls || !audioUrls[currentAyah]) return;
-                  const link = document.createElement("a");
-                  link.href = audioUrls[currentAyah];
-                  link.download = `surah-${surahNumber}-ayah-${currentAyah + 1}.mp3`;
-                  link.target = "_blank";
-                  link.rel = "noopener noreferrer";
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
-              >
-                Current Ayah
+            <DropdownMenuContent align="center" className="min-w-[160px]">
+              <DropdownMenuItem className="text-xs gap-2" onClick={() => {
+                if (!audioUrls || !audioUrls[currentAyah]) return;
+                const link = document.createElement("a");
+                link.href = audioUrls[currentAyah];
+                link.download = `surah-${surahNumber}-ayah-${currentAyah + 1}.mp3`;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}>
+                <Download className="w-3 h-3" /> Current Ayah
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs"
-                disabled={downloading}
-                onClick={async () => {
-                  if (!audioUrls || downloading) return;
-                  setDownloading(true);
-                  try {
-                    const zip = new JSZip();
-                    for (let i = 0; i < audioUrls.length; i++) {
-                      setDownloadProgress(`${i + 1}/${audioUrls.length}`);
-                      const res = await fetch(audioUrls[i]);
-                      const blob = await res.blob();
-                      zip.file(`ayah-${String(i + 1).padStart(3, "0")}.mp3`, blob);
-                    }
-                    setDownloadProgress("Zipping…");
-                    const content = await zip.generateAsync({ type: "blob" });
-                    const reciterName = reciters?.find(r => r.id === reciterId)?.reciter_name || "reciter";
-                    saveAs(content, `surah-${surahNumber}-${reciterName.replace(/\s+/g, "-")}.zip`);
-                  } catch (e) {
-                    console.error("Download failed", e);
-                  } finally {
-                    setDownloading(false);
-                    setDownloadProgress("");
-                  }
-                }}
-              >
-                Entire Surah (ZIP)
+              <DropdownMenuItem className="text-xs gap-2" disabled={downloading} onClick={handleDownloadZip}>
+                <Download className="w-3 h-3" /> Surah as ZIP
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {isOfflineAvailable ? (
+                <DropdownMenuItem className="text-xs gap-2 text-destructive" onClick={handleRemoveOffline}>
+                  <Trash2 className="w-3 h-3" /> Remove offline data
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem className="text-xs gap-2" disabled={downloading} onClick={handleSaveOffline}>
+                  <HardDriveDownload className="w-3 h-3" /> Save for offline
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Repeat mode */}
           <Button
-            variant="ghost"
-            size="sm"
+            variant="ghost" size="sm"
             className={`h-7 px-2 text-xs gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
             onClick={cycleRepeatMode}
             title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
