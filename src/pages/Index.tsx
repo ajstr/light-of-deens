@@ -5,6 +5,7 @@ import { Book } from "lucide-react";
 import SurahList from "@/components/SurahList";
 import SurahReader from "@/components/SurahReader";
 import BookmarksPage from "@/components/BookmarksPage";
+import DownloadsPage from "@/components/DownloadsPage";
 import SettingsPage from "@/components/SettingsPage";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -79,6 +80,8 @@ const Index = () => {
             }}
           />
         );
+      case "downloads":
+        return <DownloadsPage />;
       case "settings":
         return <SettingsPage onTabChange={handleTabChange} onSurahChange={(surahNum, ayah) => {
           handleSurahChange(surahNum, ayah);
