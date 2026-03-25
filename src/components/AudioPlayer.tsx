@@ -149,7 +149,6 @@ const AudioPlayer = ({
   useEffect(() => {
     togglePlayRef.current = togglePlay;
   }, [togglePlay]);
-  };
 
   const prev = () => {
     if (currentAyah > 0) {
