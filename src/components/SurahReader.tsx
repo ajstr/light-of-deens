@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark } from "lucide-react";
+import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,7 @@ interface SurahReaderProps {
 const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAyah, onAyahChange, playTrigger, onPlayTriggerChange, isAudioPlaying }: SurahReaderProps) => {
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
+  const [translationEnabled, setTranslationEnabled] = useState(true);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -149,6 +150,17 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                 setWbwEnabled(v);
                 if (v) setTajweedEnabled(false);
               }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Languages className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="translation-toggle" className="text-sm text-muted-foreground cursor-pointer">
+              Translation
+            </Label>
+            <Switch
+              id="translation-toggle"
+              checked={translationEnabled}
+              onCheckedChange={setTranslationEnabled}
             />
           </div>
         </div>
@@ -297,9 +309,11 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                     )}
 
                     {/* Full verse translation */}
-                    <p className="text-muted-foreground text-sm leading-relaxed border-t border-border/50 pt-3">
-                      {ayah.translation}
-                    </p>
+                    {translationEnabled && (
+                      <p className="text-muted-foreground text-sm leading-relaxed border-t border-border/50 pt-3">
+                        {ayah.translation}
+                      </p>
+                    )}
                   </div>
                 </div>
               </motion.div>
