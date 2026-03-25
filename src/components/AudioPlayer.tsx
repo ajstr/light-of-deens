@@ -239,6 +239,12 @@ const AudioPlayer = ({
     setSleepMinutesLeft(null);
   };
 
+  const cycleRepeatMode = () => {
+    const next = repeatMode === "none" ? "surah" : repeatMode === "surah" ? "ayah" : "none";
+    setRepeatMode(next);
+    repeatModeRef.current = next;
+  };
+
   useEffect(() => {
     return () => {
       if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
