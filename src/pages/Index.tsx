@@ -105,6 +105,18 @@ const Index = () => {
 
       {renderContent()}
 
+      {selectedSurah && (
+        <AudioPlayer
+          surahNumber={selectedSurah.number}
+          totalAyahs={selectedSurah.numberOfAyahs}
+          currentAyah={currentAyah}
+          onAyahChange={setCurrentAyah}
+          playTrigger={playTrigger}
+          onPlayingChange={setIsAudioPlaying}
+          surahName={selectedSurah.englishName}
+        />
+      )}
+
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
