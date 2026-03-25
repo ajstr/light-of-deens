@@ -126,6 +126,7 @@ const Index = () => {
         />
       )}
 
+      <InstallPrompt />
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
