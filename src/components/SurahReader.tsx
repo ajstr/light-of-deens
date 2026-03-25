@@ -307,16 +307,6 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
           })}
         </div>
       )}
-      {data && (
-        <AudioPlayer
-          surahNumber={surah.number}
-          totalAyahs={surah.numberOfAyahs}
-          currentAyah={currentAyah}
-          onAyahChange={setCurrentAyah}
-          playTrigger={playTrigger}
-          onPlayingChange={setIsAudioPlaying}
-        />
-      )}
 
       {/* Back to Top */}
       {showBackToTop && (
