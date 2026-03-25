@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
-import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -30,6 +30,7 @@ interface AudioPlayerProps {
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
+const SLEEP_OPTIONS = [5, 10, 15, 30, 60, 90]; // minutes
 
 const formatTime = (seconds: number) => {
   if (!seconds || !isFinite(seconds)) return "0:00";
@@ -60,6 +61,9 @@ const AudioPlayer = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const togglePlayRef = useRef<() => void>(() => {});
   const speedRef = useRef(1);
+  const [sleepMinutesLeft, setSleepMinutesLeft] = useState<number | null>(null);
+  const sleepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sleepEndRef = useRef<number | null>(null);
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
@@ -198,6 +202,41 @@ const AudioPlayer = ({
     }
   };
 
+  const startSleepTimer = (minutes: number) => {
+    if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+    sleepEndRef.current = Date.now() + minutes * 60 * 1000;
+    setSleepMinutesLeft(minutes);
+    sleepTimerRef.current = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil(((sleepEndRef.current || 0) - Date.now()) / 60000));
+      setSleepMinutesLeft(remaining);
+      if (remaining <= 0) {
+        // Stop audio
+        audioRef.current?.pause();
+        setIsPlaying(false);
+        setProgress(0);
+        setCurrentTime(0);
+        setDuration(0);
+        setSleepMinutesLeft(null);
+        sleepEndRef.current = null;
+        if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+        sleepTimerRef.current = null;
+      }
+    }, 10000);
+  };
+
+  const cancelSleepTimer = () => {
+    if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+    sleepTimerRef.current = null;
+    sleepEndRef.current = null;
+    setSleepMinutesLeft(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+    };
+  }, []);
+
   const displayName = (r: Reciter) =>
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
 
@@ -281,6 +320,39 @@ const AudioPlayer = ({
                   {speed}x
                 </DropdownMenuItem>
               ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Sleep timer */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-7 px-2 text-xs gap-1 ${sleepMinutesLeft !== null ? "text-primary" : ""}`}
+              >
+                <Timer className="w-3 h-3" />
+                {sleepMinutesLeft !== null ? `${sleepMinutesLeft}m` : ""}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[100px]">
+              {SLEEP_OPTIONS.map((mins) => (
+                <DropdownMenuItem
+                  key={mins}
+                  onClick={() => startSleepTimer(mins)}
+                  className="text-xs justify-center"
+                >
+                  {mins} min
+                </DropdownMenuItem>
+              ))}
+              {sleepMinutesLeft !== null && (
+                <DropdownMenuItem
+                  onClick={cancelSleepTimer}
+                  className="text-xs justify-center text-destructive"
+                >
+                  Cancel timer
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
