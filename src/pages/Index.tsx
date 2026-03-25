@@ -61,6 +61,11 @@ const Index = () => {
               }}
               onSurahChange={handleSurahChange}
               initialAyah={initialAyah}
+              currentAyah={currentAyah}
+              onAyahChange={setCurrentAyah}
+              playTrigger={playTrigger}
+              onPlayTriggerChange={setPlayTrigger}
+              isAudioPlaying={isAudioPlaying}
             />
           );
         }

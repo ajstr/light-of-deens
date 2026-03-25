@@ -136,13 +136,19 @@ const AudioPlayer = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playTrigger]);
 
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     if (isPlaying) {
       audioRef.current?.pause();
       setIsPlaying(false);
+      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
     } else {
       if (audioUrls) playAyah(currentAyah);
     }
+  }, [isPlaying, audioUrls, currentAyah, playAyah, setIsPlaying]);
+
+  useEffect(() => {
+    togglePlayRef.current = togglePlay;
+  }, [togglePlay]);
   };
 
   const prev = () => {
