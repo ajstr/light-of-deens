@@ -30,6 +30,7 @@ const AudioPlayer = ({
   onAyahChange,
   playTrigger,
   onPlayingChange,
+  surahName,
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [isPlaying, setIsPlayingRaw] = useState(false);
