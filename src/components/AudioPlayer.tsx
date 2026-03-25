@@ -202,6 +202,41 @@ const AudioPlayer = ({
     }
   };
 
+  const startSleepTimer = (minutes: number) => {
+    if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+    sleepEndRef.current = Date.now() + minutes * 60 * 1000;
+    setSleepMinutesLeft(minutes);
+    sleepTimerRef.current = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil(((sleepEndRef.current || 0) - Date.now()) / 60000));
+      setSleepMinutesLeft(remaining);
+      if (remaining <= 0) {
+        // Stop audio
+        audioRef.current?.pause();
+        setIsPlaying(false);
+        setProgress(0);
+        setCurrentTime(0);
+        setDuration(0);
+        setSleepMinutesLeft(null);
+        sleepEndRef.current = null;
+        if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+        sleepTimerRef.current = null;
+      }
+    }, 10000);
+  };
+
+  const cancelSleepTimer = () => {
+    if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+    sleepTimerRef.current = null;
+    sleepEndRef.current = null;
+    setSleepMinutesLeft(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+    };
+  }, []);
+
   const displayName = (r: Reciter) =>
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
 
