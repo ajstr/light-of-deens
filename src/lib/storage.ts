@@ -18,6 +18,7 @@ export interface AppSettings {
   theme: "light" | "dark";
   defaultReciterId: number;
   arabicFont: string;
+  showTranslation: boolean;
 }
 
 const BOOKMARKS_KEY = "quran-bookmarks";
