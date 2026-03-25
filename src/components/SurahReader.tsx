@@ -6,7 +6,6 @@ import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark } from "l
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import AudioPlayer from "@/components/AudioPlayer";
 import QuranNavigator from "@/components/QuranNavigator";
 import TajweedLegend from "@/components/TajweedLegend";
 import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings } from "@/lib/storage";
