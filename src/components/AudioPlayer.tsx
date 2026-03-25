@@ -97,8 +97,13 @@ const AudioPlayer = ({
         }
       });
       audio.addEventListener("ended", () => {
-        if (index + 1 < audioUrls.length) {
+        if (repeatModeRef.current === "ayah") {
+          playAyah(index);
+        } else if (index + 1 < audioUrls.length) {
           onAyahChange(index + 1);
+        } else if (repeatModeRef.current === "surah") {
+          onAyahChange(0);
+          playAyah(0);
         } else {
           setIsPlaying(false);
           setProgress(0);
