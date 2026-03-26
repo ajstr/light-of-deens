@@ -30,6 +30,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   const [translationEnabled, setTranslationEnabled] = useState(settings.showTranslation);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
+  const [highlightedAyah, setHighlightedAyah] = useState<number | null>(null);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const fontSizeClass = ["text-xl", "text-2xl", "text-3xl", "text-4xl"][settings.fontSize - 1] || "text-2xl";
