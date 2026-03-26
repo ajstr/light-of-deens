@@ -273,6 +273,16 @@ const DownloadsPage = () => {
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-9 w-9 text-primary hover:bg-primary/10 shrink-0"
+                        disabled={exporting === key || isDeleting}
+                        onClick={() => handleExportSurah(entry)}
+                        title="Export as MP3 (ZIP)"
+                      >
+                        {exporting === key ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="h-9 w-9 text-destructive hover:bg-destructive/10 shrink-0"
                         disabled={isDeleting}
                         onClick={() => handleDelete(entry)}
