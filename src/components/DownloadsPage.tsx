@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { HardDriveDownload, Trash2, WifiOff, Music, Download, Loader2, X } from "lucide-react";
+import { HardDriveDownload, Trash2, WifiOff, Music, Download, Loader2, X, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getDownloadedSurahs, deleteSurahAudio, downloadSurahForOffline, isSurahDownloaded } from "@/lib/offline-audio";
+import { getDownloadedSurahs, deleteSurahAudio, downloadSurahForOffline, isSurahDownloaded, getAudioBlob } from "@/lib/offline-audio";
 import { fetchSurahs, fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
