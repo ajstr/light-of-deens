@@ -28,6 +28,8 @@ const DownloadsPage = () => {
   const [bulkReciterId, setBulkReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 114, surahName: "", ayahsDone: 0, ayahsTotal: 0 });
   const cancelRef = useRef(false);
+  const [exporting, setExporting] = useState<string | null>(null);
+  const [exportProgress, setExportProgress] = useState("");
 
   const { data: surahs } = useQuery({ queryKey: ["surahs"], queryFn: fetchSurahs });
   const { data: reciters } = useQuery({ queryKey: ["reciters"], queryFn: fetchReciters });
