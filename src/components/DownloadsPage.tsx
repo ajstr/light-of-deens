@@ -296,14 +296,23 @@ const DownloadsPage = () => {
             </div>
 
             {downloads.length > 1 && (
-              <div className="text-center">
+              <div className="flex items-center justify-center gap-3">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  disabled={!!exporting}
+                  onClick={handleExportAll}
+                >
+                  {exporting === "all" ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                  {exporting === "all" ? `Exporting ${exportProgress}` : "Export All as MP3"}
+                </Button>
                 <Button
                   variant="outline"
                   className="text-destructive border-destructive/30 hover:bg-destructive/10"
                   onClick={handleDeleteAll}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Remove All Downloads
+                  Remove All
                 </Button>
               </div>
             )}
