@@ -230,9 +230,10 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: Math.min(i * 0.03, 1) }}
-                className={`bg-card rounded-lg p-6 group transition-colors ${
+                className={`bg-card rounded-lg p-6 group transition-all duration-300 cursor-pointer ${
                   currentAyah === i ? "ring-2 ring-primary/30" : ""
-                }`}
+                } ${highlightedAyah === i ? "bg-primary/10 shadow-md" : ""}`}
+                onClick={() => setHighlightedAyah(highlightedAyah === i ? null : i)}
               >
                 <div className="flex items-start gap-4">
                   <div className="flex flex-col items-center gap-1 shrink-0 mt-2">
