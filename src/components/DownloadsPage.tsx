@@ -54,6 +54,56 @@ const DownloadsPage = () => {
     await loadDownloads();
   };
 
+  const handleDownloadAll = useCallback(async () => {
+    if (!surahs || bulkDownloading) return;
+    setBulkDownloading(true);
+    setBulkCancelled(false);
+    const cancelledRef = { current: false };
+
+    // We need a ref-like approach since state won't update in the loop
+    const checkCancelled = () => cancelledRef.current;
+
+    try {
+      for (let i = 0; i < surahs.length; i++) {
+        if (checkCancelled()) break;
+        const surah = surahs[i];
+        const alreadyDownloaded = await isSurahDownloaded(surah.number, bulkReciterId);
+        if (alreadyDownloaded) {
+          setBulkProgress(p => ({ ...p, current: i + 1, surahName: surah.englishName, ayahsDone: surah.numberOfAyahs, ayahsTotal: surah.numberOfAyahs }));
+          continue;
+        }
+
+        setBulkProgress({ current: i, total: surahs.length, surahName: surah.englishName, ayahsDone: 0, ayahsTotal: surah.numberOfAyahs });
+
+        const audioUrls = await fetchAudioUrls(surah.number, bulkReciterId);
+        if (checkCancelled()) break;
+
+        await downloadSurahForOffline(surah.number, bulkReciterId, audioUrls, (done, total) => {
+          setBulkProgress(p => ({ ...p, current: i, ayahsDone: done, ayahsTotal: total }));
+        });
+        setBulkProgress(p => ({ ...p, current: i + 1 }));
+      }
+    } catch (e) {
+      console.error("Bulk download failed", e);
+    } finally {
+      setBulkDownloading(false);
+      await loadDownloads();
+    }
+
+    // Expose cancel mechanism
+    setBulkCancelled(false);
+    // Store cancel fn on window for the cancel button
+    (window as any).__cancelBulkDownload = () => { cancelledRef.current = true; setBulkCancelled(true); };
+  }, [surahs, bulkReciterId, bulkDownloading]);
+
+  // Wrap handleDownloadAll to set up cancel before starting
+  const startBulkDownload = useCallback(() => {
+    // Reset
+    const cancelledRef = { current: false };
+    (window as any).__cancelBulkDownload = () => { cancelledRef.current = true; setBulkCancelled(true); };
+    handleDownloadAll();
+  }, [handleDownloadAll]);
+
   const getSurahName = (num: number) => {
     const s = surahs?.find((s) => s.number === num);
     return s ? `${s.englishName} (${s.name})` : `Surah ${num}`;
