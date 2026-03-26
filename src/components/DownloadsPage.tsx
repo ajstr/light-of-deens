@@ -105,6 +105,62 @@ const DownloadsPage = () => {
   const displayName = (r: Reciter) =>
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
 
+  const handleExportSurah = async (entry: DownloadEntry) => {
+    const key = `${entry.reciterId}-${entry.surahNumber}`;
+    if (exporting) return;
+    setExporting(key);
+    try {
+      const zip = new JSZip();
+      for (let i = 0; i < entry.totalAyahs; i++) {
+        setExportProgress(`${i + 1}/${entry.totalAyahs}`);
+        const blob = await getAudioBlob(entry.surahNumber, i, entry.reciterId);
+        if (blob) {
+          zip.file(`ayah-${String(i + 1).padStart(3, "0")}.mp3`, blob);
+        }
+      }
+      setExportProgress("Zipping…");
+      const content = await zip.generateAsync({ type: "blob" });
+      const reciterName = getReciterName(entry.reciterId).replace(/\s+/g, "-");
+      const surahName = surahs?.find(s => s.number === entry.surahNumber)?.englishName || `surah-${entry.surahNumber}`;
+      saveAs(content, `${surahName.replace(/\s+/g, "-")}-${reciterName}.zip`);
+    } catch (e) {
+      console.error("Export failed", e);
+    } finally {
+      setExporting(null);
+      setExportProgress("");
+    }
+  };
+
+  const handleExportAll = async () => {
+    if (exporting || downloads.length === 0) return;
+    setExporting("all");
+    try {
+      const zip = new JSZip();
+      let totalAyahs = downloads.reduce((a, d) => a + d.totalAyahs, 0);
+      let done = 0;
+      for (const entry of downloads) {
+        const surahName = surahs?.find(s => s.number === entry.surahNumber)?.englishName || `surah-${entry.surahNumber}`;
+        const folder = zip.folder(`${String(entry.surahNumber).padStart(3, "0")}-${surahName.replace(/\s+/g, "-")}`)!;
+        for (let i = 0; i < entry.totalAyahs; i++) {
+          done++;
+          setExportProgress(`${done}/${totalAyahs}`);
+          const blob = await getAudioBlob(entry.surahNumber, i, entry.reciterId);
+          if (blob) {
+            folder.file(`ayah-${String(i + 1).padStart(3, "0")}.mp3`, blob);
+          }
+        }
+      }
+      setExportProgress("Zipping…");
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, `quran-audio-export.zip`);
+    } catch (e) {
+      console.error("Bulk export failed", e);
+    } finally {
+      setExporting(null);
+      setExportProgress("");
+    }
+  };
+
   const estimatedSize = downloads.reduce((acc, d) => acc + d.totalAyahs * 0.3, 0);
   const overallPercent = bulkProgress.total > 0
     ? ((bulkProgress.current + (bulkProgress.ayahsTotal > 0 ? bulkProgress.ayahsDone / bulkProgress.ayahsTotal : 0)) / bulkProgress.total) * 100
