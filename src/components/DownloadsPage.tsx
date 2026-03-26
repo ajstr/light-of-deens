@@ -22,6 +22,10 @@ const DownloadsPage = () => {
   const [downloads, setDownloads] = useState<DownloadEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [bulkDownloading, setBulkDownloading] = useState(false);
+  const [bulkReciterId, setBulkReciterId] = useState<number>(() => getSettings().defaultReciterId);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 114, surahName: "", ayahsDone: 0, ayahsTotal: 0 });
+  const [bulkCancelled, setBulkCancelled] = useState(false);
 
   const { data: surahs } = useQuery({ queryKey: ["surahs"], queryFn: fetchSurahs });
   const { data: reciters } = useQuery({ queryKey: ["reciters"], queryFn: fetchReciters });
