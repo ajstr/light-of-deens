@@ -46,9 +46,12 @@ const AudioPlayer = ({
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [isPlaying, setIsPlayingRaw] = useState(false);
+  const wakeLockFnRef = useRef<{ request: () => void; release: () => void }>({ request: () => {}, release: () => {} });
   const setIsPlaying = useCallback((v: boolean) => {
     setIsPlayingRaw(v);
     onPlayingChange?.(v);
+    if (v) wakeLockFnRef.current.request();
+    else wakeLockFnRef.current.release();
   }, [onPlayingChange]);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -62,6 +65,43 @@ const AudioPlayer = ({
   const sleepEndRef = useRef<number | null>(null);
   const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
   const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  // Request Wake Lock to keep audio playing in background
+  const requestWakeLock = useCallback(async () => {
+    try {
+      if ("wakeLock" in navigator && !wakeLockRef.current) {
+        wakeLockRef.current = await navigator.wakeLock.request("screen");
+        wakeLockRef.current.addEventListener("release", () => {
+          wakeLockRef.current = null;
+        });
+      }
+    } catch {
+      // Wake Lock not supported or failed silently
+    }
+  }, []);
+
+  const releaseWakeLock = useCallback(() => {
+    wakeLockRef.current?.release();
+    wakeLockRef.current = null;
+  }, []);
+
+  // Re-acquire wake lock when page becomes visible again
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible" && isPlaying) {
+        requestWakeLock();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [isPlaying, requestWakeLock]);
+
+  // Connect wake lock functions to ref so setIsPlaying can use them without circular deps
+  useEffect(() => {
+    wakeLockFnRef.current = { request: requestWakeLock, release: releaseWakeLock };
+  }, [requestWakeLock, releaseWakeLock]);
+
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState("");
   const [isOfflineAvailable, setIsOfflineAvailable] = useState(false);
@@ -166,8 +206,11 @@ const AudioPlayer = ({
   }, [currentAyah]);
 
   useEffect(() => {
-    return () => { audioRef.current?.pause(); };
-  }, []);
+    return () => {
+      audioRef.current?.pause();
+      releaseWakeLock();
+    };
+  }, [releaseWakeLock]);
 
   useEffect(() => {
     audioRef.current?.pause();
