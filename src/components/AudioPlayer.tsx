@@ -4,7 +4,7 @@ import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
-  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff
+  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck
 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -66,14 +66,17 @@ const AudioPlayer = ({
   const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
   const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const [wakeLockActive, setWakeLockActive] = useState(false);
 
   // Request Wake Lock to keep audio playing in background
   const requestWakeLock = useCallback(async () => {
     try {
       if ("wakeLock" in navigator && !wakeLockRef.current) {
         wakeLockRef.current = await navigator.wakeLock.request("screen");
+        setWakeLockActive(true);
         wakeLockRef.current.addEventListener("release", () => {
           wakeLockRef.current = null;
+          setWakeLockActive(false);
         });
       }
     } catch {
@@ -84,6 +87,7 @@ const AudioPlayer = ({
   const releaseWakeLock = useCallback(() => {
     wakeLockRef.current?.release();
     wakeLockRef.current = null;
+    setWakeLockActive(false);
   }, []);
 
   // Re-acquire wake lock when page becomes visible again
@@ -356,6 +360,11 @@ const AudioPlayer = ({
         {/* Reciter selector */}
         <div className="flex items-center gap-3">
           <Volume2 className="w-4 h-4 text-muted-foreground shrink-0" />
+          {wakeLockActive && (
+            <span className="flex items-center gap-1 text-[10px] text-accent-foreground shrink-0" title="Background playback active">
+              <ShieldCheck className="w-3 h-3 text-primary" /> BG
+            </span>
+          )}
           {isOfflineAvailable && (
             <span className="flex items-center gap-1 text-[10px] text-primary shrink-0">
               <WifiOff className="w-3 h-3" /> Offline
