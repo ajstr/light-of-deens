@@ -4,7 +4,7 @@ import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings } from "@/lib/storage";
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
-  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff
+  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck
 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
