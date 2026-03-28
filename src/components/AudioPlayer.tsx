@@ -360,6 +360,11 @@ const AudioPlayer = ({
         {/* Reciter selector */}
         <div className="flex items-center gap-3">
           <Volume2 className="w-4 h-4 text-muted-foreground shrink-0" />
+          {wakeLockActive && (
+            <span className="flex items-center gap-1 text-[10px] text-accent-foreground shrink-0" title="Background playback active">
+              <ShieldCheck className="w-3 h-3 text-primary" /> BG
+            </span>
+          )}
           {isOfflineAvailable && (
             <span className="flex items-center gap-1 text-[10px] text-primary shrink-0">
               <WifiOff className="w-3 h-3" /> Offline
