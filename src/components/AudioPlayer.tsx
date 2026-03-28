@@ -96,6 +96,12 @@ const AudioPlayer = ({
     document.addEventListener("visibilitychange", handleVisibility);
     return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, [isPlaying, requestWakeLock]);
+
+  // Connect wake lock functions to ref so setIsPlaying can use them without circular deps
+  useEffect(() => {
+    wakeLockFnRef.current = { request: requestWakeLock, release: releaseWakeLock };
+  }, [requestWakeLock, releaseWakeLock]);
+
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState("");
   const [isOfflineAvailable, setIsOfflineAvailable] = useState(false);
