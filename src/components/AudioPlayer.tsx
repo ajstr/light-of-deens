@@ -355,23 +355,23 @@ const AudioPlayer = ({
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
 
   return (
-    <div className="sticky bottom-16 z-40 bg-card border-t border-border p-3">
-      <div className="max-w-3xl mx-auto space-y-2">
+    <div className="sticky bottom-16 z-40 bg-card border-t border-border p-2 sm:p-3">
+      <div className="max-w-3xl mx-auto space-y-1.5 sm:space-y-2">
         {/* Reciter selector */}
-        <div className="flex items-center gap-3">
-          <Volume2 className="w-4 h-4 text-muted-foreground shrink-0" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Volume2 className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
           {wakeLockActive && (
-            <span className="flex items-center gap-1 text-[10px] text-accent-foreground shrink-0" title="Background playback active">
+            <span className="flex items-center gap-0.5 text-[9px] sm:text-[10px] text-accent-foreground shrink-0" title="Background playback active">
               <ShieldCheck className="w-3 h-3 text-primary" /> BG
             </span>
           )}
           {isOfflineAvailable && (
-            <span className="flex items-center gap-1 text-[10px] text-primary shrink-0">
+            <span className="flex items-center gap-0.5 text-[9px] sm:text-[10px] text-primary shrink-0">
               <WifiOff className="w-3 h-3" /> Offline
             </span>
           )}
           <Select value={String(reciterId)} onValueChange={(v) => setReciterId(Number(v))}>
-            <SelectTrigger className="flex-1 h-8 text-xs">
+            <SelectTrigger className="flex-1 h-7 sm:h-8 text-[11px] sm:text-xs">
               <SelectValue placeholder="Select reciter" />
             </SelectTrigger>
             <SelectContent className="max-h-60">
@@ -384,24 +384,20 @@ const AudioPlayer = ({
           </Select>
         </div>
 
-        {/* Controls row 1: playback */}
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prev}>
-            <SkipBack className="w-4 h-4" />
+        {/* Controls: playback + progress */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 shrink-0" onClick={prev}>
+            <SkipBack className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
-          <Button variant="default" size="icon" className="h-9 w-9 rounded-full" onClick={togglePlay}>
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+          <Button variant="default" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 rounded-full shrink-0" onClick={togglePlay}>
+            {isPlaying ? <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5" />}
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={next}>
-            <SkipForward className="w-4 h-4" />
+          <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 shrink-0" onClick={next}>
+            <SkipForward className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
-
-          <span className="text-xs text-muted-foreground min-w-[65px] text-center tabular-nums">
-            {formatTime(currentTime)} / {formatTime(duration)}
-          </span>
 
           <Slider
-            value={[progress]} max={100} step={0.1} className="flex-1"
+            value={[progress]} max={100} step={0.1} className="flex-1 min-w-0"
             onValueChange={([v]) => {
               if (audioRef.current && audioRef.current.duration) {
                 audioRef.current.currentTime = (v / 100) * audioRef.current.duration;
@@ -410,108 +406,114 @@ const AudioPlayer = ({
             }}
           />
 
-          <span className="text-xs text-muted-foreground min-w-[60px] text-right">
-            Ayah {currentAyah + 1}/{totalAyahs}
+          <span className="text-[10px] sm:text-xs text-muted-foreground shrink-0 tabular-nums">
+            {formatTime(currentTime)}/{formatTime(duration)}
           </span>
         </div>
 
-        {/* Controls row 2: speed, sleep, download, repeat */}
-        <div className="flex items-center justify-center gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
-                <Gauge className="w-3 h-3" />
-                {playbackSpeed}x
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="min-w-[80px]">
-              {SPEED_OPTIONS.map((speed) => (
-                <DropdownMenuItem
-                  key={speed}
-                  onClick={() => handleSpeedChange(speed)}
-                  className={`text-xs justify-center ${speed === playbackSpeed ? "bg-accent font-semibold" : ""}`}
+        {/* Controls row 2: speed, sleep, download, repeat, ayah counter */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1">
+                  <Gauge className="w-3 h-3" />
+                  {playbackSpeed}x
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="min-w-[80px]">
+                {SPEED_OPTIONS.map((speed) => (
+                  <DropdownMenuItem
+                    key={speed}
+                    onClick={() => handleSpeedChange(speed)}
+                    className={`text-xs justify-center ${speed === playbackSpeed ? "bg-accent font-semibold" : ""}`}
+                  >
+                    {speed}x
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost" size="sm"
+                  className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${sleepMinutesLeft !== null ? "text-primary font-semibold" : ""}`}
                 >
-                  {speed}x
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <Timer className="w-3 h-3" />
+                  {sleepMinutesLeft !== null ? `${sleepMinutesLeft}m` : "Sleep"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="min-w-[100px]">
+                {SLEEP_OPTIONS.map((mins) => (
+                  <DropdownMenuItem key={mins} onClick={() => startSleepTimer(mins)} className="text-xs justify-center">
+                    {mins} min
+                  </DropdownMenuItem>
+                ))}
+                {sleepMinutesLeft !== null && (
+                  <DropdownMenuItem onClick={cancelSleepTimer} className="text-xs justify-center text-destructive">
+                    Cancel timer
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost" size="sm"
-                className={`h-7 px-2 text-xs gap-1 ${sleepMinutesLeft !== null ? "text-primary font-semibold" : ""}`}
-              >
-                <Timer className="w-3 h-3" />
-                {sleepMinutesLeft !== null ? `${sleepMinutesLeft}m` : "Sleep"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="min-w-[100px]">
-              {SLEEP_OPTIONS.map((mins) => (
-                <DropdownMenuItem key={mins} onClick={() => startSleepTimer(mins)} className="text-xs justify-center">
-                  {mins} min
+            {/* Download & Offline */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost" size="sm"
+                  className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${isOfflineAvailable ? "text-primary font-semibold" : ""}`}
+                  disabled={downloading}
+                >
+                  {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                  <span className="hidden xs:inline">{downloading ? downloadProgress : isOfflineAvailable ? "Saved" : "DL"}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="min-w-[160px]">
+                <DropdownMenuItem className="text-xs gap-2" onClick={() => {
+                  if (!audioUrls || !audioUrls[currentAyah]) return;
+                  const link = document.createElement("a");
+                  link.href = audioUrls[currentAyah];
+                  link.download = `surah-${surahNumber}-ayah-${currentAyah + 1}.mp3`;
+                  link.target = "_blank";
+                  link.rel = "noopener noreferrer";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}>
+                  <Download className="w-3 h-3" /> Current Ayah
                 </DropdownMenuItem>
-              ))}
-              {sleepMinutesLeft !== null && (
-                <DropdownMenuItem onClick={cancelSleepTimer} className="text-xs justify-center text-destructive">
-                  Cancel timer
+                <DropdownMenuItem className="text-xs gap-2" disabled={downloading} onClick={handleDownloadZip}>
+                  <Download className="w-3 h-3" /> Surah as ZIP
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuSeparator />
+                {isOfflineAvailable ? (
+                  <DropdownMenuItem className="text-xs gap-2 text-destructive" onClick={handleRemoveOffline}>
+                    <Trash2 className="w-3 h-3" /> Remove offline data
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem className="text-xs gap-2" disabled={downloading} onClick={handleSaveOffline}>
+                    <HardDriveDownload className="w-3 h-3" /> Save for offline
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          {/* Download & Offline */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost" size="sm"
-                className={`h-7 px-2 text-xs gap-1 ${isOfflineAvailable ? "text-primary font-semibold" : ""}`}
-                disabled={downloading}
-              >
-                {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                {downloading ? downloadProgress : isOfflineAvailable ? "Saved" : "Download"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="min-w-[160px]">
-              <DropdownMenuItem className="text-xs gap-2" onClick={() => {
-                if (!audioUrls || !audioUrls[currentAyah]) return;
-                const link = document.createElement("a");
-                link.href = audioUrls[currentAyah];
-                link.download = `surah-${surahNumber}-ayah-${currentAyah + 1}.mp3`;
-                link.target = "_blank";
-                link.rel = "noopener noreferrer";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }}>
-                <Download className="w-3 h-3" /> Current Ayah
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-xs gap-2" disabled={downloading} onClick={handleDownloadZip}>
-                <Download className="w-3 h-3" /> Surah as ZIP
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {isOfflineAvailable ? (
-                <DropdownMenuItem className="text-xs gap-2 text-destructive" onClick={handleRemoveOffline}>
-                  <Trash2 className="w-3 h-3" /> Remove offline data
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem className="text-xs gap-2" disabled={downloading} onClick={handleSaveOffline}>
-                  <HardDriveDownload className="w-3 h-3" /> Save for offline
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <Button
+              variant="ghost" size="sm"
+              className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
+              onClick={cycleRepeatMode}
+              title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
+            >
+              {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
+              <span className="hidden xs:inline">{repeatMode === "none" ? "Repeat" : repeatMode === "surah" ? "Surah" : "Ayah"}</span>
+            </Button>
+          </div>
 
-          <Button
-            variant="ghost" size="sm"
-            className={`h-7 px-2 text-xs gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
-            onClick={cycleRepeatMode}
-            title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
-          >
-            {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
-            {repeatMode === "none" ? "Repeat" : repeatMode === "surah" ? "Surah" : "Ayah"}
-          </Button>
+          <span className="text-[10px] sm:text-xs text-muted-foreground tabular-nums shrink-0">
+            Ayah {currentAyah + 1}/{totalAyahs}
+          </span>
         </div>
       </div>
     </div>
