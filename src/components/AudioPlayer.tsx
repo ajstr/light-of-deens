@@ -46,9 +46,12 @@ const AudioPlayer = ({
 }: AudioPlayerProps) => {
   const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
   const [isPlaying, setIsPlayingRaw] = useState(false);
+  const wakeLockFnRef = useRef<{ request: () => void; release: () => void }>({ request: () => {}, release: () => {} });
   const setIsPlaying = useCallback((v: boolean) => {
     setIsPlayingRaw(v);
     onPlayingChange?.(v);
+    if (v) wakeLockFnRef.current.request();
+    else wakeLockFnRef.current.release();
   }, [onPlayingChange]);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
