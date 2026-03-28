@@ -197,8 +197,11 @@ const AudioPlayer = ({
   }, [currentAyah]);
 
   useEffect(() => {
-    return () => { audioRef.current?.pause(); };
-  }, []);
+    return () => {
+      audioRef.current?.pause();
+      releaseWakeLock();
+    };
+  }, [releaseWakeLock]);
 
   useEffect(() => {
     audioRef.current?.pause();
