@@ -66,14 +66,17 @@ const AudioPlayer = ({
   const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
   const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const [wakeLockActive, setWakeLockActive] = useState(false);
 
   // Request Wake Lock to keep audio playing in background
   const requestWakeLock = useCallback(async () => {
     try {
       if ("wakeLock" in navigator && !wakeLockRef.current) {
         wakeLockRef.current = await navigator.wakeLock.request("screen");
+        setWakeLockActive(true);
         wakeLockRef.current.addEventListener("release", () => {
           wakeLockRef.current = null;
+          setWakeLockActive(false);
         });
       }
     } catch {
@@ -84,6 +87,7 @@ const AudioPlayer = ({
   const releaseWakeLock = useCallback(() => {
     wakeLockRef.current?.release();
     wakeLockRef.current = null;
+    setWakeLockActive(false);
   }, []);
 
   // Re-acquire wake lock when page becomes visible again
