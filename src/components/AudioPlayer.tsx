@@ -11,6 +11,9 @@ import { saveAs } from "file-saver";
 import {
   getAudioBlob, downloadSurahForOffline, isSurahDownloaded, deleteSurahAudio
 } from "@/lib/offline-audio";
+import {
+  getPersistentAudio, startSilentKeepalive, stopSilentKeepalive, isIOS
+} from "@/lib/ios-audio";
 import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
