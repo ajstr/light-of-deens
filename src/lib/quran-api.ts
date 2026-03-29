@@ -66,6 +66,7 @@ export interface TranslationOption {
   id: number; // 0 = bundled Sahih International
   name: string;
   author: string;
+  isTafsir?: boolean; // true = use tafsir endpoint instead of translations
 }
 
 export const TRANSLATIONS: TranslationOption[] = [
@@ -77,7 +78,7 @@ export const TRANSLATIONS: TranslationOption[] = [
   { id: 84, name: "Maududi", author: "Abul Ala Maududi" },
   { id: 95, name: "Muhammad Pickthall", author: "Muhammad Marmaduke Pickthall" },
   { id: 22, name: "Muhsin Khan", author: "Muhammad Muhsin Khan" },
-  { id: 169, name: "Ibn Kathir (Abridged)", author: "Ibn Kathir" },
+  { id: 169, name: "Ibn Kathir (Abridged)", author: "Ibn Kathir", isTafsir: true },
 ];
 
 let cachedData: QuranJsonSurah[] | null = null;
