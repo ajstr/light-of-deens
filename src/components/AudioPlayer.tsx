@@ -224,6 +224,7 @@ const AudioPlayer = ({
     return () => {
       audioRef.current?.pause();
       releaseWakeLock();
+      stopSilentKeepalive();
     };
   }, [releaseWakeLock]);
 
