@@ -249,6 +249,12 @@ async function fetchApiTranslation(surahNumber: number, translationId: number): 
   const key = `${translationId}-${surahNumber}`;
   if (translationCache.has(key)) return translationCache.get(key)!;
 
+  const option = TRANSLATIONS.find((t) => t.id === translationId);
+
+  if (option?.isTafsir) {
+    return fetchTafsirTranslation(surahNumber, translationId, key);
+  }
+
   const allTranslations: string[] = [];
   let page = 1;
   let totalPages = 1;
@@ -268,6 +274,29 @@ async function fetchApiTranslation(surahNumber: number, translationId: number): 
 
   translationCache.set(key, allTranslations);
   return allTranslations;
+}
+
+// Fetch tafsir text from Quran.com tafsir endpoint
+async function fetchTafsirTranslation(surahNumber: number, tafsirId: number, cacheKey: string): Promise<string[]> {
+  const allTexts: string[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  while (page <= totalPages) {
+    const res = await fetch(
+      `https://api.quran.com/api/v4/tafsirs/${tafsirId}/by_chapter/${surahNumber}?per_page=50&page=${page}`
+    );
+    const json = await res.json();
+    (json.tafsirs || []).forEach((t: any) => {
+      const text = (t.text || "").replace(/<[^>]*>/g, "").replace(/\s{2,}/g, " ").trim();
+      allTexts.push(text);
+    });
+    totalPages = json.pagination?.total_pages || 1;
+    page++;
+  }
+
+  translationCache.set(cacheKey, allTexts);
+  return allTexts;
 }
 
 export async function fetchSurah(number: number, translationId: number = 0): Promise<SurahDetail> {
