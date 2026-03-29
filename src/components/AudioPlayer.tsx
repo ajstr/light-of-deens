@@ -144,23 +144,26 @@ const AudioPlayer = ({
   const playAyah = useCallback(
     async (index: number) => {
       if (!audioUrls || index < 0 || index >= audioUrls.length) return;
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+
       const src = await getAudioSource(index);
       if (!src) return;
 
-      const audio = new Audio(src);
-      audio.playbackRate = speedRef.current;
-      audioRef.current = audio;
-      audio.addEventListener("loadedmetadata", () => setDuration(audio.duration));
-      audio.addEventListener("timeupdate", () => {
+      // Start silent keepalive on iOS to maintain audio session between tracks
+      if (isIOS()) startSilentKeepalive();
+
+      // Reuse persistent audio element (critical for iOS background playback)
+      const audio = getPersistentAudio();
+
+      // Remove old event listeners by cloning approach — instead, we use
+      // named handlers stored on the element to allow cleanup
+      audio.onloadedmetadata = () => setDuration(audio.duration);
+      audio.ontimeupdate = () => {
         if (audio.duration) {
           setProgress((audio.currentTime / audio.duration) * 100);
           setCurrentTime(audio.currentTime);
         }
-      });
-      audio.addEventListener("ended", () => {
+      };
+      audio.onended = () => {
         // Revoke blob URL if it was one
         if (src.startsWith("blob:")) URL.revokeObjectURL(src);
         if (repeatModeRef.current === "ayah") {
@@ -175,8 +178,13 @@ const AudioPlayer = ({
           setProgress(0);
           setCurrentTime(0);
           setDuration(0);
+          stopSilentKeepalive();
         }
-      });
+      };
+
+      audio.playbackRate = speedRef.current;
+      audio.src = src;
+      audioRef.current = audio;
       audio.play();
       setIsPlaying(true);
       onAyahChange(index);
@@ -202,7 +210,7 @@ const AudioPlayer = ({
         });
       }
     },
-    [audioUrls, onAyahChange, surahName, surahNumber, getAudioSource]
+    [audioUrls, onAyahChange, surahName, surahNumber, getAudioSource, setIsPlaying]
   );
 
   useEffect(() => {
