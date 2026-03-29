@@ -286,6 +286,7 @@ const AudioPlayer = ({
         setProgress(0);
         setCurrentTime(0);
         setDuration(0);
+        stopSilentKeepalive();
         setSleepMinutesLeft(null);
         sleepEndRef.current = null;
         if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
