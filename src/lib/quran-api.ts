@@ -299,6 +299,32 @@ async function fetchTafsirTranslation(surahNumber: number, tafsirId: number, cac
   return allTexts;
 }
 
+// Available tafsir sources for per-verse lookup
+export const TAFSIR_SOURCES = [
+  { id: 169, name: "Ibn Kathir (Abridged)", author: "Ibn Kathir" },
+  { id: 74, name: "Tafsir al-Jalalayn", author: "Jalal ad-Din al-Mahalli & as-Suyuti" },
+  { id: 168, name: "Al-Tabari", author: "Ibn Jarir al-Tabari" },
+  { id: 816, name: "Tafsir al-Wasit", author: "Muhammad Sayyid Tantawi" },
+];
+
+const verseTafsirCache = new Map<string, string>();
+
+export async function fetchVerseTafsir(surahNumber: number, ayahNumber: number, tafsirId: number): Promise<string> {
+  const key = `${tafsirId}-${surahNumber}:${ayahNumber}`;
+  if (verseTafsirCache.has(key)) return verseTafsirCache.get(key)!;
+
+  const verseKey = `${surahNumber}:${ayahNumber}`;
+  const res = await fetch(
+    `https://api.quran.com/api/v4/tafsirs/${tafsirId}/by_ayah/${verseKey}`
+  );
+  if (!res.ok) throw new Error("Failed to fetch tafsir");
+  const json = await res.json();
+  const raw = json.tafsir?.text || "";
+  const text = raw.replace(/<[^>]*>/g, "").replace(/\s{2,}/g, " ").trim();
+  verseTafsirCache.set(key, text);
+  return text;
+}
+
 export async function fetchSurah(number: number, translationId: number = 0): Promise<SurahDetail> {
   const cacheKey = `${number}-${translationId}`;
   if (surahCache.has(cacheKey)) return surahCache.get(cacheKey)!;
