@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah, TRANSLATIONS } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark, Languages } from "lucide-react";
+import { ArrowLeft, ArrowUp, BookOpen, Palette, Play, Square, Bookmark, Languages, BookText } from "lucide-react";
+import TafsirModal from "@/components/TafsirModal";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const [highlightedAyah, setHighlightedAyah] = useState<number | null>(null);
+  const [tafsirAyah, setTafsirAyah] = useState<number | null>(null);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const fontSizeClass = ["text-xl", "text-2xl", "text-3xl", "text-4xl"][settings.fontSize - 1] || "text-2xl";
@@ -272,6 +274,13 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                     >
                       <Bookmark className={`w-3 h-3 ${bookmarkedAyahs.has(ayah.numberInSurah) ? "fill-current" : ""}`} />
                     </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setTafsirAyah(ayah.numberInSurah); }}
+                      className="w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-primary/10 hover:bg-primary/20 text-primary"
+                      title="View Tafsir"
+                    >
+                      <BookText className="w-3 h-3" />
+                    </button>
                   </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
@@ -344,6 +353,15 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
           </Button>
         </motion.div>
       )}
+
+      {/* Tafsir Modal */}
+      <TafsirModal
+        open={tafsirAyah !== null}
+        onOpenChange={(open) => { if (!open) setTafsirAyah(null); }}
+        surahNumber={surah.number}
+        ayahNumber={tafsirAyah ?? 1}
+        surahName={surah.englishName}
+      />
     </div>
   );
 };
