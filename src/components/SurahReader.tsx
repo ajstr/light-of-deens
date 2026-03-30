@@ -353,6 +353,15 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
           </Button>
         </motion.div>
       )}
+
+      {/* Tafsir Modal */}
+      <TafsirModal
+        open={tafsirAyah !== null}
+        onOpenChange={(open) => { if (!open) setTafsirAyah(null); }}
+        surahNumber={surah.number}
+        ayahNumber={tafsirAyah ?? 1}
+        surahName={surah.englishName}
+      />
     </div>
   );
 };
