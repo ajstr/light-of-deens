@@ -274,6 +274,13 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                     >
                       <Bookmark className={`w-3 h-3 ${bookmarkedAyahs.has(ayah.numberInSurah) ? "fill-current" : ""}`} />
                     </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setTafsirAyah(ayah.numberInSurah); }}
+                      className="w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-primary/10 hover:bg-primary/20 text-primary"
+                      title="View Tafsir"
+                    >
+                      <BookText className="w-3 h-3" />
+                    </button>
                   </div>
                   <div className="flex-1 space-y-3">
                     {/* Word-by-word view */}
