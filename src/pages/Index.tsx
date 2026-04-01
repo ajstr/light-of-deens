@@ -128,7 +128,7 @@ const Index = () => {
             }}
           />
         </>
-      )}
+      {renderContent()}
 
       {selectedSurah && (
         <AudioPlayer
