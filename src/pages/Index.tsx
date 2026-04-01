@@ -128,6 +128,7 @@ const Index = () => {
             }}
           />
         </>
+      )}
       {renderContent()}
 
       {selectedSurah && (
