@@ -9,6 +9,7 @@ import DownloadsPage from "@/components/DownloadsPage";
 import SettingsPage from "@/components/SettingsPage";
 import DuaPage from "@/components/DuaPage";
 import DailyDua from "@/components/DailyDua";
+import ContinueReading from "@/components/ContinueReading";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -116,7 +117,18 @@ const Index = () => {
         <div className="ornament-divider mt-4 mx-auto max-w-xs" />
       </header>
 
-      {activeTab === "home" && <DailyDua />}
+      {activeTab === "home" && (
+        <>
+          <DailyDua />
+          <ContinueReading
+            surahs={surahs ?? []}
+            onContinue={(surahNum, ayah) => {
+              handleSurahChange(surahNum, ayah);
+              setActiveTab("read");
+            }}
+          />
+        </>
+      )}
       {renderContent()}
 
       {selectedSurah && (
