@@ -117,8 +117,18 @@ const Index = () => {
         <div className="ornament-divider mt-4 mx-auto max-w-xs" />
       </header>
 
-      {activeTab === "home" && <DailyDua />}
-      {renderContent()}
+      {activeTab === "home" && (
+        <>
+          <DailyDua />
+          <ContinueReading
+            surahs={surahs ?? []}
+            onContinue={(surahNum, ayah) => {
+              handleSurahChange(surahNum, ayah);
+              setActiveTab("read");
+            }}
+          />
+        </>
+      )}
 
       {selectedSurah && (
         <AudioPlayer
