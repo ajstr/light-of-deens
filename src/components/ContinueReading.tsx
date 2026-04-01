@@ -1,17 +1,19 @@
 import { getLastRead } from "@/lib/storage";
 import { BookOpen, ChevronRight } from "lucide-react";
-import { SURAH_NAMES } from "@/lib/quran-metadata";
+import { Surah } from "@/lib/quran-api";
 
 interface ContinueReadingProps {
+  surahs: Surah[];
   onContinue: (surahNumber: number, ayahIndex: number) => void;
 }
 
-const ContinueReading = ({ onContinue }: ContinueReadingProps) => {
+const ContinueReading = ({ surahs, onContinue }: ContinueReadingProps) => {
   const lastRead = getLastRead();
 
-  if (!lastRead) return null;
+  if (!lastRead || surahs.length === 0) return null;
 
-  const surahName = SURAH_NAMES[lastRead.surahNumber - 1];
+  const surah = surahs.find((s) => s.number === lastRead.surahNumber);
+  const displayName = surah ? surah.englishName : `Surah ${lastRead.surahNumber}`;
 
   return (
     <div className="max-w-2xl mx-auto px-4 mb-6">
@@ -25,7 +27,7 @@ const ContinueReading = ({ onContinue }: ContinueReadingProps) => {
         <div className="flex-1 min-w-0">
           <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Continue Reading</p>
           <p className="text-foreground font-semibold truncate">
-            {surahName ?? `Surah ${lastRead.surahNumber}`} — Ayah {lastRead.ayahIndex + 1}
+            {displayName} — Ayah {lastRead.ayahIndex + 1}
           </p>
         </div>
         <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
