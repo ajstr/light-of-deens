@@ -25,6 +25,7 @@ export interface AppSettings {
 const BOOKMARKS_KEY = "quran-bookmarks";
 const LAST_READ_KEY = "quran-last-read";
 const SETTINGS_KEY = "quran-settings";
+const READING_PROGRESS_KEY = "quran-reading-progress";
 
 // Bookmarks
 export function getBookmarks(): Bookmark[] {
