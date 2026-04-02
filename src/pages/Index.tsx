@@ -10,6 +10,7 @@ import SettingsPage from "@/components/SettingsPage";
 import DuaPage from "@/components/DuaPage";
 import DailyDua from "@/components/DailyDua";
 import ContinueReading from "@/components/ContinueReading";
+import ReadingProgress from "@/components/ReadingProgress";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -120,6 +121,7 @@ const Index = () => {
       {activeTab === "home" && (
         <>
           <DailyDua />
+          <ReadingProgress />
           <ContinueReading
             surahs={surahs ?? []}
             onContinue={(surahNum, ayah) => {

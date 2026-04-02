@@ -10,7 +10,7 @@ import TajweedLegend from "@/components/TajweedLegend";
 import SurahHeader from "@/components/SurahHeader";
 import ReaderToolbar from "@/components/ReaderToolbar";
 import VerseCard from "@/components/VerseCard";
-import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings } from "@/lib/storage";
+import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings, markAyahRead } from "@/lib/storage";
 import { getFontClass } from "@/components/FontPreview";
 
 interface SurahReaderProps {
@@ -60,6 +60,10 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
 
   useEffect(() => {
     saveLastRead(surah.number, currentAyah);
+    // Mark current ayah as read (ayahIndex is 0-based, ayahNumber is 1-based)
+    if (currentAyah >= 0) {
+      markAyahRead(surah.number, currentAyah + 1);
+    }
   }, [surah.number, currentAyah]);
 
   const toggleBookmark = (ayahNumberInSurah: number) => {
