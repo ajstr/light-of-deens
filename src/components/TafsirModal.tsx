@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchVerseTafsir, TAFSIR_SOURCES } from "@/lib/quran-api";
 
 interface TafsirModalProps {
@@ -24,7 +23,7 @@ const TafsirModal = ({ open, onOpenChange, surahNumber, ayahNumber, surahName }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-lg">
             Tafsir — {surahName} : Ayah {ayahNumber}
@@ -49,7 +48,7 @@ const TafsirModal = ({ open, onOpenChange, surahNumber, ayahNumber, surahName }:
           </Select>
         </div>
 
-        <ScrollArea className="flex-1 min-h-0 max-h-[60vh] pr-4">
+        <div className="flex-1 min-h-0 overflow-y-auto pr-1">
           {isLoading ? (
             <div className="space-y-3 py-4">
               <div className="h-4 bg-muted animate-pulse rounded w-full" />
@@ -67,7 +66,7 @@ const TafsirModal = ({ open, onOpenChange, surahNumber, ayahNumber, surahName }:
               No tafsir available for this verse.
             </p>
           )}
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
