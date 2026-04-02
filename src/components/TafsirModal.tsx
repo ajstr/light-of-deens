@@ -24,7 +24,7 @@ const TafsirModal = ({ open, onOpenChange, surahNumber, ayahNumber, surahName }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-lg">
             Tafsir — {surahName} : Ayah {ayahNumber}
