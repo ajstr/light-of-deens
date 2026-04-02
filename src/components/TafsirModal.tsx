@@ -49,7 +49,7 @@ const TafsirModal = ({ open, onOpenChange, surahNumber, ayahNumber, surahName }:
           </Select>
         </div>
 
-        <ScrollArea className="flex-1 min-h-0 max-h-[60vh] pr-4">
+        <div className="flex-1 min-h-0 overflow-y-auto pr-1">
           {isLoading ? (
             <div className="space-y-3 py-4">
               <div className="h-4 bg-muted animate-pulse rounded w-full" />
@@ -67,7 +67,7 @@ const TafsirModal = ({ open, onOpenChange, surahNumber, ayahNumber, surahName }:
               No tafsir available for this verse.
             </p>
           )}
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
