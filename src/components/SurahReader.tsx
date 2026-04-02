@@ -10,7 +10,7 @@ import TajweedLegend from "@/components/TajweedLegend";
 import SurahHeader from "@/components/SurahHeader";
 import ReaderToolbar from "@/components/ReaderToolbar";
 import VerseCard from "@/components/VerseCard";
-import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings } from "@/lib/storage";
+import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings, markAyahRead } from "@/lib/storage";
 import { getFontClass } from "@/components/FontPreview";
 
 interface SurahReaderProps {
