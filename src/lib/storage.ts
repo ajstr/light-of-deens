@@ -97,3 +97,39 @@ export function getSettings(): AppSettings {
 export function saveSettings(settings: AppSettings): void {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
+
+// Reading Progress — tracks which ayahs have been read per surah
+// Stored as { [surahNumber]: number[] } where array contains read ayah numbers (1-based)
+export interface ReadingProgress {
+  [surahNumber: number]: number[];
+}
+
+export function getReadingProgress(): ReadingProgress {
+  try {
+    const raw = localStorage.getItem(READING_PROGRESS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function markAyahRead(surahNumber: number, ayahNumber: number): void {
+  const progress = getReadingProgress();
+  if (!progress[surahNumber]) progress[surahNumber] = [];
+  if (!progress[surahNumber].includes(ayahNumber)) {
+    progress[surahNumber].push(ayahNumber);
+    localStorage.setItem(READING_PROGRESS_KEY, JSON.stringify(progress));
+  }
+}
+
+export function getSurahReadCount(surahNumber: number): number {
+  const progress = getReadingProgress();
+  return progress[surahNumber]?.length ?? 0;
+}
+
+export function getTotalAyahsRead(): number {
+  const progress = getReadingProgress();
+  return Object.values(progress).reduce((sum, arr) => sum + arr.length, 0);
+}
+
+export const TOTAL_QURAN_AYAHS = 6236;
