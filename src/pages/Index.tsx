@@ -121,6 +121,7 @@ const Index = () => {
       {activeTab === "home" && (
         <>
           <DailyDua />
+          <ReadingProgress />
           <ContinueReading
             surahs={surahs ?? []}
             onContinue={(surahNum, ayah) => {
