@@ -57,6 +57,40 @@ const Index = () => {
     }
   };
 
+  // Register the "open reader" handler so the GlobalMiniPlayer can navigate
+  useEffect(() => {
+    registerOpenReader((surahNumber: number, ayah: number) => {
+      handleSurahChange(surahNumber, ayah);
+      setActiveTab("read");
+    });
+  }, [registerOpenReader, handleSurahChange]);
+
+  // Restore last session on first mount once surahs are loaded
+  useEffect(() => {
+    if (!surahs || surahs.length === 0) return;
+    if (selectedSurah) return; // user already opened something
+    const session = getLastSession();
+    if (!session) return;
+    const target = surahs.find((s) => s.number === session.surahNumber);
+    if (!target) return;
+    setInitialAyah(session.ayahIndex);
+    setSelectedSurah(target);
+    setActiveTab("read");
+    if (session.wasPlaying) {
+      // iOS blocks autoplay — surface a one-tap resume
+      toast("Continue listening?", {
+        description: `${target.englishName} • Ayah ${session.ayahIndex + 1}`,
+        action: {
+          label: "Resume",
+          onClick: () => setPlayTrigger(session.ayahIndex),
+        },
+        duration: 8000,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surahs]);
+
+
   const renderContent = () => {
     switch (activeTab) {
       case "read":
