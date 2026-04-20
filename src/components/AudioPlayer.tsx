@@ -179,7 +179,14 @@ const AudioPlayer = ({
 
       // Remove old event listeners by cloning approach — instead, we use
       // named handlers stored on the element to allow cleanup
-      audio.onloadedmetadata = () => setDuration(audio.duration);
+      audio.onloadedmetadata = () => {
+        setDuration(audio.duration);
+        // Apply pending resume time (only once, on first ayah load after restore)
+        if (pendingResumeTimeRef.current !== null && pendingResumeTimeRef.current > 0 && pendingResumeTimeRef.current < audio.duration) {
+          audio.currentTime = pendingResumeTimeRef.current;
+        }
+        pendingResumeTimeRef.current = null;
+      };
       audio.ontimeupdate = () => {
         if (audio.duration) {
           setProgress((audio.currentTime / audio.duration) * 100);
@@ -189,9 +196,22 @@ const AudioPlayer = ({
       audio.onended = () => {
         // Revoke blob URL if it was one
         if (src.startsWith("blob:")) URL.revokeObjectURL(src);
+
         if (repeatModeRef.current === "ayah") {
-          playAyah(index);
-        } else if (index + 1 < audioUrls.length) {
+          // Infinite (count = 0) or still under the target → loop again
+          const target = repeatCountRef.current;
+          if (target === 0 || repeatIterationRef.current < target) {
+            repeatIterationRef.current += 1;
+            setRepeatIteration(repeatIterationRef.current);
+            playAyah(index);
+            return;
+          }
+          // Reached target — reset and continue to next ayah (or stop)
+          repeatIterationRef.current = 1;
+          setRepeatIteration(1);
+        }
+
+        if (index + 1 < audioUrls.length) {
           onAyahChange(index + 1);
         } else if (repeatModeRef.current === "surah") {
           onAyahChange(0);
@@ -211,6 +231,7 @@ const AudioPlayer = ({
       audio.play();
       setIsPlaying(true);
       onAyahChange(index);
+
 
       if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
