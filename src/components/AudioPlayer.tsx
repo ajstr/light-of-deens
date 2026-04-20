@@ -354,10 +354,15 @@ const AudioPlayer = ({
     setSleepMinutesLeft(null);
   };
 
-  const cycleRepeatMode = () => {
-    const next = repeatMode === "none" ? "surah" : repeatMode === "surah" ? "ayah" : "none";
-    setRepeatMode(next);
-    repeatModeRef.current = next;
+  const setRepeatModeAndCount = (mode: RepeatMode, count?: number) => {
+    setRepeatMode(mode);
+    repeatModeRef.current = mode;
+    if (typeof count === "number") {
+      setRepeatCount(count);
+      repeatCountRef.current = count;
+    }
+    repeatIterationRef.current = 1;
+    setRepeatIteration(1);
   };
 
   const handleSaveOffline = async () => {
