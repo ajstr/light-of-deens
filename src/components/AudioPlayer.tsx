@@ -829,13 +829,49 @@ const AudioPlayer = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Range Repeat */}
+            <Button
+              variant="ghost" size="sm"
+              className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${rangeActive ? "text-primary font-semibold" : ""}`}
+              onClick={() => setRangeDialogOpen(true)}
+              title={
+                rangeActive
+                  ? `Range ${rangeStart + 1}–${rangeEnd + 1} · loop ${rangeLoopCount === 0 ? "∞" : rangeIteration + "/" + rangeLoopCount}`
+                  : "Range repeat"
+              }
+            >
+              <ListRestart className="w-3 h-3" />
+              <span className="hidden xs:inline">
+                {rangeActive
+                  ? `${rangeStart + 1}–${rangeEnd + 1}`
+                  : "Range"}
+              </span>
+            </Button>
+
           </div>
 
           <span className="text-[10px] sm:text-xs text-muted-foreground tabular-nums shrink-0">
-            Ayah {currentAyah + 1}/{totalAyahs}
+            {rangeActive ? (
+              <>Range {rangeIteration}{rangeLoopCount === 0 ? "/∞" : `/${rangeLoopCount}`} · A {rangeAyahIteration}/{rangeAyahCount}</>
+            ) : (
+              <>Ayah {currentAyah + 1}/{totalAyahs}</>
+            )}
           </span>
         </div>
       </div>
+
+      <RangeRepeatDialog
+        open={rangeDialogOpen}
+        onOpenChange={setRangeDialogOpen}
+        totalAyahs={totalAyahs}
+        initialStart={rangeActive ? rangeStart : currentAyah}
+        initialEnd={rangeActive ? rangeEnd : Math.min(currentAyah + 4, totalAyahs - 1)}
+        initialRangeCount={rangeLoopCount}
+        initialAyahCount={rangeAyahCount}
+        onApply={applyRange}
+        onClear={clearRange}
+        hasActiveRange={rangeActive}
+      />
     </div>
   );
 };
