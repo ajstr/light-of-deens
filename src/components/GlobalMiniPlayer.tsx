@@ -1,30 +1,12 @@
-import { useEffect, useRef, useState } from "react";
 import { Play, Pause, SkipForward, SkipBack, X, Repeat1, Repeat, ListRestart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { Button } from "@/components/ui/button";
+import { useHideOnScroll } from "@/hooks/use-scroll-direction";
 
 const GlobalMiniPlayer = () => {
   const { nowPlaying, controls, requestOpenReader } = useAudioPlayer();
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      const delta = y - lastY.current;
-      if (y < 80) {
-        setHidden(false);
-      } else if (delta > 10) {
-        setHidden(true);
-      } else if (delta < -10) {
-        setHidden(false);
-      }
-      lastY.current = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const hidden = useHideOnScroll();
 
   if (!nowPlaying || !controls) return null;
 

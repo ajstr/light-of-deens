@@ -1,5 +1,6 @@
 import { Home, BookOpen, Bookmark, Settings, HardDriveDownload, HandHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useHideOnScroll } from "@/hooks/use-scroll-direction";
 
 interface BottomTabBarProps {
   activeTab: string;
@@ -16,8 +17,15 @@ const tabs = [
 ];
 
 const BottomTabBar = ({ activeTab, onTabChange }: BottomTabBarProps) => {
+  const hidden = useHideOnScroll();
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md safe-area-bottom">
+    <nav
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md safe-area-bottom transition-transform duration-300 ease-out",
+        hidden ? "translate-y-full" : "translate-y-0"
+      )}
+      style={{ pointerEvents: hidden ? "none" : "auto" }}
+    >
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
