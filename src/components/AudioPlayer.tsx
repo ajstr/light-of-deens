@@ -51,7 +51,11 @@ const AudioPlayer = ({
   surahNumber, totalAyahs, currentAyah, onAyahChange,
   playTrigger, onPlayingChange, surahName,
 }: AudioPlayerProps) => {
-  const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
+  const { setNowPlaying, registerControls } = useAudioPlayer();
+  const [reciterId, setReciterId] = useState<number>(() => {
+    const sess = getLastSession();
+    return sess?.surahNumber === surahNumber ? sess.reciterId : getSettings().defaultReciterId;
+  });
   const [isPlaying, setIsPlayingRaw] = useState(false);
   const wakeLockFnRef = useRef<{ request: () => void; release: () => void }>({ request: () => {}, release: () => {} });
   const setIsPlaying = useCallback((v: boolean) => {
@@ -70,10 +74,25 @@ const AudioPlayer = ({
   const [sleepMinutesLeft, setSleepMinutesLeft] = useState<number | null>(null);
   const sleepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sleepEndRef = useRef<number | null>(null);
-  const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
-  const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
+
+  // Repeat: mode + count (0 = infinite, otherwise total target loops). Count only applies when mode === "ayah"
+  const initialSession = useRef(getLastSession()).current;
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>(
+    initialSession?.surahNumber === surahNumber ? initialSession.repeatMode : "none"
+  );
+  const [repeatCount, setRepeatCount] = useState<number>(
+    initialSession?.surahNumber === surahNumber ? initialSession.repeatCount : 10
+  );
+  const [repeatIteration, setRepeatIteration] = useState<number>(1);
+  const repeatModeRef = useRef<RepeatMode>(repeatMode);
+  const repeatCountRef = useRef<number>(repeatCount);
+  const repeatIterationRef = useRef<number>(1);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const [wakeLockActive, setWakeLockActive] = useState(false);
+  const pendingResumeTimeRef = useRef<number | null>(
+    initialSession?.surahNumber === surahNumber ? initialSession.currentTime : null
+  );
+
 
   // Request Wake Lock to keep audio playing in background
   const requestWakeLock = useCallback(async () => {
