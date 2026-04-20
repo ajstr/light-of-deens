@@ -12,6 +12,7 @@ import ReaderToolbar from "@/components/ReaderToolbar";
 import VerseCard from "@/components/VerseCard";
 import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings, markAyahRead } from "@/lib/storage";
 import { getFontClass } from "@/components/FontPreview";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 
 interface SurahReaderProps {
   surah: Surah;
@@ -27,6 +28,7 @@ interface SurahReaderProps {
 
 const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAyah, onAyahChange, playTrigger, onPlayTriggerChange, isAudioPlaying }: SurahReaderProps) => {
   const settings = getSettings();
+  const { nowPlaying } = useAudioPlayer();
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [translationEnabled, setTranslationEnabled] = useState(settings.showTranslation);
@@ -156,31 +158,39 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
         </div>
       ) : (
         <div className="space-y-4">
-          {data?.ayahs.map((ayah, i) => (
-            <VerseCard
-              key={ayah.number}
-              ref={(el) => (ayahRefs.current[i] = el)}
-              ayah={ayah}
-              index={i}
-              currentAyah={currentAyah}
-              highlightedAyah={highlightedAyah}
-              onHighlightToggle={(idx) => setHighlightedAyah(highlightedAyah === idx ? null : idx)}
-              isAudioPlaying={isAudioPlaying}
-              onPlayToggle={handlePlayToggle}
-              isBookmarked={bookmarkedAyahs.has(ayah.numberInSurah)}
-              onBookmarkToggle={toggleBookmark}
-              onTafsirOpen={setTafsirAyah}
-              translationEnabled={translationEnabled}
-              fontSizeClass={fontSizeClass}
-              arabicFontClass={arabicFontClass}
-              wbwEnabled={wbwEnabled}
-              wbwLoading={wbwLoading}
-              verseWords={wbwData?.find((v) => v.verseNumber === ayah.numberInSurah)}
-              tajweedEnabled={tajweedEnabled}
-              tajweedLoading={tajweedLoading}
-              tajweedHtml={tajweedData?.[i]}
-            />
-          ))}
+          {data?.ayahs.map((ayah, i) => {
+            const isInRange =
+              !!nowPlaying?.rangeActive &&
+              nowPlaying.surahNumber === surah.number &&
+              i >= nowPlaying.rangeStart &&
+              i <= nowPlaying.rangeEnd;
+            return (
+              <VerseCard
+                key={ayah.number}
+                ref={(el) => (ayahRefs.current[i] = el)}
+                ayah={ayah}
+                index={i}
+                currentAyah={currentAyah}
+                highlightedAyah={highlightedAyah}
+                onHighlightToggle={(idx) => setHighlightedAyah(highlightedAyah === idx ? null : idx)}
+                isAudioPlaying={isAudioPlaying}
+                onPlayToggle={handlePlayToggle}
+                isBookmarked={bookmarkedAyahs.has(ayah.numberInSurah)}
+                onBookmarkToggle={toggleBookmark}
+                onTafsirOpen={setTafsirAyah}
+                translationEnabled={translationEnabled}
+                fontSizeClass={fontSizeClass}
+                arabicFontClass={arabicFontClass}
+                wbwEnabled={wbwEnabled}
+                wbwLoading={wbwLoading}
+                verseWords={wbwData?.find((v) => v.verseNumber === ayah.numberInSurah)}
+                tajweedEnabled={tajweedEnabled}
+                tajweedLoading={tajweedLoading}
+                tajweedHtml={tajweedData?.[i]}
+                inActiveRange={isInRange}
+              />
+            );
+          })}
         </div>
       )}
 

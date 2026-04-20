@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Play, Pause, SkipForward, SkipBack, X, Repeat1, Repeat, ListRestart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
@@ -5,6 +6,25 @@ import { Button } from "@/components/ui/button";
 
 const GlobalMiniPlayer = () => {
   const { nowPlaying, controls, requestOpenReader } = useAudioPlayer();
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY.current;
+      if (y < 80) {
+        setHidden(false);
+      } else if (delta > 10) {
+        setHidden(true);
+      } else if (delta < -10) {
+        setHidden(false);
+      }
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   if (!nowPlaying || !controls) return null;
 
@@ -26,11 +46,11 @@ const GlobalMiniPlayer = () => {
     <AnimatePresence>
       <motion.div
         initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        animate={{ y: hidden ? -80 : 0, opacity: hidden ? 0 : 1 }}
         exit={{ y: -60, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 32 }}
         className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-md"
-        style={{ paddingTop: "env(safe-area-inset-top)" }}
+        style={{ paddingTop: "env(safe-area-inset-top)", pointerEvents: hidden ? "none" : "auto" }}
       >
         {/* Thin progress bar */}
         <div className="h-0.5 w-full bg-secondary">
