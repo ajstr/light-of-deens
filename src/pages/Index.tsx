@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Book } from "lucide-react";
@@ -15,7 +15,9 @@ import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
-import { saveLastRead } from "@/lib/storage";
+import { saveLastRead, getLastSession } from "@/lib/storage";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { toast } from "sonner";
 
 const Index = () => {
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
@@ -24,6 +26,7 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
   const { data: surahs } = useQuery({
     queryKey: ["surahs"],
@@ -53,6 +56,40 @@ const Index = () => {
       setSelectedSurah(null);
     }
   };
+
+  // Register the "open reader" handler so the GlobalMiniPlayer can navigate
+  useEffect(() => {
+    registerOpenReader((surahNumber: number, ayah: number) => {
+      handleSurahChange(surahNumber, ayah);
+      setActiveTab("read");
+    });
+  }, [registerOpenReader, handleSurahChange]);
+
+  // Restore last session on first mount once surahs are loaded
+  useEffect(() => {
+    if (!surahs || surahs.length === 0) return;
+    if (selectedSurah) return; // user already opened something
+    const session = getLastSession();
+    if (!session) return;
+    const target = surahs.find((s) => s.number === session.surahNumber);
+    if (!target) return;
+    setInitialAyah(session.ayahIndex);
+    setSelectedSurah(target);
+    setActiveTab("read");
+    if (session.wasPlaying) {
+      // iOS blocks autoplay — surface a one-tap resume
+      toast("Continue listening?", {
+        description: `${target.englishName} • Ayah ${session.ayahIndex + 1}`,
+        action: {
+          label: "Resume",
+          onClick: () => setPlayTrigger(session.ayahIndex),
+        },
+        duration: 8000,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surahs]);
+
 
   const renderContent = () => {
     switch (activeTab) {
@@ -100,7 +137,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className={`min-h-screen bg-background pb-20 ${nowPlaying ? "pt-12 sm:pt-14" : ""}`}>
       {/* Header */}
       <header className="py-8 text-center border-b border-border mb-8">
         <motion.div

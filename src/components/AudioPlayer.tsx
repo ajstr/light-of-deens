@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
-import { getSettings } from "@/lib/storage";
+import { getSettings, saveLastSession, getLastSession, type RepeatMode } from "@/lib/storage";
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
-  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck
+  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck, Infinity as InfinityIcon
 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -20,8 +20,10 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+
 
 interface AudioPlayerProps {
   surahNumber: number;
@@ -35,6 +37,8 @@ interface AudioPlayerProps {
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
 const SLEEP_OPTIONS = [5, 10, 15, 30, 60, 90];
+const REPEAT_COUNT_OPTIONS = [5, 10, 15, 25, 50]; // 0 = infinite
+
 
 const formatTime = (seconds: number) => {
   if (!seconds || !isFinite(seconds)) return "0:00";
@@ -47,7 +51,11 @@ const AudioPlayer = ({
   surahNumber, totalAyahs, currentAyah, onAyahChange,
   playTrigger, onPlayingChange, surahName,
 }: AudioPlayerProps) => {
-  const [reciterId, setReciterId] = useState<number>(() => getSettings().defaultReciterId);
+  const { setNowPlaying, registerControls } = useAudioPlayer();
+  const [reciterId, setReciterId] = useState<number>(() => {
+    const sess = getLastSession();
+    return sess?.surahNumber === surahNumber ? sess.reciterId : getSettings().defaultReciterId;
+  });
   const [isPlaying, setIsPlayingRaw] = useState(false);
   const wakeLockFnRef = useRef<{ request: () => void; release: () => void }>({ request: () => {}, release: () => {} });
   const setIsPlaying = useCallback((v: boolean) => {
@@ -66,10 +74,25 @@ const AudioPlayer = ({
   const [sleepMinutesLeft, setSleepMinutesLeft] = useState<number | null>(null);
   const sleepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sleepEndRef = useRef<number | null>(null);
-  const [repeatMode, setRepeatMode] = useState<"none" | "surah" | "ayah">("none");
-  const repeatModeRef = useRef<"none" | "surah" | "ayah">("none");
+
+  // Repeat: mode + count (0 = infinite, otherwise total target loops). Count only applies when mode === "ayah"
+  const initialSession = useRef(getLastSession()).current;
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>(
+    initialSession?.surahNumber === surahNumber ? initialSession.repeatMode : "none"
+  );
+  const [repeatCount, setRepeatCount] = useState<number>(
+    initialSession?.surahNumber === surahNumber ? initialSession.repeatCount : 10
+  );
+  const [repeatIteration, setRepeatIteration] = useState<number>(1);
+  const repeatModeRef = useRef<RepeatMode>(repeatMode);
+  const repeatCountRef = useRef<number>(repeatCount);
+  const repeatIterationRef = useRef<number>(1);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const [wakeLockActive, setWakeLockActive] = useState(false);
+  const pendingResumeTimeRef = useRef<number | null>(
+    initialSession?.surahNumber === surahNumber ? initialSession.currentTime : null
+  );
+
 
   // Request Wake Lock to keep audio playing in background
   const requestWakeLock = useCallback(async () => {
@@ -156,7 +179,14 @@ const AudioPlayer = ({
 
       // Remove old event listeners by cloning approach — instead, we use
       // named handlers stored on the element to allow cleanup
-      audio.onloadedmetadata = () => setDuration(audio.duration);
+      audio.onloadedmetadata = () => {
+        setDuration(audio.duration);
+        // Apply pending resume time (only once, on first ayah load after restore)
+        if (pendingResumeTimeRef.current !== null && pendingResumeTimeRef.current > 0 && pendingResumeTimeRef.current < audio.duration) {
+          audio.currentTime = pendingResumeTimeRef.current;
+        }
+        pendingResumeTimeRef.current = null;
+      };
       audio.ontimeupdate = () => {
         if (audio.duration) {
           setProgress((audio.currentTime / audio.duration) * 100);
@@ -166,9 +196,22 @@ const AudioPlayer = ({
       audio.onended = () => {
         // Revoke blob URL if it was one
         if (src.startsWith("blob:")) URL.revokeObjectURL(src);
+
         if (repeatModeRef.current === "ayah") {
-          playAyah(index);
-        } else if (index + 1 < audioUrls.length) {
+          // Infinite (count = 0) or still under the target → loop again
+          const target = repeatCountRef.current;
+          if (target === 0 || repeatIterationRef.current < target) {
+            repeatIterationRef.current += 1;
+            setRepeatIteration(repeatIterationRef.current);
+            playAyah(index);
+            return;
+          }
+          // Reached target — reset and continue to next ayah (or stop)
+          repeatIterationRef.current = 1;
+          setRepeatIteration(1);
+        }
+
+        if (index + 1 < audioUrls.length) {
           onAyahChange(index + 1);
         } else if (repeatModeRef.current === "surah") {
           onAyahChange(0);
@@ -188,6 +231,7 @@ const AudioPlayer = ({
       audio.play();
       setIsPlaying(true);
       onAyahChange(index);
+
 
       if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -270,8 +314,16 @@ const AudioPlayer = ({
     if (audioRef.current) audioRef.current.playbackRate = speed;
   };
 
-  const prev = () => { if (currentAyah > 0) playAyah(currentAyah - 1); };
-  const next = () => { if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1); };
+  const prev = () => {
+    repeatIterationRef.current = 1;
+    setRepeatIteration(1);
+    if (currentAyah > 0) playAyah(currentAyah - 1);
+  };
+  const next = () => {
+    repeatIterationRef.current = 1;
+    setRepeatIteration(1);
+    if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1);
+  };
 
   const startSleepTimer = (minutes: number) => {
     if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
@@ -302,10 +354,15 @@ const AudioPlayer = ({
     setSleepMinutesLeft(null);
   };
 
-  const cycleRepeatMode = () => {
-    const next = repeatMode === "none" ? "surah" : repeatMode === "surah" ? "ayah" : "none";
-    setRepeatMode(next);
-    repeatModeRef.current = next;
+  const setRepeatModeAndCount = (mode: RepeatMode, count?: number) => {
+    setRepeatMode(mode);
+    repeatModeRef.current = mode;
+    if (typeof count === "number") {
+      setRepeatCount(count);
+      repeatCountRef.current = count;
+    }
+    repeatIterationRef.current = 1;
+    setRepeatIteration(1);
   };
 
   const handleSaveOffline = async () => {
@@ -363,6 +420,84 @@ const AudioPlayer = ({
   useEffect(() => {
     return () => { if (sleepTimerRef.current) clearInterval(sleepTimerRef.current); };
   }, []);
+
+  // Publish now-playing state to global context (drives the GlobalMiniPlayer)
+  useEffect(() => {
+    setNowPlaying({
+      surahNumber,
+      surahName: surahName || `Surah ${surahNumber}`,
+      totalAyahs,
+      currentAyah,
+      isPlaying,
+      progress,
+      repeatMode,
+      repeatCount,
+      repeatIteration,
+    });
+  }, [setNowPlaying, surahNumber, surahName, totalAyahs, currentAyah, isPlaying, progress, repeatMode, repeatCount, repeatIteration]);
+
+  // Register controls so GlobalMiniPlayer can call play/pause/next/prev/stop
+  useEffect(() => {
+    registerControls({
+      toggle: () => togglePlayRef.current(),
+      next: () => {
+        repeatIterationRef.current = 1;
+        setRepeatIteration(1);
+        if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1);
+      },
+      prev: () => {
+        repeatIterationRef.current = 1;
+        setRepeatIteration(1);
+        if (currentAyah > 0) playAyah(currentAyah - 1);
+      },
+      stop: () => {
+        audioRef.current?.pause();
+        setIsPlaying(false);
+        setProgress(0);
+        setCurrentTime(0);
+        setDuration(0);
+        stopSilentKeepalive();
+      },
+      openReader: () => { /* handled at page level via requestOpenReader */ },
+    });
+    return () => registerControls(null);
+  }, [registerControls, audioUrls, currentAyah, playAyah, setIsPlaying]);
+
+  // Persist session continuously
+  useEffect(() => {
+    saveLastSession({
+      surahNumber,
+      surahName,
+      ayahIndex: currentAyah,
+      reciterId,
+      wasPlaying: isPlaying,
+      currentTime,
+      repeatMode,
+      repeatCount,
+    });
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
+
+  // Save fresh state on tab hide / unload
+  useEffect(() => {
+    const persist = () => {
+      saveLastSession({
+        surahNumber,
+        surahName,
+        ayahIndex: currentAyah,
+        reciterId,
+        wasPlaying: isPlaying,
+        currentTime: audioRef.current?.currentTime ?? currentTime,
+        repeatMode,
+        repeatCount,
+      });
+    };
+    window.addEventListener("beforeunload", persist);
+    document.addEventListener("visibilitychange", persist);
+    return () => {
+      window.removeEventListener("beforeunload", persist);
+      document.removeEventListener("visibilitychange", persist);
+    };
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
 
   const displayName = (r: Reciter) =>
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
@@ -513,15 +648,64 @@ const AudioPlayer = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button
-              variant="ghost" size="sm"
-              className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
-              onClick={cycleRepeatMode}
-              title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
-            >
-              {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
-              <span className="hidden xs:inline">{repeatMode === "none" ? "Repeat" : repeatMode === "surah" ? "Surah" : "Ayah"}</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost" size="sm"
+                  className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
+                  title={
+                    repeatMode === "none" ? "No repeat"
+                    : repeatMode === "surah" ? "Repeat surah"
+                    : `Repeat ayah ${repeatCount === 0 ? "∞" : repeatCount + "×"}`
+                  }
+                >
+                  {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
+                  <span className="hidden xs:inline">
+                    {repeatMode === "none"
+                      ? "Repeat"
+                      : repeatMode === "surah"
+                        ? "Surah"
+                        : repeatCount === 0
+                          ? `${repeatIteration}/∞`
+                          : `${repeatIteration}/${repeatCount}`}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="min-w-[140px]">
+                <DropdownMenuItem
+                  onClick={() => setRepeatModeAndCount("none")}
+                  className={`text-xs justify-between ${repeatMode === "none" ? "bg-accent font-semibold" : ""}`}
+                >
+                  <span>Off</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setRepeatModeAndCount("surah")}
+                  className={`text-xs justify-between ${repeatMode === "surah" ? "bg-accent font-semibold" : ""}`}
+                >
+                  <span className="flex items-center gap-1.5"><Repeat className="w-3 h-3" /> Repeat surah</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Repeat ayah
+                </DropdownMenuLabel>
+                {REPEAT_COUNT_OPTIONS.map((c) => (
+                  <DropdownMenuItem
+                    key={c}
+                    onClick={() => setRepeatModeAndCount("ayah", c)}
+                    className={`text-xs justify-between ${repeatMode === "ayah" && repeatCount === c ? "bg-accent font-semibold" : ""}`}
+                  >
+                    <span className="flex items-center gap-1.5"><Repeat1 className="w-3 h-3" /> {c}×</span>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuItem
+                  onClick={() => setRepeatModeAndCount("ayah", 0)}
+                  className={`text-xs justify-between ${repeatMode === "ayah" && repeatCount === 0 ? "bg-accent font-semibold" : ""}`}
+                >
+                  <span className="flex items-center gap-1.5"><InfinityIcon className="w-3 h-3" /> Infinite</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
           </div>
 
           <span className="text-[10px] sm:text-xs text-muted-foreground tabular-nums shrink-0">
