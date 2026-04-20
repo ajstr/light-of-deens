@@ -4,7 +4,7 @@ import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings, saveLastSession, getLastSession, type RepeatMode } from "@/lib/storage";
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
-  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck, Infinity as InfinityIcon
+  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck, Infinity as InfinityIcon, ListRestart
 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -23,6 +23,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import RangeRepeatDialog from "@/components/RangeRepeatDialog";
 
 
 interface AudioPlayerProps {
@@ -92,6 +93,37 @@ const AudioPlayer = ({
   const pendingResumeTimeRef = useRef<number | null>(
     initialSession?.surahNumber === surahNumber ? initialSession.currentTime : null
   );
+
+  // Range repeat state — when active, plays ayahs [rangeStart..rangeEnd] (0-based, inclusive),
+  // repeating each ayah `rangeAyahCount` times before advancing, looping the entire range
+  // `rangeLoopCount` times (0 = infinite).
+  const [rangeActive, setRangeActive] = useState<boolean>(
+    !!(initialSession?.surahNumber === surahNumber &&
+       initialSession.rangeStart !== undefined &&
+       initialSession.rangeEnd !== undefined)
+  );
+  const [rangeStart, setRangeStart] = useState<number>(
+    initialSession?.rangeStart ?? 0
+  );
+  const [rangeEnd, setRangeEnd] = useState<number>(
+    initialSession?.rangeEnd ?? Math.max(0, totalAyahs - 1)
+  );
+  const [rangeLoopCount, setRangeLoopCount] = useState<number>(
+    initialSession?.rangeCount ?? 10
+  );
+  const [rangeAyahCount, setRangeAyahCount] = useState<number>(1);
+  const [rangeIteration, setRangeIteration] = useState<number>(1);
+  const [rangeAyahIteration, setRangeAyahIteration] = useState<number>(1);
+  const [rangeDialogOpen, setRangeDialogOpen] = useState(false);
+
+  const rangeActiveRef = useRef(rangeActive);
+  const rangeStartRef = useRef(rangeStart);
+  const rangeEndRef = useRef(rangeEnd);
+  const rangeLoopCountRef = useRef(rangeLoopCount);
+  const rangeAyahCountRef = useRef(rangeAyahCount);
+  const rangeIterationRef = useRef(1);
+  const rangeAyahIterationRef = useRef(1);
+
 
 
   // Request Wake Lock to keep audio playing in background
@@ -197,6 +229,49 @@ const AudioPlayer = ({
         // Revoke blob URL if it was one
         if (src.startsWith("blob:")) URL.revokeObjectURL(src);
 
+        // ----- Range repeat takes precedence -----
+        if (rangeActiveRef.current) {
+          const rs = rangeStartRef.current;
+          const re = rangeEndRef.current;
+          const ayahTarget = rangeAyahCountRef.current;
+          const loopTarget = rangeLoopCountRef.current;
+
+          // Repeat the same ayah inside the range first
+          if (rangeAyahIterationRef.current < ayahTarget) {
+            rangeAyahIterationRef.current += 1;
+            setRangeAyahIteration(rangeAyahIterationRef.current);
+            playAyah(index);
+            return;
+          }
+          // Per-ayah quota satisfied — reset and advance
+          rangeAyahIterationRef.current = 1;
+          setRangeAyahIteration(1);
+
+          if (index < re) {
+            // Move to next ayah within the range
+            playAyah(index + 1);
+            return;
+          }
+          // Reached end of range — bump range iteration
+          if (loopTarget === 0 || rangeIterationRef.current < loopTarget) {
+            rangeIterationRef.current += 1;
+            setRangeIteration(rangeIterationRef.current);
+            playAyah(rs);
+            return;
+          }
+          // Range fully complete — clear and stop
+          rangeIterationRef.current = 1;
+          setRangeIteration(1);
+          rangeActiveRef.current = false;
+          setRangeActive(false);
+          setIsPlaying(false);
+          setProgress(0);
+          setCurrentTime(0);
+          setDuration(0);
+          stopSilentKeepalive();
+          return;
+        }
+
         if (repeatModeRef.current === "ayah") {
           // Infinite (count = 0) or still under the target → loop again
           const target = repeatCountRef.current;
@@ -224,6 +299,7 @@ const AudioPlayer = ({
           stopSilentKeepalive();
         }
       };
+
 
       audio.playbackRate = speedRef.current;
       audio.src = src;
@@ -433,8 +509,13 @@ const AudioPlayer = ({
       repeatMode,
       repeatCount,
       repeatIteration,
+      rangeActive,
+      rangeStart,
+      rangeEnd,
+      rangeCount: rangeLoopCount,
+      rangeIteration,
     });
-  }, [setNowPlaying, surahNumber, surahName, totalAyahs, currentAyah, isPlaying, progress, repeatMode, repeatCount, repeatIteration]);
+  }, [setNowPlaying, surahNumber, surahName, totalAyahs, currentAyah, isPlaying, progress, repeatMode, repeatCount, repeatIteration, rangeActive, rangeStart, rangeEnd, rangeLoopCount, rangeIteration]);
 
   // Register controls so GlobalMiniPlayer can call play/pause/next/prev/stop
   useEffect(() => {
@@ -443,11 +524,15 @@ const AudioPlayer = ({
       next: () => {
         repeatIterationRef.current = 1;
         setRepeatIteration(1);
+        rangeAyahIterationRef.current = 1;
+        setRangeAyahIteration(1);
         if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1);
       },
       prev: () => {
         repeatIterationRef.current = 1;
         setRepeatIteration(1);
+        rangeAyahIterationRef.current = 1;
+        setRangeAyahIteration(1);
         if (currentAyah > 0) playAyah(currentAyah - 1);
       },
       stop: () => {
@@ -474,8 +559,11 @@ const AudioPlayer = ({
       currentTime,
       repeatMode,
       repeatCount,
+      rangeStart: rangeActive ? rangeStart : undefined,
+      rangeEnd: rangeActive ? rangeEnd : undefined,
+      rangeCount: rangeActive ? rangeLoopCount : undefined,
     });
-  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount, rangeActive, rangeStart, rangeEnd, rangeLoopCount]);
 
   // Save fresh state on tab hide / unload
   useEffect(() => {
@@ -489,6 +577,9 @@ const AudioPlayer = ({
         currentTime: audioRef.current?.currentTime ?? currentTime,
         repeatMode,
         repeatCount,
+        rangeStart: rangeActive ? rangeStart : undefined,
+        rangeEnd: rangeActive ? rangeEnd : undefined,
+        rangeCount: rangeActive ? rangeLoopCount : undefined,
       });
     };
     window.addEventListener("beforeunload", persist);
@@ -497,7 +588,39 @@ const AudioPlayer = ({
       window.removeEventListener("beforeunload", persist);
       document.removeEventListener("visibilitychange", persist);
     };
-  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount, rangeActive, rangeStart, rangeEnd, rangeLoopCount]);
+
+  const applyRange = (start: number, end: number, loopCount: number, ayahCount: number) => {
+    rangeStartRef.current = start;
+    rangeEndRef.current = end;
+    rangeLoopCountRef.current = loopCount;
+    rangeAyahCountRef.current = ayahCount;
+    rangeIterationRef.current = 1;
+    rangeAyahIterationRef.current = 1;
+    rangeActiveRef.current = true;
+    setRangeStart(start);
+    setRangeEnd(end);
+    setRangeLoopCount(loopCount);
+    setRangeAyahCount(ayahCount);
+    setRangeIteration(1);
+    setRangeAyahIteration(1);
+    setRangeActive(true);
+    // Disable conflicting modes while range is active
+    repeatModeRef.current = "none";
+    setRepeatMode("none");
+    // Jump to start ayah and begin playback
+    playAyah(start);
+  };
+
+  const clearRange = () => {
+    rangeActiveRef.current = false;
+    setRangeActive(false);
+    rangeIterationRef.current = 1;
+    setRangeIteration(1);
+    rangeAyahIterationRef.current = 1;
+    setRangeAyahIteration(1);
+  };
+
 
   const displayName = (r: Reciter) =>
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
@@ -706,13 +829,49 @@ const AudioPlayer = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Range Repeat */}
+            <Button
+              variant="ghost" size="sm"
+              className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${rangeActive ? "text-primary font-semibold" : ""}`}
+              onClick={() => setRangeDialogOpen(true)}
+              title={
+                rangeActive
+                  ? `Range ${rangeStart + 1}–${rangeEnd + 1} · loop ${rangeLoopCount === 0 ? "∞" : rangeIteration + "/" + rangeLoopCount}`
+                  : "Range repeat"
+              }
+            >
+              <ListRestart className="w-3 h-3" />
+              <span className="hidden xs:inline">
+                {rangeActive
+                  ? `${rangeStart + 1}–${rangeEnd + 1}`
+                  : "Range"}
+              </span>
+            </Button>
+
           </div>
 
           <span className="text-[10px] sm:text-xs text-muted-foreground tabular-nums shrink-0">
-            Ayah {currentAyah + 1}/{totalAyahs}
+            {rangeActive ? (
+              <>Range {rangeIteration}{rangeLoopCount === 0 ? "/∞" : `/${rangeLoopCount}`} · A {rangeAyahIteration}/{rangeAyahCount}</>
+            ) : (
+              <>Ayah {currentAyah + 1}/{totalAyahs}</>
+            )}
           </span>
         </div>
       </div>
+
+      <RangeRepeatDialog
+        open={rangeDialogOpen}
+        onOpenChange={setRangeDialogOpen}
+        totalAyahs={totalAyahs}
+        initialStart={rangeActive ? rangeStart : currentAyah}
+        initialEnd={rangeActive ? rangeEnd : Math.min(currentAyah + 4, totalAyahs - 1)}
+        initialRangeCount={rangeLoopCount}
+        initialAyahCount={rangeAyahCount}
+        onApply={applyRange}
+        onClear={clearRange}
+        hasActiveRange={rangeActive}
+      />
     </div>
   );
 };

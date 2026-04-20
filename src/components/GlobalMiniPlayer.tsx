@@ -1,4 +1,4 @@
-import { Play, Pause, SkipForward, SkipBack, X, Repeat1, Repeat } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, X, Repeat1, Repeat, ListRestart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,11 @@ const GlobalMiniPlayer = () => {
 
   if (!nowPlaying || !controls) return null;
 
-  const { surahName, currentAyah, totalAyahs, isPlaying, progress, repeatMode, repeatCount, repeatIteration } = nowPlaying;
+  const {
+    surahName, currentAyah, totalAyahs, isPlaying, progress,
+    repeatMode, repeatCount, repeatIteration,
+    rangeActive, rangeStart, rangeEnd, rangeCount, rangeIteration,
+  } = nowPlaying;
 
   const handleOpen = () => {
     requestOpenReader(nowPlaying.surahNumber, currentAyah);
@@ -62,13 +66,19 @@ const GlobalMiniPlayer = () => {
               </div>
               <div className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight flex items-center gap-1.5">
                 <span className="tabular-nums">Ayah {currentAyah + 1}/{totalAyahs}</span>
-                {showRepeatBadge && (
+                {rangeActive && (
+                  <span className="flex items-center gap-0.5 text-primary font-medium tabular-nums">
+                    <ListRestart className="w-2.5 h-2.5" />
+                    {rangeStart + 1}–{rangeEnd + 1} · {rangeIteration}{rangeCount === 0 ? "/∞" : `/${rangeCount}`}
+                  </span>
+                )}
+                {!rangeActive && showRepeatBadge && (
                   <span className="flex items-center gap-0.5 text-primary font-medium">
                     <Repeat1 className="w-2.5 h-2.5" />
                     {repeatLabel}
                   </span>
                 )}
-                {repeatMode === "surah" && (
+                {!rangeActive && repeatMode === "surah" && (
                   <span className="flex items-center gap-0.5 text-primary font-medium">
                     <Repeat className="w-2.5 h-2.5" />
                   </span>

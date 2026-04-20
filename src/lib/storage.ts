@@ -39,6 +39,11 @@ export interface LastSession {
   currentTime: number;       // seconds within current ayah audio
   repeatMode: RepeatMode;
   repeatCount: number;       // 0 = infinite, otherwise total target loops
+  // Range repeat (optional). When rangeStart and rangeEnd are set (>= 0), playback loops
+  // ayahs [rangeStart..rangeEnd] (0-based inclusive). rangeCount === 0 means infinite.
+  rangeStart?: number;
+  rangeEnd?: number;
+  rangeCount?: number;
   updatedAt: number;
 }
 
