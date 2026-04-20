@@ -421,6 +421,84 @@ const AudioPlayer = ({
     return () => { if (sleepTimerRef.current) clearInterval(sleepTimerRef.current); };
   }, []);
 
+  // Publish now-playing state to global context (drives the GlobalMiniPlayer)
+  useEffect(() => {
+    setNowPlaying({
+      surahNumber,
+      surahName: surahName || `Surah ${surahNumber}`,
+      totalAyahs,
+      currentAyah,
+      isPlaying,
+      progress,
+      repeatMode,
+      repeatCount,
+      repeatIteration,
+    });
+  }, [setNowPlaying, surahNumber, surahName, totalAyahs, currentAyah, isPlaying, progress, repeatMode, repeatCount, repeatIteration]);
+
+  // Register controls so GlobalMiniPlayer can call play/pause/next/prev/stop
+  useEffect(() => {
+    registerControls({
+      toggle: () => togglePlayRef.current(),
+      next: () => {
+        repeatIterationRef.current = 1;
+        setRepeatIteration(1);
+        if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1);
+      },
+      prev: () => {
+        repeatIterationRef.current = 1;
+        setRepeatIteration(1);
+        if (currentAyah > 0) playAyah(currentAyah - 1);
+      },
+      stop: () => {
+        audioRef.current?.pause();
+        setIsPlaying(false);
+        setProgress(0);
+        setCurrentTime(0);
+        setDuration(0);
+        stopSilentKeepalive();
+      },
+      openReader: () => { /* handled at page level via requestOpenReader */ },
+    });
+    return () => registerControls(null);
+  }, [registerControls, audioUrls, currentAyah, playAyah, setIsPlaying]);
+
+  // Persist session continuously
+  useEffect(() => {
+    saveLastSession({
+      surahNumber,
+      surahName,
+      ayahIndex: currentAyah,
+      reciterId,
+      wasPlaying: isPlaying,
+      currentTime,
+      repeatMode,
+      repeatCount,
+    });
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
+
+  // Save fresh state on tab hide / unload
+  useEffect(() => {
+    const persist = () => {
+      saveLastSession({
+        surahNumber,
+        surahName,
+        ayahIndex: currentAyah,
+        reciterId,
+        wasPlaying: isPlaying,
+        currentTime: audioRef.current?.currentTime ?? currentTime,
+        repeatMode,
+        repeatCount,
+      });
+    };
+    window.addEventListener("beforeunload", persist);
+    document.addEventListener("visibilitychange", persist);
+    return () => {
+      window.removeEventListener("beforeunload", persist);
+      document.removeEventListener("visibilitychange", persist);
+    };
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
+
   const displayName = (r: Reciter) =>
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
 
