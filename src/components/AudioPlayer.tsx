@@ -570,15 +570,64 @@ const AudioPlayer = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button
-              variant="ghost" size="sm"
-              className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
-              onClick={cycleRepeatMode}
-              title={repeatMode === "none" ? "No repeat" : repeatMode === "surah" ? "Repeat surah" : "Repeat ayah"}
-            >
-              {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
-              <span className="hidden xs:inline">{repeatMode === "none" ? "Repeat" : repeatMode === "surah" ? "Surah" : "Ayah"}</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost" size="sm"
+                  className={`h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1 ${repeatMode !== "none" ? "text-primary font-semibold" : ""}`}
+                  title={
+                    repeatMode === "none" ? "No repeat"
+                    : repeatMode === "surah" ? "Repeat surah"
+                    : `Repeat ayah ${repeatCount === 0 ? "∞" : repeatCount + "×"}`
+                  }
+                >
+                  {repeatMode === "ayah" ? <Repeat1 className="w-3 h-3" /> : <Repeat className="w-3 h-3" />}
+                  <span className="hidden xs:inline">
+                    {repeatMode === "none"
+                      ? "Repeat"
+                      : repeatMode === "surah"
+                        ? "Surah"
+                        : repeatCount === 0
+                          ? `${repeatIteration}/∞`
+                          : `${repeatIteration}/${repeatCount}`}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="min-w-[140px]">
+                <DropdownMenuItem
+                  onClick={() => setRepeatModeAndCount("none")}
+                  className={`text-xs justify-between ${repeatMode === "none" ? "bg-accent font-semibold" : ""}`}
+                >
+                  <span>Off</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setRepeatModeAndCount("surah")}
+                  className={`text-xs justify-between ${repeatMode === "surah" ? "bg-accent font-semibold" : ""}`}
+                >
+                  <span className="flex items-center gap-1.5"><Repeat className="w-3 h-3" /> Repeat surah</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Repeat ayah
+                </DropdownMenuLabel>
+                {REPEAT_COUNT_OPTIONS.map((c) => (
+                  <DropdownMenuItem
+                    key={c}
+                    onClick={() => setRepeatModeAndCount("ayah", c)}
+                    className={`text-xs justify-between ${repeatMode === "ayah" && repeatCount === c ? "bg-accent font-semibold" : ""}`}
+                  >
+                    <span className="flex items-center gap-1.5"><Repeat1 className="w-3 h-3" /> {c}×</span>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuItem
+                  onClick={() => setRepeatModeAndCount("ayah", 0)}
+                  className={`text-xs justify-between ${repeatMode === "ayah" && repeatCount === 0 ? "bg-accent font-semibold" : ""}`}
+                >
+                  <span className="flex items-center gap-1.5"><InfinityIcon className="w-3 h-3" /> Infinite</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
           </div>
 
           <span className="text-[10px] sm:text-xs text-muted-foreground tabular-nums shrink-0">
