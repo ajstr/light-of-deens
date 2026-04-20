@@ -4,7 +4,7 @@ import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings, saveLastSession, getLastSession, type RepeatMode } from "@/lib/storage";
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
-  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck, Infinity as InfinityIcon
+  Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck, Infinity as InfinityIcon, ListRestart
 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -23,6 +23,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import RangeRepeatDialog from "@/components/RangeRepeatDialog";
 
 
 interface AudioPlayerProps {
