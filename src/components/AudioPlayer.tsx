@@ -508,8 +508,13 @@ const AudioPlayer = ({
       repeatMode,
       repeatCount,
       repeatIteration,
+      rangeActive,
+      rangeStart,
+      rangeEnd,
+      rangeCount: rangeLoopCount,
+      rangeIteration,
     });
-  }, [setNowPlaying, surahNumber, surahName, totalAyahs, currentAyah, isPlaying, progress, repeatMode, repeatCount, repeatIteration]);
+  }, [setNowPlaying, surahNumber, surahName, totalAyahs, currentAyah, isPlaying, progress, repeatMode, repeatCount, repeatIteration, rangeActive, rangeStart, rangeEnd, rangeLoopCount, rangeIteration]);
 
   // Register controls so GlobalMiniPlayer can call play/pause/next/prev/stop
   useEffect(() => {
@@ -518,11 +523,15 @@ const AudioPlayer = ({
       next: () => {
         repeatIterationRef.current = 1;
         setRepeatIteration(1);
+        rangeAyahIterationRef.current = 1;
+        setRangeAyahIteration(1);
         if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1);
       },
       prev: () => {
         repeatIterationRef.current = 1;
         setRepeatIteration(1);
+        rangeAyahIterationRef.current = 1;
+        setRangeAyahIteration(1);
         if (currentAyah > 0) playAyah(currentAyah - 1);
       },
       stop: () => {
@@ -549,8 +558,11 @@ const AudioPlayer = ({
       currentTime,
       repeatMode,
       repeatCount,
+      rangeStart: rangeActive ? rangeStart : undefined,
+      rangeEnd: rangeActive ? rangeEnd : undefined,
+      rangeCount: rangeActive ? rangeLoopCount : undefined,
     });
-  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount, rangeActive, rangeStart, rangeEnd, rangeLoopCount]);
 
   // Save fresh state on tab hide / unload
   useEffect(() => {
@@ -564,6 +576,9 @@ const AudioPlayer = ({
         currentTime: audioRef.current?.currentTime ?? currentTime,
         repeatMode,
         repeatCount,
+        rangeStart: rangeActive ? rangeStart : undefined,
+        rangeEnd: rangeActive ? rangeEnd : undefined,
+        rangeCount: rangeActive ? rangeLoopCount : undefined,
       });
     };
     window.addEventListener("beforeunload", persist);
@@ -572,7 +587,39 @@ const AudioPlayer = ({
       window.removeEventListener("beforeunload", persist);
       document.removeEventListener("visibilitychange", persist);
     };
-  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount]);
+  }, [surahNumber, surahName, currentAyah, reciterId, isPlaying, currentTime, repeatMode, repeatCount, rangeActive, rangeStart, rangeEnd, rangeLoopCount]);
+
+  const applyRange = (start: number, end: number, loopCount: number, ayahCount: number) => {
+    rangeStartRef.current = start;
+    rangeEndRef.current = end;
+    rangeLoopCountRef.current = loopCount;
+    rangeAyahCountRef.current = ayahCount;
+    rangeIterationRef.current = 1;
+    rangeAyahIterationRef.current = 1;
+    rangeActiveRef.current = true;
+    setRangeStart(start);
+    setRangeEnd(end);
+    setRangeLoopCount(loopCount);
+    setRangeAyahCount(ayahCount);
+    setRangeIteration(1);
+    setRangeAyahIteration(1);
+    setRangeActive(true);
+    // Disable conflicting modes while range is active
+    repeatModeRef.current = "none";
+    setRepeatMode("none");
+    // Jump to start ayah and begin playback
+    playAyah(start);
+  };
+
+  const clearRange = () => {
+    rangeActiveRef.current = false;
+    setRangeActive(false);
+    rangeIterationRef.current = 1;
+    setRangeIteration(1);
+    rangeAyahIterationRef.current = 1;
+    setRangeAyahIteration(1);
+  };
+
 
   const displayName = (r: Reciter) =>
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
