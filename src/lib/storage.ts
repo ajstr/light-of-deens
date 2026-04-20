@@ -26,6 +26,55 @@ const BOOKMARKS_KEY = "quran-bookmarks";
 const LAST_READ_KEY = "quran-last-read";
 const SETTINGS_KEY = "quran-settings";
 const READING_PROGRESS_KEY = "quran-reading-progress";
+const LAST_SESSION_KEY = "quran-last-session";
+
+// Last full session — for "Continue where you left off" (reading + audio state)
+export type RepeatMode = "none" | "surah" | "ayah";
+export interface LastSession {
+  surahNumber: number;
+  surahName?: string;
+  ayahIndex: number;
+  reciterId: number;
+  wasPlaying: boolean;
+  currentTime: number;       // seconds within current ayah audio
+  repeatMode: RepeatMode;
+  repeatCount: number;       // 0 = infinite, otherwise total target loops
+  updatedAt: number;
+}
+
+export function getLastSession(): LastSession | null {
+  try {
+    const raw = localStorage.getItem(LAST_SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveLastSession(session: Partial<LastSession>): void {
+  const prev = getLastSession();
+  const merged: LastSession = {
+    surahNumber: 1,
+    ayahIndex: 0,
+    reciterId: getSettings().defaultReciterId,
+    wasPlaying: false,
+    currentTime: 0,
+    repeatMode: "none",
+    repeatCount: 0,
+    ...prev,
+    ...session,
+    updatedAt: Date.now(),
+  };
+  try {
+    localStorage.setItem(LAST_SESSION_KEY, JSON.stringify(merged));
+  } catch {
+    /* quota — ignore */
+  }
+}
+
+export function clearLastSession(): void {
+  localStorage.removeItem(LAST_SESSION_KEY);
+}
 
 // Bookmarks
 export function getBookmarks(): Bookmark[] {
