@@ -18,6 +18,12 @@ export interface NowPlaying {
   repeatMode: "none" | "surah" | "ayah";
   repeatCount: number;        // 0 = infinite
   repeatIteration: number;    // current loop number (1-based) when in ayah-repeat
+  // Range repeat
+  rangeActive: boolean;
+  rangeStart: number;         // 0-based
+  rangeEnd: number;           // 0-based, inclusive
+  rangeCount: number;         // 0 = infinite (loops of the entire range)
+  rangeIteration: number;     // current range loop (1-based)
 }
 
 interface Ctx {
