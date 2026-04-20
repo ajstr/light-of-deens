@@ -1,4 +1,4 @@
-import { Play, Pause, SkipForward, SkipBack, X, Repeat1, Repeat } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, X, Repeat1, Repeat, ListRestart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,11 @@ const GlobalMiniPlayer = () => {
 
   if (!nowPlaying || !controls) return null;
 
-  const { surahName, currentAyah, totalAyahs, isPlaying, progress, repeatMode, repeatCount, repeatIteration } = nowPlaying;
+  const {
+    surahName, currentAyah, totalAyahs, isPlaying, progress,
+    repeatMode, repeatCount, repeatIteration,
+    rangeActive, rangeStart, rangeEnd, rangeCount, rangeIteration,
+  } = nowPlaying;
 
   const handleOpen = () => {
     requestOpenReader(nowPlaying.surahNumber, currentAyah);
