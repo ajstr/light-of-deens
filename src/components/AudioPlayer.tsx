@@ -37,6 +37,8 @@ interface AudioPlayerProps {
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
 const SLEEP_OPTIONS = [5, 10, 15, 30, 60, 90];
+const REPEAT_COUNT_OPTIONS = [5, 10, 15, 25, 50]; // 0 = infinite
+
 
 const formatTime = (seconds: number) => {
   if (!seconds || !isFinite(seconds)) return "0:00";
