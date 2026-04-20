@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Book } from "lucide-react";
@@ -15,7 +15,9 @@ import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
-import { saveLastRead } from "@/lib/storage";
+import { saveLastRead, getLastSession } from "@/lib/storage";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { toast } from "sonner";
 
 const Index = () => {
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
@@ -24,6 +26,7 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const { registerOpenReader } = useAudioPlayer();
 
   const { data: surahs } = useQuery({
     queryKey: ["surahs"],
