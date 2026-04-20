@@ -228,6 +228,49 @@ const AudioPlayer = ({
         // Revoke blob URL if it was one
         if (src.startsWith("blob:")) URL.revokeObjectURL(src);
 
+        // ----- Range repeat takes precedence -----
+        if (rangeActiveRef.current) {
+          const rs = rangeStartRef.current;
+          const re = rangeEndRef.current;
+          const ayahTarget = rangeAyahCountRef.current;
+          const loopTarget = rangeLoopCountRef.current;
+
+          // Repeat the same ayah inside the range first
+          if (rangeAyahIterationRef.current < ayahTarget) {
+            rangeAyahIterationRef.current += 1;
+            setRangeAyahIteration(rangeAyahIterationRef.current);
+            playAyah(index);
+            return;
+          }
+          // Per-ayah quota satisfied — reset and advance
+          rangeAyahIterationRef.current = 1;
+          setRangeAyahIteration(1);
+
+          if (index < re) {
+            // Move to next ayah within the range
+            playAyah(index + 1);
+            return;
+          }
+          // Reached end of range — bump range iteration
+          if (loopTarget === 0 || rangeIterationRef.current < loopTarget) {
+            rangeIterationRef.current += 1;
+            setRangeIteration(rangeIterationRef.current);
+            playAyah(rs);
+            return;
+          }
+          // Range fully complete — clear and stop
+          rangeIterationRef.current = 1;
+          setRangeIteration(1);
+          rangeActiveRef.current = false;
+          setRangeActive(false);
+          setIsPlaying(false);
+          setProgress(0);
+          setCurrentTime(0);
+          setDuration(0);
+          stopSilentKeepalive();
+          return;
+        }
+
         if (repeatModeRef.current === "ayah") {
           // Infinite (count = 0) or still under the target → loop again
           const target = repeatCountRef.current;
@@ -255,6 +298,7 @@ const AudioPlayer = ({
           stopSilentKeepalive();
         }
       };
+
 
       audio.playbackRate = speedRef.current;
       audio.src = src;
