@@ -314,8 +314,16 @@ const AudioPlayer = ({
     if (audioRef.current) audioRef.current.playbackRate = speed;
   };
 
-  const prev = () => { if (currentAyah > 0) playAyah(currentAyah - 1); };
-  const next = () => { if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1); };
+  const prev = () => {
+    repeatIterationRef.current = 1;
+    setRepeatIteration(1);
+    if (currentAyah > 0) playAyah(currentAyah - 1);
+  };
+  const next = () => {
+    repeatIterationRef.current = 1;
+    setRepeatIteration(1);
+    if (audioUrls && currentAyah < audioUrls.length - 1) playAyah(currentAyah + 1);
+  };
 
   const startSleepTimer = (minutes: number) => {
     if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
