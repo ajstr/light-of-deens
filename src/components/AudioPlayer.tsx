@@ -93,6 +93,37 @@ const AudioPlayer = ({
     initialSession?.surahNumber === surahNumber ? initialSession.currentTime : null
   );
 
+  // Range repeat state — when active, plays ayahs [rangeStart..rangeEnd] (0-based, inclusive),
+  // repeating each ayah `rangeAyahCount` times before advancing, looping the entire range
+  // `rangeLoopCount` times (0 = infinite).
+  const [rangeActive, setRangeActive] = useState<boolean>(
+    !!(initialSession?.surahNumber === surahNumber &&
+       initialSession.rangeStart !== undefined &&
+       initialSession.rangeEnd !== undefined)
+  );
+  const [rangeStart, setRangeStart] = useState<number>(
+    initialSession?.rangeStart ?? 0
+  );
+  const [rangeEnd, setRangeEnd] = useState<number>(
+    initialSession?.rangeEnd ?? Math.max(0, totalAyahs - 1)
+  );
+  const [rangeLoopCount, setRangeLoopCount] = useState<number>(
+    initialSession?.rangeCount ?? 10
+  );
+  const [rangeAyahCount, setRangeAyahCount] = useState<number>(1);
+  const [rangeIteration, setRangeIteration] = useState<number>(1);
+  const [rangeAyahIteration, setRangeAyahIteration] = useState<number>(1);
+  const [rangeDialogOpen, setRangeDialogOpen] = useState(false);
+
+  const rangeActiveRef = useRef(rangeActive);
+  const rangeStartRef = useRef(rangeStart);
+  const rangeEndRef = useRef(rangeEnd);
+  const rangeLoopCountRef = useRef(rangeLoopCount);
+  const rangeAyahCountRef = useRef(rangeAyahCount);
+  const rangeIterationRef = useRef(1);
+  const rangeAyahIterationRef = useRef(1);
+
+
 
   // Request Wake Lock to keep audio playing in background
   const requestWakeLock = useCallback(async () => {
