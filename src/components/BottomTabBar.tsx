@@ -1,5 +1,6 @@
 import { Home, BookOpen, Bookmark, Settings, HardDriveDownload, HandHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useHideOnScroll } from "@/hooks/use-scroll-direction";
 
 interface BottomTabBarProps {
   activeTab: string;
