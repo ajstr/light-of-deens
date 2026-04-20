@@ -12,6 +12,7 @@ import ReaderToolbar from "@/components/ReaderToolbar";
 import VerseCard from "@/components/VerseCard";
 import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings, markAyahRead } from "@/lib/storage";
 import { getFontClass } from "@/components/FontPreview";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 
 interface SurahReaderProps {
   surah: Surah;
