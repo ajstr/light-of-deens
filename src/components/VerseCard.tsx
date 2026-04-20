@@ -61,6 +61,7 @@ const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
       tajweedEnabled,
       tajweedLoading,
       tajweedHtml,
+      inActiveRange = false,
     },
     ref
   ) => {
@@ -74,7 +75,9 @@ const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
         transition={{ delay: Math.min(index * 0.03, 1) }}
         className={`bg-card rounded-lg p-6 group transition-all duration-300 cursor-pointer ${
           currentAyah === index ? "ring-2 ring-primary/30" : ""
-        } ${highlightedAyah === index ? "bg-primary/10 shadow-md" : ""}`}
+        } ${highlightedAyah === index ? "bg-primary/10 shadow-md" : ""} ${
+          inActiveRange ? "bg-accent/10 ring-1 ring-accent/30" : ""
+        }`}
         onClick={() => onHighlightToggle(index)}
       >
         <div className="flex items-start gap-4">
