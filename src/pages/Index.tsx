@@ -26,7 +26,7 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const { registerOpenReader } = useAudioPlayer();
+  const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
   const { data: surahs } = useQuery({
     queryKey: ["surahs"],
@@ -137,7 +137,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className={`min-h-screen bg-background pb-20 ${nowPlaying ? "pt-12 sm:pt-14" : ""}`}>
       {/* Header */}
       <header className="py-8 text-center border-b border-border mb-8">
         <motion.div
