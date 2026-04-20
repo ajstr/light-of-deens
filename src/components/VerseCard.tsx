@@ -35,6 +35,8 @@ interface VerseCardProps {
   tajweedEnabled: boolean;
   tajweedLoading: boolean;
   tajweedHtml?: string;
+  // Range repeat
+  inActiveRange?: boolean;
 }
 
 const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
