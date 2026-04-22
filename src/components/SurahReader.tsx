@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowUp } from "lucide-react";
+import { ArrowLeft, ArrowUp, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TafsirModal from "@/components/TafsirModal";
 import QuranNavigator from "@/components/QuranNavigator";
@@ -33,6 +33,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [translationEnabled, setTranslationEnabled] = useState(settings.showTranslation);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [activeAyahOffscreen, setActiveAyahOffscreen] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
   const [highlightedAyah, setHighlightedAyah] = useState<number | null>(null);
   const [tafsirAyah, setTafsirAyah] = useState<number | null>(null);
@@ -42,14 +43,31 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   const arabicFontClass = getFontClass(settings.arabicFont);
 
   useEffect(() => {
-    const handleScroll = () => setShowBackToTop(window.scrollY > 400);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+      // Check if active ayah is offscreen
+      const el = ayahRefs.current[currentAyah];
+      if (!el) {
+        setActiveAyahOffscreen(false);
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const offscreen = rect.bottom < 80 || rect.top > vh - 80;
+      setActiveAyahOffscreen(offscreen);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [currentAyah]);
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
+  const scrollToCurrentAyah = useCallback(() => {
+    ayahRefs.current[currentAyah]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [currentAyah]);
 
   useEffect(() => {
     onAyahChange(initialAyah);
@@ -193,6 +211,27 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
           })}
         </div>
       )}
+
+      {/* Jump to current ayah (while audio playing & offscreen) */}
+      {isAudioPlaying &&
+        nowPlaying?.surahNumber === surah.number &&
+        activeAyahOffscreen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-40 left-1/2 -translate-x-1/2 z-50"
+          >
+            <Button
+              onClick={scrollToCurrentAyah}
+              size="sm"
+              className="rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 gap-2"
+            >
+              <Headphones className="h-4 w-4" />
+              <span className="text-xs font-medium tabular-nums">Jump to ayah {currentAyah + 1}</span>
+            </Button>
+          </motion.div>
+        )}
 
       {/* Back to Top */}
       {showBackToTop && (
