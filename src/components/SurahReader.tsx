@@ -150,6 +150,15 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
     enabled: tajweedEnabled,
   });
 
+  // After data loads, snap to the initial ayah from last session (runs once per surah load)
+  useEffect(() => {
+    if (!data?.ayahs?.length) return;
+    const t = setTimeout(() => {
+      ayahRefs.current[initialAyah]?.scrollIntoView({ behavior: "auto", block: "center" });
+    }, 80);
+    return () => clearTimeout(t);
+  }, [data, initialAyah]);
+
   return (
     <div className="max-w-3xl mx-auto px-4">
       {/* Top bar */}
