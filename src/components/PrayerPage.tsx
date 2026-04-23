@@ -113,7 +113,7 @@ const PrayerPage = () => {
         <p className="text-muted-foreground text-sm mb-4">
           We need your location to compute prayer times.
         </p>
-        <Button onClick={refresh} disabled={loading}>
+        <Button onClick={() => refresh(true)} disabled={loading}>
           {loading ? "Detecting…" : "Detect my location"}
         </Button>
       </div>
@@ -146,12 +146,24 @@ const PrayerPage = () => {
             </div>
           </div>
           <div className="flex gap-1">
-            <Button size="icon" variant="ghost" onClick={refresh} disabled={loading} aria-label="Refresh location">
+            <Button size="icon" variant="ghost" onClick={() => refresh(false)} disabled={loading} aria-label="Refresh location">
               <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
             </Button>
             <SettingsSheet settings={settings} onChange={update} loc={loc} onManualLoc={setManualLocation} />
           </div>
         </div>
+
+        {/* Prominent re-detect button (forces fresh GPS fix) */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => refresh(true)}
+          disabled={loading}
+          className="w-full mb-2"
+        >
+          <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+          {loading ? "Detecting fresh GPS…" : "Re-detect location"}
+        </Button>
 
         <Button
           size="sm"
