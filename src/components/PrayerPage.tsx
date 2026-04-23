@@ -62,12 +62,14 @@ const PrayerPage = () => {
     return () => clearInterval(id);
   }, []);
 
-  const refresh = async () => {
+  const refresh = async (forceFresh = false) => {
     setLoading(true);
     try {
-      const detected = await detectLocation();
+      const detected = await detectLocation({ forceFresh });
       setLoc(detected);
-      toast.success(`Location: ${detected.city ?? detected.country ?? "detected"}`);
+      setTick((t) => t + 1); // force timetable recompute immediately
+      const src = detected.source === "gps" ? "GPS" : detected.source === "ip" ? "IP" : "manual";
+      toast.success(`Location updated (${src}): ${detected.city ?? detected.country ?? `${detected.lat.toFixed(2)}, ${detected.lng.toFixed(2)}`}`);
     } catch {
       toast.error("Could not detect location. Set it manually below.");
     } finally { setLoading(false); }
