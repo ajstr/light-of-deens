@@ -118,6 +118,21 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
     ayahRefs.current[currentAyah]?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [currentAyah]);
 
+  // Keyboard shortcut: "J" jumps to current ayah while audio is playing
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key !== "j" && e.key !== "J") return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!isAudioPlaying) return;
+      e.preventDefault();
+      scrollToCurrentAyah();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [isAudioPlaying, scrollToCurrentAyah]);
+
   const { data, isLoading } = useQuery({
     queryKey: ["surah", surah.number, settings.translationId],
     queryFn: () => fetchSurah(surah.number, settings.translationId),
