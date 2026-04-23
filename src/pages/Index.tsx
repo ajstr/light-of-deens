@@ -9,6 +9,8 @@ import DownloadsPage from "@/components/DownloadsPage";
 import SettingsPage from "@/components/SettingsPage";
 import DuaPage from "@/components/DuaPage";
 import DailyDua from "@/components/DailyDua";
+import PrayerPage from "@/components/PrayerPage";
+import PrayerCard from "@/components/PrayerCard";
 import ContinueReading from "@/components/ContinueReading";
 import ReadingProgress from "@/components/ReadingProgress";
 import BottomTabBar from "@/components/BottomTabBar";
@@ -122,6 +124,8 @@ const Index = () => {
             }}
           />
         );
+      case "prayer":
+        return <PrayerPage />;
       case "duas":
         return <DuaPage />;
       case "downloads":
@@ -157,6 +161,7 @@ const Index = () => {
 
       {activeTab === "home" && (
         <>
+          <PrayerCard onOpen={() => setActiveTab("prayer")} />
           <DailyDua />
           <ReadingProgress />
           <ContinueReading
