@@ -155,9 +155,9 @@ export function savePrayerLocation(loc: PrayerLocation): void {
 }
 
 // ---------- Location detection ----------
-export async function detectLocation(): Promise<PrayerLocation> {
+export async function detectLocation(opts: { forceFresh?: boolean } = {}): Promise<PrayerLocation> {
   // 1) GPS
-  const gps = await getGpsLocation().catch(() => null);
+  const gps = await getGpsLocation(opts.forceFresh).catch(() => null);
   if (gps) {
     const meta = await reverseGeocode(gps.lat, gps.lng).catch(() => ({}));
     const loc: PrayerLocation = {
@@ -175,13 +175,17 @@ export async function detectLocation(): Promise<PrayerLocation> {
   return ip;
 }
 
-function getGpsLocation(): Promise<{ lat: number; lng: number }> {
+function getGpsLocation(forceFresh = false): Promise<{ lat: number; lng: number }> {
   return new Promise((resolve, reject) => {
     if (!("geolocation" in navigator)) return reject(new Error("no geolocation"));
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       (err) => reject(err),
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 5 * 60 * 1000 }
+      {
+        enableHighAccuracy: forceFresh,
+        timeout: forceFresh ? 15000 : 8000,
+        maximumAge: forceFresh ? 0 : 5 * 60 * 1000,
+      }
     );
   });
 }
