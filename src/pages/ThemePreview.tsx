@@ -281,9 +281,29 @@ const ThemePreview = () => {
             Back
           </Link>
           <h1 className="font-display text-xl font-semibold">Theme Preview</h1>
-          <div className="flex items-center gap-2">
-            {isDark ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-accent" />}
-            <Switch checked={isDark} onCheckedChange={setIsDark} aria-label="Toggle dark mode" />
+          <div className="inline-flex items-center rounded-md border border-border bg-card p-0.5">
+            <button
+              type="button"
+              onClick={() => setIsDark(false)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                !isDark ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+              aria-pressed={!isDark}
+            >
+              <Sun className="w-3.5 h-3.5" />
+              Light
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsDark(true)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                isDark ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+              aria-pressed={isDark}
+            >
+              <Moon className="w-3.5 h-3.5" />
+              Dark
+            </button>
           </div>
         </div>
       </header>
