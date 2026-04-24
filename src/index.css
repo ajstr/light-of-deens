@@ -101,6 +101,9 @@
     --gold: 43 70% 50%;
     --gold-light: 43 50% 35%;
     --emerald-deep: 153 45% 30%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(var(--emerald-deep)), hsl(var(--primary)) 60%, hsl(var(--gold)));
+    --gradient-hero-foreground: 40 20% 95%;
   }
 }
 
