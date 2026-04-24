@@ -150,6 +150,14 @@
   height: 1px;
 }
 
+.hero-surface {
+  background: var(--gradient-hero);
+  color: hsl(var(--gradient-hero-foreground));
+}
+.hero-surface .hero-muted {
+  color: hsl(var(--gradient-hero-foreground) / 0.8);
+}
+
 .tajweed-text {
   color: hsl(var(--foreground));
 }
