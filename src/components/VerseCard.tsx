@@ -171,9 +171,8 @@ const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
               <p
                 className={`${arabicFontClass} ${fontSizeClass} leading-[2.2] text-foreground text-right`}
                 dir="rtl"
-              >
-                {ayah.text}
-              </p>
+                dangerouslySetInnerHTML={{ __html: highlightWaqf(ayah.text) }}
+              />
             )}
 
             {translationEnabled && (
