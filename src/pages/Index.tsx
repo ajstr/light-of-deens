@@ -143,19 +143,19 @@ const Index = () => {
   return (
     <div className={`min-h-screen bg-background pb-20 ${nowPlaying ? "pt-12 sm:pt-14" : ""}`}>
       {/* Header */}
-      <header className="py-8 text-center border-b border-border mb-8">
+      <header className="hero-surface py-10 text-center mb-8 shadow-md">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-center gap-3 mb-2"
         >
-          <Book className="w-7 h-7 text-gold" />
-          <h1 className="font-display text-3xl font-bold text-foreground tracking-tight">
+          <Book className="w-7 h-7" style={{ color: "hsl(var(--gold-light))" }} />
+          <h1 className="font-display text-3xl font-bold tracking-tight">
             القرآن الكريم
           </h1>
-          <Book className="w-7 h-7 text-gold" />
+          <Book className="w-7 h-7" style={{ color: "hsl(var(--gold-light))" }} />
         </motion.div>
-        <p className="text-muted-foreground font-display text-lg">The Noble Quran</p>
+        <p className="hero-muted font-display text-lg">The Noble Quran</p>
         <div className="ornament-divider mt-4 mx-auto max-w-xs" />
       </header>
 
