@@ -56,6 +56,9 @@
     --gold-light: 43 60% 75%;
     --emerald-deep: 153 50% 18%;
 
+    --gradient-hero: linear-gradient(135deg, hsl(var(--emerald-deep)), hsl(var(--primary)) 60%, hsl(var(--gold)));
+    --gradient-hero-foreground: 40 30% 96%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
