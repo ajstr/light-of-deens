@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -87,6 +88,25 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
               />
             </div>
           </div>
+
+          {/* Theme Preview / Color Picker */}
+          <Link
+            to="/theme"
+            className="block bg-card rounded-lg p-4 border border-border hover:border-primary/40 transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Palette className="w-5 h-5 text-accent" />
+                <div>
+                  <Label className="text-foreground font-medium cursor-pointer">Theme Preview & Colors</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Pick custom colors for light & dark mode
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </Link>
 
           {/* Translation Toggle */}
           <div className="bg-card rounded-lg p-4 border border-border">
