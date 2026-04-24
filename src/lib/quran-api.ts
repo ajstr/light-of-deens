@@ -107,7 +107,9 @@ async function fetchDisplayArabicAyahs(surahNumber: number): Promise<string[]> {
   const json = await res.json();
   const verses = (json.verses || []).map((verse: any) =>
     (verse.text_uthmani || "")
-      .replace(/[\u06D6-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "")
+      // Strip end-of-ayah markers (۝), rub/hizb (۞), circles, and superscript alef/extras —
+      // BUT preserve waqf (pause) signs U+06D6–U+06DC so tajweed pause rulings render in the reader.
+      .replace(/[\u06DD\u06DE\u06DF-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "")
       .replace(/\s{2,}/g, " ")
       .trim()
   );
@@ -353,7 +355,8 @@ export async function fetchSurah(number: number, translationId: number = 0): Pro
     revelationType: s.type.charAt(0).toUpperCase() + s.type.slice(1),
     ayahs: s.verses.map((v, index) => ({
       number: index + 1,
-      text: (arabicAyahs[index] ?? v.text).replace(/[\u06D6-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "").replace(/\s{2,}/g, " ").trim(),
+      // Preserve waqf signs (U+06D6–U+06DC); strip only ayah-end/ornament markers
+      text: (arabicAyahs[index] ?? v.text).replace(/[\u06DD\u06DE\u06DF-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "").replace(/\s{2,}/g, " ").trim(),
       translation: translations?.[index] ?? v.translation.replace(/<[^>]*>/g, ""),
       numberInSurah: index + 1,
     })),
