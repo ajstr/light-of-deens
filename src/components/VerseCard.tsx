@@ -1,12 +1,18 @@
 import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { Play, Square, Bookmark, BookText } from "lucide-react";
+import DOMPurify from "dompurify";
 
 // Waqf (pause) signs U+06D6–U+06DC. Wrap each in a styled span so pause points stand out.
 const WAQF_REGEX = /([\u06D6-\u06DC])/g;
 function highlightWaqf(text: string): string {
-  return text.replace(WAQF_REGEX, '<span class="waqf-mark">$1</span>');
+  const wrapped = text.replace(WAQF_REGEX, '<span class="waqf-mark">$1</span>');
+  return DOMPurify.sanitize(wrapped, {
+    ALLOWED_TAGS: ['span'],
+    ALLOWED_ATTR: ['class'],
+  });
 }
+
 
 interface VerseWord {
   arabic: string;
