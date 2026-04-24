@@ -7,6 +7,7 @@ import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import GlobalMiniPlayer from "@/components/GlobalMiniPlayer";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ThemePreview from "./pages/ThemePreview.tsx";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <GlobalMiniPlayer />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/theme" element={<ThemePreview />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
