@@ -1,8 +1,15 @@
-import { getTotalAyahsRead, TOTAL_QURAN_AYAHS, getReadingProgress } from "@/lib/storage";
+import { useEffect, useState } from "react";
+import { getTotalAyahsRead, TOTAL_QURAN_AYAHS, getReadingProgress, subscribeProgressChange } from "@/lib/storage";
 import { BookOpen, TrendingUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 const ReadingProgress = () => {
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    return subscribeProgressChange(() => setTick((t) => t + 1));
+  }, []);
+
   const totalRead = getTotalAyahsRead();
   const percentage = Math.min(Math.round((totalRead / TOTAL_QURAN_AYAHS) * 100), 100);
   const progress = getReadingProgress();

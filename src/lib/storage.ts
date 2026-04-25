@@ -127,6 +127,25 @@ export function getLastRead(): LastRead | null {
 
 export function saveLastRead(surahNumber: number, ayahIndex: number): void {
   localStorage.setItem(LAST_READ_KEY, JSON.stringify({ surahNumber, ayahIndex }));
+  emitProgressChange();
+}
+
+// Reactive subscription — components can re-read storage when progress changes
+const PROGRESS_EVENT = "quran-progress-change";
+function emitProgressChange() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(PROGRESS_EVENT));
+  }
+}
+export function subscribeProgressChange(cb: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const handler = () => cb();
+  window.addEventListener(PROGRESS_EVENT, handler);
+  window.addEventListener("storage", handler);
+  return () => {
+    window.removeEventListener(PROGRESS_EVENT, handler);
+    window.removeEventListener("storage", handler);
+  };
 }
 
 // Settings
@@ -173,6 +192,7 @@ export function markAyahRead(surahNumber: number, ayahNumber: number): void {
   if (!progress[surahNumber].includes(ayahNumber)) {
     progress[surahNumber].push(ayahNumber);
     localStorage.setItem(READING_PROGRESS_KEY, JSON.stringify(progress));
+    emitProgressChange();
   }
 }
 

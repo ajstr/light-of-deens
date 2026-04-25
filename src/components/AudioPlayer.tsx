@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
-import { getSettings, saveLastSession, getLastSession, type RepeatMode } from "@/lib/storage";
+import { getSettings, saveLastSession, getLastSession, saveLastRead, markAyahRead, type RepeatMode } from "@/lib/storage";
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
   Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck, Infinity as InfinityIcon, ListRestart
@@ -332,6 +332,15 @@ const AudioPlayer = ({
     },
     [audioUrls, onAyahChange, surahName, surahNumber, getAudioSource, setIsPlaying]
   );
+
+  // Track listening progress: mark ayah as read + update last-read whenever
+  // the audio advances (so home progress reflects audio-only sessions too).
+  useEffect(() => {
+    if (currentAyah >= 0 && currentAyah < totalAyahs) {
+      markAyahRead(surahNumber, currentAyah + 1);
+      saveLastRead(surahNumber, currentAyah);
+    }
+  }, [surahNumber, currentAyah, totalAyahs]);
 
   useEffect(() => {
     if (isPlaying && audioUrls) {

@@ -1,4 +1,5 @@
-import { getLastRead } from "@/lib/storage";
+import { useEffect, useState } from "react";
+import { getLastRead, subscribeProgressChange } from "@/lib/storage";
 import { BookOpen, ChevronRight } from "lucide-react";
 import { Surah } from "@/lib/quran-api";
 
@@ -8,6 +9,8 @@ interface ContinueReadingProps {
 }
 
 const ContinueReading = ({ surahs, onContinue }: ContinueReadingProps) => {
+  const [, setTick] = useState(0);
+  useEffect(() => subscribeProgressChange(() => setTick((t) => t + 1)), []);
   const lastRead = getLastRead();
 
   if (!lastRead || surahs.length === 0) return null;
