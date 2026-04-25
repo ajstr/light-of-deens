@@ -333,6 +333,15 @@ const AudioPlayer = ({
     [audioUrls, onAyahChange, surahName, surahNumber, getAudioSource, setIsPlaying]
   );
 
+  // Track listening progress: mark ayah as read + update last-read whenever
+  // the audio advances (so home progress reflects audio-only sessions too).
+  useEffect(() => {
+    if (currentAyah >= 0 && currentAyah < totalAyahs) {
+      markAyahRead(surahNumber, currentAyah + 1);
+      saveLastRead(surahNumber, currentAyah);
+    }
+  }, [surahNumber, currentAyah, totalAyahs]);
+
   useEffect(() => {
     if (isPlaying && audioUrls) {
       playAyah(currentAyah);
