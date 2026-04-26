@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight } from "lucide-react";
+import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -288,6 +288,25 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
               />
             </div>
           )}
+
+          {/* Privacy Policy */}
+          <Link
+            to="/privacy"
+            className="block bg-card rounded-lg p-4 border border-border hover:border-primary/40 transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 text-primary" />
+                <div>
+                  <Label className="text-foreground font-medium cursor-pointer">Privacy Policy</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    How your data is handled
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </Link>
         </div>
       </motion.div>
     </div>
