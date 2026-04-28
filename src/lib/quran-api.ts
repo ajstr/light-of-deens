@@ -78,6 +78,7 @@ export const TRANSLATIONS: TranslationOption[] = [
   { id: 84, name: "Maududi", author: "Abul Ala Maududi" },
   { id: 95, name: "Muhammad Pickthall", author: "Muhammad Marmaduke Pickthall" },
   { id: 22, name: "Muhsin Khan", author: "Muhammad Muhsin Khan" },
+  { id: 244, name: "Somali (Af-Soomaali)", author: "Mahmud Muhammad Abduh" },
   { id: 169, name: "Ibn Kathir (Abridged)", author: "Ibn Kathir", isTafsir: true },
 ];
 
