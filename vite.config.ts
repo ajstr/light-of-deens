@@ -33,6 +33,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    syncIosVersionPlugin(),
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
