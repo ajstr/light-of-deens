@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.lightofdeen',
+  appId: 'com.lightofdeen.app',
   appName: 'Light of Deen',
   webDir: 'dist'
 };
