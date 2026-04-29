@@ -21,6 +21,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import QiblaCompass from "@/components/QiblaCompass";
+import LocationDiagnostics from "@/components/LocationDiagnostics";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -152,6 +153,8 @@ const PrayerPage = () => {
             <SettingsSheet settings={settings} onChange={update} loc={loc} onManualLoc={setManualLocation} />
           </div>
         </div>
+
+        <LocationDiagnostics />
 
         {/* Prominent re-detect button (forces fresh GPS fix) */}
         <Button
