@@ -1,8 +1,26 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { spawnSync } from "node:child_process";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
+
+// Syncs iOS MARKETING_VERSION + CURRENT_PROJECT_VERSION from package.json
+// into ios/App/App.xcodeproj/project.pbxproj on every production build.
+const syncIosVersionPlugin = (): PluginOption => ({
+  name: "sync-ios-version",
+  apply: "build",
+  buildStart() {
+    const result = spawnSync(
+      process.execPath,
+      [path.resolve(__dirname, "scripts/sync-ios-version.mjs")],
+      { stdio: "inherit" }
+    );
+    if (result.status !== 0) {
+      this.warn("sync-ios-version script exited with a non-zero status.");
+    }
+  },
+});
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -15,6 +33,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    syncIosVersionPlugin(),
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
