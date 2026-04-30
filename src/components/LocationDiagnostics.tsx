@@ -78,7 +78,7 @@ const LocationDiagnostics = () => {
         label: "Permission state",
         status: "fail",
         detail: isNative
-          ? "denied — open iOS Settings → Light of Deen → Location and choose 'While Using'."
+          ? "denied — open iOS Settings → Light of Sirat → Location and choose 'While Using'."
           : "denied — click the 🔒 / location icon in the address bar and allow location, then retry.",
       });
     } else if (permState === "prompt") {

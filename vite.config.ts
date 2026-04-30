@@ -68,8 +68,8 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       manifest: {
-        name: "Light of Deen - Quran Reader",
-        short_name: "Light of Deen",
+        name: "Light of Sirat - Quran Reader",
+        short_name: "Light of Sirat",
         description: "Beautiful Quran reader with audio recitation, tajweed, and offline support",
         theme_color: "#1a1a2e",
         background_color: "#1a1a2e",
