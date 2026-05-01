@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Light of Sirat</string>
+	<string>AJS Muslim Companion</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -48,8 +48,8 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Light of Sirat uses your location to calculate accurate prayer times and Qibla direction.</string>
+	<string>AJS Muslim Companion uses your location to calculate accurate prayer times and Qibla direction.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Light of Sirat uses your location to calculate accurate prayer times and Qibla direction.</string>
+	<string>AJS Muslim Companion uses your location to calculate accurate prayer times and Qibla direction.</string>
 </dict>
 </plist>
