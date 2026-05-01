@@ -304,10 +304,9 @@ async function fetchTafsirTranslation(surahNumber: number, tafsirId: number, cac
 
 // Available tafsir sources for per-verse lookup
 export const TAFSIR_SOURCES = [
-  { id: 169, name: "Ibn Kathir (Abridged)", author: "Ibn Kathir" },
-  { id: 74, name: "Tafsir al-Jalalayn", author: "Jalal ad-Din al-Mahalli & as-Suyuti" },
-  { id: 168, name: "Al-Tabari", author: "Ibn Jarir al-Tabari" },
-  { id: 816, name: "Tafsir al-Wasit", author: "Muhammad Sayyid Tantawi" },
+  { id: 169, name: "Ibn Kathir (Abridged)", author: "Hafiz Ibn Kathir" },
+  { id: 168, name: "Ma'arif al-Qur'an", author: "Mufti Muhammad Shafi" },
+  { id: 817, name: "Tazkirul Quran", author: "Maulana Wahiduddin Khan" },
 ];
 
 const verseTafsirCache = new Map<string, string>();
