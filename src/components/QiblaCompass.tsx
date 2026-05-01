@@ -276,6 +276,44 @@ const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
           {/* Center hub */}
           <div className="absolute w-4 h-4 rounded-full bg-card border-2 border-gold" />
         </div>
+
+        {/* Calibration overlay */}
+        {showCalibration && heading != null && (
+          <div className="absolute inset-0 rounded-full bg-background/85 backdrop-blur-md flex flex-col items-center justify-center p-6 z-10 animate-in fade-in duration-300">
+            <button
+              onClick={dismissCalibration}
+              className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-muted/50 text-muted-foreground"
+              aria-label="Dismiss"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <svg viewBox="0 0 100 70" className="w-28 h-20 mb-3" aria-hidden>
+              <path
+                d="M 20 35 Q 20 10 50 35 Q 80 60 80 35 Q 80 10 50 35 Q 20 60 20 35 Z"
+                fill="none"
+                stroke="hsl(var(--gold) / 0.3)"
+                strokeWidth="1.5"
+                strokeDasharray="3 3"
+              />
+              <g style={{ animation: "qibla-fig8 3s ease-in-out infinite" }}>
+                <rect x="-5" y="-8" width="10" height="16" rx="2" fill="hsl(var(--gold))" />
+                <rect x="-3" y="-6" width="6" height="11" fill="hsl(var(--background))" />
+              </g>
+            </svg>
+            <h4 className="text-sm font-semibold text-foreground mb-1">Calibrate compass</h4>
+            <p className="text-[11px] text-center text-muted-foreground leading-relaxed max-w-[200px]">
+              Move your phone in a <span className="text-gold font-medium">figure-8</span> motion until accuracy improves.
+            </p>
+            {(quality === "good" || quality === "fair") && (
+              <button
+                onClick={dismissCalibration}
+                className="mt-3 px-4 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold"
+              >
+                Done ✓
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Readout */}
