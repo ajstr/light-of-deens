@@ -1,29 +1,57 @@
-import { useEffect, useRef, useState } from "react";
-import { Compass } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Compass, RefreshCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QiblaCompassProps {
-  qiblaBearing: number; // degrees from North to Qibla
+  qiblaBearing: number;
 }
 
-// Live Qibla finder. Listens to deviceorientation; iOS requires user permission gesture.
+type CalQuality = "unknown" | "calibrating" | "poor" | "fair" | "good";
+
+const CAL_DISMISSED_KEY = "qibla:cal:dismissed";
+
 const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
   const [heading, setHeading] = useState<number | null>(null);
   const [needsPerm, setNeedsPerm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [iosAccuracy, setIosAccuracy] = useState<number | null>(null);
+  const [jitter, setJitter] = useState<number | null>(null);
+  const [showCalibration, setShowCalibration] = useState(false);
+
   const cleanupRef = useRef<() => void>();
   const lastBuzzRef = useRef<number>(0);
+  const samplesRef = useRef<number[]>([]);
+  const poorSinceRef = useRef<number | null>(null);
 
   const start = () => {
     setError(null);
+    samplesRef.current = [];
     const handler = (e: DeviceOrientationEvent) => {
-      // iOS provides webkitCompassHeading (true heading)
       // @ts-ignore
       const wkh = (e as any).webkitCompassHeading;
+      // @ts-ignore — iOS-only accuracy in degrees (-1 invalid, lower is better)
+      const wka = (e as any).webkitCompassAccuracy;
+      let h: number | null = null;
       if (typeof wkh === "number") {
-        setHeading(wkh);
+        h = wkh;
+        if (typeof wka === "number") setIosAccuracy(wka);
       } else if (typeof e.alpha === "number") {
-        setHeading(360 - e.alpha);
+        h = 360 - e.alpha;
+      }
+      if (h == null) return;
+      setHeading(h);
+
+      // Track ~30 recent samples → angular spread for jitter (Android proxy for accuracy)
+      const buf = samplesRef.current;
+      buf.push(h);
+      if (buf.length > 30) buf.shift();
+      if (buf.length >= 10) {
+        const sin = buf.reduce((s, v) => s + Math.sin((v * Math.PI) / 180), 0) / buf.length;
+        const cos = buf.reduce((s, v) => s + Math.cos((v * Math.PI) / 180), 0) / buf.length;
+        const mean = (Math.atan2(sin, cos) * 180) / Math.PI;
+        const dev =
+          buf.reduce((s, v) => s + Math.abs(((v - mean + 540) % 360) - 180), 0) / buf.length;
+        setJitter(dev);
       }
     };
     const evtName: any =
@@ -37,11 +65,8 @@ const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
     const NeedsPerm =
       typeof DeviceOrientationEvent !== "undefined" &&
       typeof (DeviceOrientationEvent as any).requestPermission === "function";
-    if (NeedsPerm) {
-      setNeedsPerm(true);
-    } else {
-      start();
-    }
+    if (NeedsPerm) setNeedsPerm(true);
+    else start();
     return () => cleanupRef.current?.();
   }, []);
 
@@ -64,16 +89,63 @@ const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
   const offset = heading != null ? ((qiblaBearing - heading + 540) % 360) - 180 : 0;
   const aligned = heading != null && Math.abs(offset) < 5;
 
-  // Light haptic pulse when newly aligned (every 2s max)
+  const quality: CalQuality = useMemo(() => {
+    if (heading == null) return "unknown";
+    if (iosAccuracy != null) {
+      if (iosAccuracy < 0) return "poor";
+      if (iosAccuracy <= 15) return "good";
+      if (iosAccuracy <= 35) return "fair";
+      return "poor";
+    }
+    if (jitter == null) return "calibrating";
+    if (jitter < 2) return "good";
+    if (jitter < 6) return "fair";
+    return "poor";
+  }, [heading, iosAccuracy, jitter]);
+
+  // Auto-open figure-8 overlay first time, or after 2s of "poor" quality
   useEffect(() => {
-    if (!aligned) return;
+    if (heading == null) return;
+    const dismissed = localStorage.getItem(CAL_DISMISSED_KEY) === "1";
+    if (!dismissed) { setShowCalibration(true); return; }
+    if (quality === "poor") {
+      if (poorSinceRef.current == null) poorSinceRef.current = Date.now();
+      else if (Date.now() - poorSinceRef.current > 2000) setShowCalibration(true);
+    } else {
+      poorSinceRef.current = null;
+    }
+  }, [quality, heading]);
+
+  const dismissCalibration = () => {
+    localStorage.setItem(CAL_DISMISSED_KEY, "1");
+    setShowCalibration(false);
+  };
+
+  const recalibrate = () => {
+    samplesRef.current = [];
+    setJitter(null);
+    setIosAccuracy(null);
+    setShowCalibration(true);
+  };
+
+  useEffect(() => {
+    if (!aligned || quality === "poor" || quality === "calibrating") return;
     const now = Date.now();
     if (now - lastBuzzRef.current < 2000) return;
     lastBuzzRef.current = now;
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       try { navigator.vibrate(40); } catch { /* noop */ }
     }
-  }, [aligned]);
+  }, [aligned, quality]);
+
+  const qualityMeta: Record<CalQuality, { label: string; color: string; dot: string }> = {
+    unknown:     { label: "Awaiting compass", color: "text-muted-foreground", dot: "bg-muted-foreground/40" },
+    calibrating: { label: "Calibrating…",     color: "text-gold",             dot: "bg-gold animate-pulse" },
+    poor:        { label: "Poor accuracy",    color: "text-destructive",      dot: "bg-destructive animate-pulse" },
+    fair:        { label: "Fair accuracy",    color: "text-gold",             dot: "bg-gold" },
+    good:        { label: "Good accuracy",    color: "text-accent",           dot: "bg-accent animate-pulse" },
+  };
+  const qm = qualityMeta[quality];
 
   return (
     <div className="flex flex-col items-center gap-5">
