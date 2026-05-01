@@ -254,3 +254,12 @@
   height: 100%;
 }
 
+
+/* Qibla calibration figure-8 animation */
+@keyframes qibla-fig8 {
+  0%   { transform: translate(20px, 35px) rotate(-20deg); }
+  25%  { transform: translate(50px, 20px) rotate(0deg); }
+  50%  { transform: translate(80px, 35px) rotate(20deg); }
+  75%  { transform: translate(50px, 50px) rotate(0deg); }
+  100% { transform: translate(20px, 35px) rotate(-20deg); }
+}
