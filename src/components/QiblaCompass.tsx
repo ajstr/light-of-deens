@@ -149,17 +149,15 @@ const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
 
   return (
     <div className="flex flex-col items-center gap-5">
-      {/* LIVE indicator */}
+      {/* Calibration status pill */}
       <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            "w-2 h-2 rounded-full",
-            heading != null ? "bg-accent animate-pulse" : "bg-muted-foreground/40"
-          )}
-        />
-        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-          {heading != null ? "Live" : "Awaiting compass"}
+        <span className={cn("w-2 h-2 rounded-full", qm.dot)} />
+        <span className={cn("text-[10px] uppercase tracking-[0.2em] font-medium", qm.color)}>
+          {qm.label}
         </span>
+        {iosAccuracy != null && iosAccuracy >= 0 && (
+          <span className="text-[10px] text-muted-foreground font-mono">±{Math.round(iosAccuracy)}°</span>
+        )}
       </div>
 
       <div className="relative w-72 h-72">
