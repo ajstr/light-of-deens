@@ -368,6 +368,17 @@ const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
           </>
         )}
       </div>
+
+      {/* Recalibrate action */}
+      {heading != null && !needsPerm && !error && (
+        <button
+          onClick={recalibrate}
+          className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <RefreshCw className="w-3 h-3" />
+          Recalibrate
+        </button>
+      )}
     </div>
   );
 };
