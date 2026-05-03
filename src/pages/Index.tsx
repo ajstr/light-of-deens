@@ -29,7 +29,15 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
+
+  useEffect(() => {
+    if (!hasSeenTutorial()) {
+      const t = setTimeout(() => setShowTutorial(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   const { data: surahs } = useQuery({
     queryKey: ["surahs"],
