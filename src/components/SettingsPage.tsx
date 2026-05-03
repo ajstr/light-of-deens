@@ -29,6 +29,7 @@ interface SettingsPageProps {
 
 const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
   const [settings, setSettings] = useState<AppSettings>(getSettings);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
