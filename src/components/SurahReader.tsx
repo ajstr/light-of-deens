@@ -159,6 +159,31 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
     return () => clearTimeout(t);
   }, [data, initialAyah]);
 
+  // Mark ayahs as read when scrolled into view (so reading progress advances
+  // even without using the audio player).
+  useEffect(() => {
+    if (!data?.ayahs?.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const idxAttr = (entry.target as HTMLElement).dataset.ayahIndex;
+          if (idxAttr == null) continue;
+          const idx = parseInt(idxAttr, 10);
+          if (Number.isNaN(idx)) continue;
+          markAyahRead(surah.number, idx + 1);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    ayahRefs.current.forEach((el, i) => {
+      if (!el) return;
+      el.dataset.ayahIndex = String(i);
+      observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [data, surah.number]);
+
   return (
     <div className="max-w-3xl mx-auto px-4">
       {/* Top bar */}
