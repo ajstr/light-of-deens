@@ -16,6 +16,7 @@ import ReadingProgress from "@/components/ReadingProgress";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
+import TutorialModal from "@/components/TutorialModal";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
 import { saveLastRead, getLastSession } from "@/lib/storage";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
