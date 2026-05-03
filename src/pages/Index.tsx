@@ -200,6 +200,7 @@ const Index = () => {
       )}
 
       <InstallPrompt />
+      <TutorialModal open={tutorialOpen} onOpenChange={setTutorialOpen} />
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
