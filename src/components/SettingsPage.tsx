@@ -291,6 +291,27 @@ const SettingsPage = ({ onTabChange, onSurahChange }: SettingsPageProps) => {
             </div>
           )}
 
+          {/* Tutorial */}
+          <button
+            onClick={() => setTutorialOpen(true)}
+            className="w-full text-left block bg-card rounded-lg p-4 border border-border hover:border-primary/40 transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <PlayCircle className="w-5 h-5 text-primary" />
+                <div>
+                  <Label className="text-foreground font-medium cursor-pointer">How to Use the App</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Watch a short video tutorial
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </button>
+
+          <TutorialModal open={tutorialOpen} onOpenChange={setTutorialOpen} />
+
           {/* Privacy Policy */}
           <Link
             to="/privacy"
