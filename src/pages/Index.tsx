@@ -197,6 +197,7 @@ const Index = () => {
       )}
 
       <InstallPrompt />
+      <TutorialOverlay open={showTutorial} onClose={() => setShowTutorial(false)} />
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
