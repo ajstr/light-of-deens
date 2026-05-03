@@ -29,6 +29,17 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem("tutorial_seen")) {
+      const t = setTimeout(() => {
+        setTutorialOpen(true);
+        localStorage.setItem("tutorial_seen", "1");
+      }, 800);
+      return () => clearTimeout(t);
+    }
+  }, []);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
   const { data: surahs } = useQuery({
