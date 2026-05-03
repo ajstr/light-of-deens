@@ -16,6 +16,7 @@ import ReadingProgress from "@/components/ReadingProgress";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
+import TutorialOverlay, { hasSeenTutorial } from "@/components/TutorialOverlay";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
 import { saveLastRead, getLastSession } from "@/lib/storage";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
@@ -28,7 +29,15 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
+
+  useEffect(() => {
+    if (!hasSeenTutorial()) {
+      const t = setTimeout(() => setShowTutorial(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   const { data: surahs } = useQuery({
     queryKey: ["surahs"],
@@ -131,7 +140,7 @@ const Index = () => {
       case "downloads":
         return <DownloadsPage />;
       case "settings":
-        return <SettingsPage onTabChange={handleTabChange} onSurahChange={(surahNum, ayah) => {
+        return <SettingsPage onTabChange={handleTabChange} onShowTutorial={() => setShowTutorial(true)} onSurahChange={(surahNum, ayah) => {
           handleSurahChange(surahNum, ayah);
           setActiveTab("read");
         }} />;
@@ -188,6 +197,7 @@ const Index = () => {
       )}
 
       <InstallPrompt />
+      <TutorialOverlay open={showTutorial} onClose={() => setShowTutorial(false)} />
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
