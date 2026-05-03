@@ -16,7 +16,6 @@ import ReadingProgress from "@/components/ReadingProgress";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
-import TutorialModal from "@/components/TutorialModal";
 import { Surah, fetchSurahs } from "@/lib/quran-api";
 import { saveLastRead, getLastSession } from "@/lib/storage";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
@@ -29,17 +28,6 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
-
-  useEffect(() => {
-    if (!localStorage.getItem("tutorial_seen")) {
-      const t = setTimeout(() => {
-        setTutorialOpen(true);
-        localStorage.setItem("tutorial_seen", "1");
-      }, 800);
-      return () => clearTimeout(t);
-    }
-  }, []);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
   const { data: surahs } = useQuery({
@@ -200,7 +188,6 @@ const Index = () => {
       )}
 
       <InstallPrompt />
-      <TutorialModal open={tutorialOpen} onOpenChange={setTutorialOpen} />
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
