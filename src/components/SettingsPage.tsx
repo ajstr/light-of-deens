@@ -290,9 +290,28 @@ const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPa
             </div>
           )}
 
+          {/* Watch video tutorial */}
+          <button
+            onClick={() => onShowTutorial?.(0)}
+            className="w-full text-left bg-card rounded-lg p-4 border border-border hover:border-primary/40 transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <PlayCircle className="w-5 h-5 text-primary" />
+                <div>
+                  <Label className="text-foreground font-medium cursor-pointer">Watch video tutorial</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Full walkthrough of every feature
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </button>
+
           {/* How to use */}
           <button
-            onClick={() => onShowTutorial?.()}
+            onClick={() => onShowTutorial?.(1)}
             className="w-full text-left bg-card rounded-lg p-4 border border-border hover:border-primary/40 transition-colors"
           >
             <div className="flex items-center justify-between">
@@ -301,7 +320,7 @@ const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPa
                 <div>
                   <Label className="text-foreground font-medium cursor-pointer">How to use the app</Label>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Replay the quick tutorial
+                    Step-by-step interactive guide
                   </p>
                 </div>
               </div>
