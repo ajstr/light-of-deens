@@ -143,7 +143,7 @@ const Index = () => {
       case "downloads":
         return <DownloadsPage />;
       case "settings":
-        return <SettingsPage onTabChange={handleTabChange} onShowTutorial={() => setShowTutorial(true)} onSurahChange={(surahNum, ayah) => {
+        return <SettingsPage onTabChange={handleTabChange} onShowTutorial={(step) => { setTutorialStep(step ?? 0); setShowTutorial(true); }} onSurahChange={(surahNum, ayah) => {
           handleSurahChange(surahNum, ayah);
           setActiveTab("read");
         }} />;
