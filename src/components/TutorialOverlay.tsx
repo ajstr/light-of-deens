@@ -28,19 +28,16 @@ const TUTORIAL_KEY = "lod_tutorial_seen_v2";
 // 🎬 Replace this with your real YouTube video ID (the part after `v=`)
 // e.g. for https://www.youtube.com/watch?v=abc123XYZ → "abc123XYZ"
 // Leave empty ("") to show a "coming soon" placeholder.
-export const TUTORIAL_VIDEO_ID = "";
-
 interface BulletItem {
   icon: React.ComponentType<{ className?: string }>;
   text: string;
 }
 
 interface Step {
-  kind?: "video" | "info";
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   body: string;
-  bullets?: BulletItem[];
+  bullets: BulletItem[];
   accent: string;
 }
 
