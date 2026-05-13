@@ -30,6 +30,7 @@ const Index = () => {
   const [currentAyah, setCurrentAyah] = useState(0);
   const [playTrigger, setPlayTrigger] = useState<number | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [autoplayPending, setAutoplayPending] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
@@ -202,6 +203,17 @@ const Index = () => {
           playTrigger={playTrigger}
           onPlayingChange={setIsAudioPlaying}
           surahName={selectedSurah.englishName}
+          autoplayOnLoad={autoplayPending}
+          onAutoplayConsumed={() => setAutoplayPending(false)}
+          onSurahEnd={() => {
+            const next = surahs?.find((s) => s.number === selectedSurah.number + 1);
+            if (!next) return;
+            setInitialAyah(0);
+            setCurrentAyah(0);
+            setSelectedSurah(next);
+            setActiveTab("read");
+            setAutoplayPending(true);
+          }}
         />
       )}
 

@@ -261,6 +261,20 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
         </div>
       )}
 
+      {/* Continue to next Surah */}
+      {!isLoading && surah.number < 114 && (
+        <div className="mt-8 flex justify-center">
+          <Button
+            onClick={() => onSurahChange?.(surah.number + 1, 0)}
+            variant="outline"
+            className="gap-2 rounded-full px-6"
+          >
+            Continue to Surah {surah.number + 1}
+            <ArrowLeft className="h-4 w-4 rotate-180" />
+          </Button>
+        </div>
+      )}
+
       {/* Jump to current ayah (while audio playing & offscreen) */}
       {isAudioPlaying &&
         nowPlaying?.surahNumber === surah.number &&
