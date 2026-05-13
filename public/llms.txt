@@ -1,0 +1,24 @@
+# AJS Muslim Companion
+
+> A beautiful, privacy-first Quran reader with audio recitation, tajweed coloring, word-by-word translation, tafsir, prayer times, Qibla compass, daily duas, and full offline support.
+
+AJS Muslim Companion (Light of Deens) is a free Quran reader and Muslim companion app available as a Progressive Web App and native iOS app. It works fully offline once content is downloaded, never collects personal data, and renders the Uthmani script with proper tajweed.
+
+## Pages
+
+- [Home](/): Quran surah list, reader, audio player, prayer times, Qibla, duas, bookmarks, and downloads.
+- [Privacy Policy](/privacy): How the app handles data — no tracking, all storage stays on-device.
+
+## Features
+
+- Full Quran in Uthmani script with native tajweed coloring
+- Audio recitation from multiple reciters with per-ayah sync, repeat modes, and range loop
+- Word-by-word translation and Ibn Kathir tafsir
+- Prayer times and Qibla direction computed on-device from your location
+- Daily featured dua and a categorized dua library
+- Offline audio downloads (IndexedDB) and PWA install support
+- Background audio playback with lock-screen controls
+
+## Optional
+
+- [Theme Preview](/theme): Internal design system preview.
