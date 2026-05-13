@@ -24,7 +24,7 @@ const fontSizeClasses = ["text-xl", "text-2xl", "text-3xl", "text-4xl"];
 interface SettingsPageProps {
   onTabChange?: (tab: string) => void;
   onSurahChange?: (surahNumber: number, ayah: number) => void;
-  onShowTutorial?: () => void;
+  onShowTutorial?: (initialStep?: number) => void;
 }
 
 const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPageProps) => {
