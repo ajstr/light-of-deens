@@ -391,6 +391,18 @@ const AudioPlayer = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playTrigger]);
 
+  // Auto-play when audioUrls become available for a newly-loaded surah
+  // (used to chain playback continuously from the previous surah).
+  const autoplayConsumedForRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!autoplayOnLoad || !audioUrls || audioUrls.length === 0) return;
+    if (autoplayConsumedForRef.current === surahNumber) return;
+    autoplayConsumedForRef.current = surahNumber;
+    onAutoplayConsumed?.();
+    playAyah(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoplayOnLoad, audioUrls, surahNumber]);
+
   const togglePlay = useCallback(() => {
     if (isPlaying) {
       audioRef.current?.pause();
