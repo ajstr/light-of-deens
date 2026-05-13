@@ -34,6 +34,9 @@ interface AudioPlayerProps {
   playTrigger?: number | null;
   onPlayingChange?: (playing: boolean) => void;
   surahName?: string;
+  onSurahEnd?: () => void;
+  autoplayOnLoad?: boolean;
+  onAutoplayConsumed?: () => void;
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
@@ -51,6 +54,7 @@ const formatTime = (seconds: number) => {
 const AudioPlayer = ({
   surahNumber, totalAyahs, currentAyah, onAyahChange,
   playTrigger, onPlayingChange, surahName,
+  onSurahEnd, autoplayOnLoad, onAutoplayConsumed,
 }: AudioPlayerProps) => {
   const { setNowPlaying, registerControls } = useAudioPlayer();
   const [reciterId, setReciterId] = useState<number>(() => {
@@ -291,6 +295,12 @@ const AudioPlayer = ({
         } else if (repeatModeRef.current === "surah") {
           onAyahChange(0);
           playAyah(0);
+        } else if (onSurahEnd) {
+          // Continuous play across surahs — hand off to parent to advance
+          setProgress(0);
+          setCurrentTime(0);
+          setDuration(0);
+          onSurahEnd();
         } else {
           setIsPlaying(false);
           setProgress(0);
