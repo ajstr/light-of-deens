@@ -13,28 +13,53 @@ import {
   MapPin,
   Bookmark,
   Hand,
+  PlayCircle,
+  Bell,
+  WifiOff,
+  Layers,
+  Heart,
+  ScrollText,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const TUTORIAL_KEY = "lod_tutorial_seen_v1";
+const TUTORIAL_KEY = "lod_tutorial_seen_v2";
+
+// 🎬 Replace this with your real YouTube video ID (the part after `v=`)
+// e.g. for https://www.youtube.com/watch?v=abc123XYZ → "abc123XYZ"
+// Leave empty ("") to show a "coming soon" placeholder.
+export const TUTORIAL_VIDEO_ID = "";
+
+interface BulletItem {
+  icon: React.ComponentType<{ className?: string }>;
+  text: string;
+}
 
 interface Step {
+  kind?: "video" | "info";
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   body: string;
-  bullets: { icon: React.ComponentType<{ className?: string }>; text: string }[];
+  bullets?: BulletItem[];
   accent: string;
 }
 
 const STEPS: Step[] = [
   {
+    kind: "video",
+    icon: PlayCircle,
+    title: "Watch the full video tutorial",
+    body: "A short walkthrough of every feature — Quran, audio, prayer, duas and more.",
+    accent: "from-primary/25 to-accent/10",
+  },
+  {
     icon: Sparkles,
     title: "Welcome to Light of Deen",
     body: "Your daily companion for Quran, Prayer, and Dua. Here's a quick tour of what you can do.",
     bullets: [
-      { icon: BookOpen, text: "Read the Quran in beautiful Uthmanic script" },
-      { icon: Volume2, text: "Listen with your favorite reciter" },
-      { icon: Compass, text: "Prayer times, Qibla and daily duas" },
+      { icon: BookOpen, text: "Read the Quran in beautiful Uthmanic script with tajweed" },
+      { icon: Volume2, text: "Listen with your favorite reciter, ayah by ayah" },
+      { icon: Compass, text: "Prayer times, Qibla compass, and a full dua library" },
     ],
     accent: "from-primary/20 to-accent/10",
   },
@@ -44,57 +69,103 @@ const STEPS: Step[] = [
     body: "Browse all 114 Surahs or jump straight to a Mushaf page.",
     bullets: [
       { icon: BookOpen, text: "Tap a Surah from the Read tab to open it" },
-      { icon: Bookmark, text: "Long-press an ayah to bookmark or open Tafsir" },
+      { icon: Layers, text: "Switch between Surah list and Mushaf page (1–604)" },
       { icon: Hand, text: "Swipe left/right to move between Surahs" },
+      { icon: Search, text: "Quickly jump to any ayah using the navigator" },
     ],
     accent: "from-emerald-500/20 to-primary/10",
+  },
+  {
+    icon: ScrollText,
+    title: "Tajweed, Word-by-Word & Tafsir",
+    body: "Deepen your understanding of every ayah.",
+    bullets: [
+      { icon: Sparkles, text: "Color-coded tajweed rules highlight pronunciation" },
+      { icon: BookOpen, text: "Tap an ayah → Tafsir for Ibn Kathir's commentary" },
+      { icon: ScrollText, text: "Enable Word-by-Word mode in Settings for translations" },
+    ],
+    accent: "from-amber-500/20 to-primary/10",
   },
   {
     icon: Volume2,
     title: "Audio & Repeat Modes",
     body: "Choose any reciter and let the player follow along ayah by ayah.",
     bullets: [
-      { icon: Repeat, text: "Repeat a single ayah, the whole surah, or a custom range" },
-      { icon: Volume2, text: "The mini-player stays at the top across every page" },
-      { icon: Download, text: "Download surahs to listen fully offline" },
+      { icon: Repeat, text: "Repeat one ayah, the whole surah, or a custom range" },
+      { icon: Volume2, text: "Mini-player stays at the top across every screen" },
+      { icon: PlayCircle, text: "Surahs play continuously — auto-advances to the next" },
     ],
     accent: "from-amber-500/20 to-primary/10",
   },
   {
+    icon: Bookmark,
+    title: "Bookmarks & Continue Reading",
+    body: "Never lose your place.",
+    bullets: [
+      { icon: Bookmark, text: "Long-press an ayah to bookmark it" },
+      { icon: BookOpen, text: "Home shows your last read position to continue" },
+      { icon: Sparkles, text: "Reading progress tracks your daily streak" },
+    ],
+    accent: "from-rose-500/20 to-primary/10",
+  },
+  {
     icon: Compass,
-    title: "Prayer Times & Qibla",
+    title: "Prayer Times, Qibla & Athan",
     body: "Accurate prayer times for your location, with Athan notifications.",
     bullets: [
       { icon: MapPin, text: "Allow location for precise times & Qibla direction" },
-      { icon: Compass, text: "Open the Prayer tab to see today's schedule" },
-      { icon: Volume2, text: "Enable Athan to be notified at each prayer time" },
+      { icon: Compass, text: "Prayer tab shows today's schedule and Hijri date" },
+      { icon: Bell, text: "Enable Athan notifications for each prayer time" },
     ],
     accent: "from-sky-500/20 to-primary/10",
   },
   {
-    icon: Sparkles,
-    title: "Duas, Tafsir & Downloads",
-    body: "A full library of authentic supplications and offline tools.",
+    icon: Heart,
+    title: "Duas — Daily & Library",
+    body: "A full library of authentic supplications.",
     bullets: [
-      { icon: Sparkles, text: "Browse duas by category or read the daily featured dua" },
-      { icon: BookOpen, text: "Tap an ayah → Tafsir to read Ibn Kathir's commentary" },
-      { icon: Download, text: "Manage offline audio in the Downloads tab" },
+      { icon: Sparkles, text: "A new featured dua appears every day on Home" },
+      { icon: Heart, text: "Browse duas by category in the Duas tab" },
+      { icon: ScrollText, text: "Each dua includes Arabic, transliteration & meaning" },
     ],
     accent: "from-rose-500/20 to-primary/10",
+  },
+  {
+    icon: Download,
+    title: "Downloads & Offline Mode",
+    body: "Take the Quran with you, anywhere.",
+    bullets: [
+      { icon: Download, text: "Download a full Surah's audio for offline playback" },
+      { icon: WifiOff, text: "Read and listen with no internet connection" },
+      { icon: Layers, text: "Manage storage from the Downloads tab" },
+    ],
+    accent: "from-emerald-500/20 to-primary/10",
+  },
+  {
+    icon: Sparkles,
+    title: "You're all set",
+    body: "May Allah accept your time spent with His Book. You can replay this tutorial anytime from Settings → How to use the app.",
+    bullets: [
+      { icon: BookOpen, text: "Start with Surah Al-Fatiha from the Read tab" },
+      { icon: Volume2, text: "Pick your favorite reciter in Settings" },
+      { icon: Bell, text: "Enable Athan to be reminded for every prayer" },
+    ],
+    accent: "from-primary/25 to-accent/10",
   },
 ];
 
 interface TutorialOverlayProps {
   open: boolean;
   onClose: () => void;
+  initialStep?: number;
 }
 
-const TutorialOverlay = ({ open, onClose }: TutorialOverlayProps) => {
-  const [step, setStep] = useState(0);
+const TutorialOverlay = ({ open, onClose, initialStep = 0 }: TutorialOverlayProps) => {
+  const [step, setStep] = useState(initialStep);
 
   useEffect(() => {
-    if (open) setStep(0);
-  }, [open]);
+    if (open) setStep(initialStep);
+  }, [open, initialStep]);
 
   if (!open) return null;
 
@@ -112,11 +183,11 @@ const TutorialOverlay = ({ open, onClose }: TutorialOverlayProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/80 backdrop-blur-sm safe-pt safe-pb px-4">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/80 backdrop-blur-sm safe-pt safe-pb px-4 overflow-y-auto py-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl overflow-hidden my-auto"
       >
         <button
           onClick={finish}
@@ -137,30 +208,57 @@ const TutorialOverlay = ({ open, onClose }: TutorialOverlayProps) => {
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.ul
+          <motion.div
             key={step}
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -16 }}
             transition={{ duration: 0.2 }}
-            className="px-6 py-5 space-y-3"
+            className="px-6 py-5"
           >
-            {current.bullets.map((b, i) => {
-              const BIcon = b.icon;
-              return (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="mt-0.5 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <BIcon className="w-3.5 h-3.5 text-primary" />
+            {current.kind === "video" ? (
+              <div className="rounded-xl overflow-hidden border border-border bg-muted aspect-video flex items-center justify-center">
+                {TUTORIAL_VIDEO_ID ? (
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${TUTORIAL_VIDEO_ID}?rel=0&modestbranding=1`}
+                    title="Light of Deen — Video Tutorial"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="text-center px-4 py-8">
+                    <PlayCircle className="w-10 h-10 text-primary mx-auto mb-3 opacity-70" />
+                    <p className="text-sm font-medium text-foreground">
+                      Video tutorial coming soon
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Tap “Next” to walk through every feature step by step.
+                    </p>
                   </div>
-                  <p className="text-sm text-foreground leading-snug">{b.text}</p>
-                </li>
-              );
-            })}
-          </motion.ul>
+                )}
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {current.bullets?.map((b, i) => {
+                  const BIcon = b.icon;
+                  return (
+                    <li key={i} className="flex items-start gap-3">
+                      <div className="mt-0.5 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <BIcon className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <p className="text-sm text-foreground leading-snug">{b.text}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </motion.div>
         </AnimatePresence>
 
         <div className="px-6 pb-5 pt-1 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 flex-wrap max-w-[55%]">
             {STEPS.map((_, i) => (
               <span
                 key={i}

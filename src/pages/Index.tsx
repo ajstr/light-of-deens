@@ -32,6 +32,7 @@ const Index = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [autoplayPending, setAutoplayPending] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
   useEffect(() => {
@@ -142,7 +143,7 @@ const Index = () => {
       case "downloads":
         return <DownloadsPage />;
       case "settings":
-        return <SettingsPage onTabChange={handleTabChange} onShowTutorial={() => setShowTutorial(true)} onSurahChange={(surahNum, ayah) => {
+        return <SettingsPage onTabChange={handleTabChange} onShowTutorial={(step) => { setTutorialStep(step ?? 0); setShowTutorial(true); }} onSurahChange={(surahNum, ayah) => {
           handleSurahChange(surahNum, ayah);
           setActiveTab("read");
         }} />;
@@ -218,7 +219,7 @@ const Index = () => {
       )}
 
       <InstallPrompt />
-      <TutorialOverlay open={showTutorial} onClose={() => setShowTutorial(false)} />
+      <TutorialOverlay open={showTutorial} initialStep={tutorialStep} onClose={() => setShowTutorial(false)} />
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
