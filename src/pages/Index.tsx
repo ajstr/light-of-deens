@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Book } from "lucide-react";
@@ -151,6 +152,14 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen bg-background pb-20 ${nowPlaying ? "pt-12 sm:pt-14" : ""}`}>
+      <Helmet>
+        <title>AJS Muslim Companion — Quran Reader, Prayer Times & Duas</title>
+        <meta name="description" content="Free Quran reader with tajweed, audio recitation, word-by-word translation, tafsir, prayer times, Qibla and offline support." />
+        <link rel="canonical" href="https://www.light-of-deens.com/" />
+        <meta property="og:title" content="AJS Muslim Companion — Quran Reader, Prayer Times & Duas" />
+        <meta property="og:description" content="Free Quran reader with tajweed, audio recitation, word-by-word translation, tafsir, prayer times, Qibla and offline support." />
+        <meta property="og:url" content="https://www.light-of-deens.com/" />
+      </Helmet>
       {/* Header */}
       <header className="hero-surface py-10 text-center mb-8 shadow-md">
         <motion.div

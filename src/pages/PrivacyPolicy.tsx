@@ -1,9 +1,18 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Shield } from "lucide-react";
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <Helmet>
+        <title>Privacy Policy — AJS Muslim Companion</title>
+        <meta name="description" content="How AJS Muslim Companion handles your data: no tracking, no accounts, all reading progress and downloads stay on your device." />
+        <link rel="canonical" href="https://www.light-of-deens.com/privacy" />
+        <meta property="og:title" content="Privacy Policy — AJS Muslim Companion" />
+        <meta property="og:description" content="No tracking, no accounts. All data stays on your device." />
+        <meta property="og:url" content="https://www.light-of-deens.com/privacy" />
+      </Helmet>
       <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link
