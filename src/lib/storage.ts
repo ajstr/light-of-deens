@@ -207,3 +207,45 @@ export function getTotalAyahsRead(): number {
 }
 
 export const TOTAL_QURAN_AYAHS = 6236;
+
+// Tutorial video ID (YouTube) — user-configurable from Settings
+const TUTORIAL_VIDEO_KEY = "lod_tutorial_video_id";
+
+/** Extract a YouTube video ID from a full URL or return the input if already an ID. */
+export function parseYouTubeId(input: string): string {
+  const s = (input || "").trim();
+  if (!s) return "";
+  // Already an ID (11 chars typical, but accept any plain token without scheme/slashes)
+  if (!/[/?=&]/.test(s) && !/^https?:/i.test(s)) return s;
+  try {
+    const url = new URL(s);
+    if (url.hostname.includes("youtu.be")) return url.pathname.replace(/^\//, "");
+    const v = url.searchParams.get("v");
+    if (v) return v;
+    const parts = url.pathname.split("/").filter(Boolean);
+    const idx = parts.findIndex((p) => ["embed", "shorts", "live"].includes(p));
+    if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
+  } catch {
+    /* not a URL */
+  }
+  return s;
+}
+
+export function getTutorialVideoId(): string {
+  try {
+    return localStorage.getItem(TUTORIAL_VIDEO_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function setTutorialVideoId(input: string): string {
+  const id = parseYouTubeId(input);
+  try {
+    if (id) localStorage.setItem(TUTORIAL_VIDEO_KEY, id);
+    else localStorage.removeItem(TUTORIAL_VIDEO_KEY);
+  } catch {
+    /* ignore */
+  }
+  return id;
+}
