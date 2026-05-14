@@ -31,6 +31,15 @@ interface SettingsPageProps {
 
 const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPageProps) => {
   const [settings, setSettings] = useState<AppSettings>(getSettings);
+  const [videoInput, setVideoInput] = useState<string>(() => getTutorialVideoId());
+  const [videoSaved, setVideoSaved] = useState(false);
+
+  const saveVideoId = () => {
+    const id = setTutorialVideoId(videoInput);
+    setVideoInput(id);
+    setVideoSaved(true);
+    window.setTimeout(() => setVideoSaved(false), 1500);
+  };
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
