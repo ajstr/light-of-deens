@@ -22,13 +22,9 @@ import {
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getTutorialVideoId } from "@/lib/storage";
 
 const TUTORIAL_KEY = "lod_tutorial_seen_v2";
-
-// 🎬 Replace this with your real YouTube video ID (the part after `v=`)
-// e.g. for https://www.youtube.com/watch?v=abc123XYZ → "abc123XYZ"
-// Leave empty ("") to show a "coming soon" placeholder.
-export const TUTORIAL_VIDEO_ID = "";
 
 interface BulletItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -162,9 +158,13 @@ interface TutorialOverlayProps {
 
 const TutorialOverlay = ({ open, onClose, initialStep = 0 }: TutorialOverlayProps) => {
   const [step, setStep] = useState(initialStep);
+  const [videoId, setVideoId] = useState<string>(() => getTutorialVideoId());
 
   useEffect(() => {
-    if (open) setStep(initialStep);
+    if (open) {
+      setStep(initialStep);
+      setVideoId(getTutorialVideoId());
+    }
   }, [open, initialStep]);
 
   if (!open) return null;
@@ -218,10 +218,10 @@ const TutorialOverlay = ({ open, onClose, initialStep = 0 }: TutorialOverlayProp
           >
             {current.kind === "video" ? (
               <div className="rounded-xl overflow-hidden border border-border bg-muted aspect-video flex items-center justify-center">
-                {TUTORIAL_VIDEO_ID ? (
+                {videoId ? (
                   <iframe
                     className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${TUTORIAL_VIDEO_ID}?rel=0&modestbranding=1`}
+                    src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
                     title="Light of Deen — Video Tutorial"
                     loading="lazy"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

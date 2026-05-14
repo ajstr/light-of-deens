@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight, Shield, HelpCircle, PlayCircle } from "lucide-react";
+import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight, Shield, HelpCircle, PlayCircle, Youtube, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchSurahs, Reciter, Surah, TRANSLATIONS } from "@/lib/quran-api";
-import { getSettings, saveSettings, AppSettings } from "@/lib/storage";
+import { getSettings, saveSettings, AppSettings, getTutorialVideoId, setTutorialVideoId } from "@/lib/storage";
 import QuranNavigator from "@/components/QuranNavigator";
 import FontPreview, { FontId } from "@/components/FontPreview";
 
@@ -29,6 +31,15 @@ interface SettingsPageProps {
 
 const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPageProps) => {
   const [settings, setSettings] = useState<AppSettings>(getSettings);
+  const [videoInput, setVideoInput] = useState<string>(() => getTutorialVideoId());
+  const [videoSaved, setVideoSaved] = useState(false);
+
+  const saveVideoId = () => {
+    const id = setTutorialVideoId(videoInput);
+    setVideoInput(id);
+    setVideoSaved(true);
+    window.setTimeout(() => setVideoSaved(false), 1500);
+  };
 
   const { data: reciters } = useQuery({
     queryKey: ["reciters"],
@@ -308,6 +319,35 @@ const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPa
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
           </button>
+
+          {/* Tutorial video URL/ID */}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <div className="flex items-center gap-3 mb-3">
+              <Youtube className="w-5 h-5 text-primary" />
+              <div>
+                <Label className="text-foreground font-medium">Tutorial video (YouTube)</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Paste a YouTube link or video ID. Saved on this device.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={videoInput}
+                onChange={(e) => setVideoInput(e.target.value)}
+                placeholder="https://youtube.com/watch?v=… or video ID"
+                className="flex-1"
+              />
+              <Button onClick={saveVideoId} size="sm" className="h-10 shrink-0">
+                {videoSaved ? <Check className="w-4 h-4" /> : "Save"}
+              </Button>
+            </div>
+            {videoInput && (
+              <p className="text-[11px] text-muted-foreground mt-2">
+                Current ID: <span className="font-mono">{videoInput}</span>
+              </p>
+            )}
+          </div>
 
           {/* How to use */}
           <button
