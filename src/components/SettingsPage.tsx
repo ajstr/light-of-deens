@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight, Shield, HelpCircle, PlayCircle } from "lucide-react";
+import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight, Shield, HelpCircle, PlayCircle, Youtube, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchSurahs, Reciter, Surah, TRANSLATIONS } from "@/lib/quran-api";
-import { getSettings, saveSettings, AppSettings } from "@/lib/storage";
+import { getSettings, saveSettings, AppSettings, getTutorialVideoId, setTutorialVideoId } from "@/lib/storage";
 import QuranNavigator from "@/components/QuranNavigator";
 import FontPreview, { FontId } from "@/components/FontPreview";
 
