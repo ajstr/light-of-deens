@@ -13,6 +13,7 @@ import {
   MapPin,
   Bookmark,
   Hand,
+  PlayCircle,
   Bell,
   WifiOff,
   Layers,
@@ -24,20 +25,33 @@ import { Button } from "@/components/ui/button";
 
 const TUTORIAL_KEY = "lod_tutorial_seen_v2";
 
+// 🎬 Replace this with your real YouTube video ID (the part after `v=`)
+// e.g. for https://www.youtube.com/watch?v=abc123XYZ → "abc123XYZ"
+// Leave empty ("") to show a "coming soon" placeholder.
+export const TUTORIAL_VIDEO_ID = "";
+
 interface BulletItem {
   icon: React.ComponentType<{ className?: string }>;
   text: string;
 }
 
 interface Step {
+  kind?: "video" | "info";
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   body: string;
-  bullets: BulletItem[];
+  bullets?: BulletItem[];
   accent: string;
 }
 
 const STEPS: Step[] = [
+  {
+    kind: "video",
+    icon: PlayCircle,
+    title: "Watch the full video tutorial",
+    body: "A short walkthrough of every feature — Quran, audio, prayer, duas and more.",
+    accent: "from-primary/25 to-accent/10",
+  },
   {
     icon: Sparkles,
     title: "Welcome to Light of Deen",
@@ -79,7 +93,7 @@ const STEPS: Step[] = [
     bullets: [
       { icon: Repeat, text: "Repeat one ayah, the whole surah, or a custom range" },
       { icon: Volume2, text: "Mini-player stays at the top across every screen" },
-      { icon: Volume2, text: "Surahs play continuously — auto-advances to the next" },
+      { icon: PlayCircle, text: "Surahs play continuously — auto-advances to the next" },
     ],
     accent: "from-amber-500/20 to-primary/10",
   },
@@ -202,19 +216,44 @@ const TutorialOverlay = ({ open, onClose, initialStep = 0 }: TutorialOverlayProp
             transition={{ duration: 0.2 }}
             className="px-6 py-5"
           >
-            <ul className="space-y-3">
-              {current.bullets.map((b, i) => {
-                const BIcon = b.icon;
-                return (
-                  <li key={i} className="flex items-start gap-3">
-                    <div className="mt-0.5 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <BIcon className="w-3.5 h-3.5 text-primary" />
-                    </div>
-                    <p className="text-sm text-foreground leading-snug">{b.text}</p>
-                  </li>
-                );
-              })}
-            </ul>
+            {current.kind === "video" ? (
+              <div className="rounded-xl overflow-hidden border border-border bg-muted aspect-video flex items-center justify-center">
+                {TUTORIAL_VIDEO_ID ? (
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${TUTORIAL_VIDEO_ID}?rel=0&modestbranding=1`}
+                    title="Light of Deen — Video Tutorial"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="text-center px-4 py-8">
+                    <PlayCircle className="w-10 h-10 text-primary mx-auto mb-3 opacity-70" />
+                    <p className="text-sm font-medium text-foreground">
+                      Video tutorial coming soon
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Tap “Next” to walk through every feature step by step.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {current.bullets?.map((b, i) => {
+                  const BIcon = b.icon;
+                  return (
+                    <li key={i} className="flex items-start gap-3">
+                      <div className="mt-0.5 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <BIcon className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <p className="text-sm text-foreground leading-snug">{b.text}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </motion.div>
         </AnimatePresence>
 
