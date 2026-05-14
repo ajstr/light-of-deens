@@ -320,6 +320,35 @@ const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPa
             </div>
           </button>
 
+          {/* Tutorial video URL/ID */}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <div className="flex items-center gap-3 mb-3">
+              <Youtube className="w-5 h-5 text-primary" />
+              <div>
+                <Label className="text-foreground font-medium">Tutorial video (YouTube)</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Paste a YouTube link or video ID. Saved on this device.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={videoInput}
+                onChange={(e) => setVideoInput(e.target.value)}
+                placeholder="https://youtube.com/watch?v=… or video ID"
+                className="flex-1"
+              />
+              <Button onClick={saveVideoId} size="sm" className="h-10 shrink-0">
+                {videoSaved ? <Check className="w-4 h-4" /> : "Save"}
+              </Button>
+            </div>
+            {videoInput && (
+              <p className="text-[11px] text-muted-foreground mt-2">
+                Current ID: <span className="font-mono">{videoInput}</span>
+              </p>
+            )}
+          </div>
+
           {/* How to use */}
           <button
             onClick={() => onShowTutorial?.(1)}
