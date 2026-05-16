@@ -58,6 +58,7 @@ const AudioPlayer = ({
   playTrigger, onPlayingChange, surahName,
   onSurahEnd, autoplayOnLoad, onAutoplayConsumed,
 }: AudioPlayerProps) => {
+  const hidden = useHideOnScroll();
   const { setNowPlaying, registerControls } = useAudioPlayer();
   const [reciterId, setReciterId] = useState<number>(() => {
     const sess = getLastSession();
