@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchAudioUrls, Reciter } from "@/lib/quran-api";
 import { getSettings, saveLastSession, getLastSession, saveLastRead, markAyahRead, type RepeatMode } from "@/lib/storage";
+import { cn } from "@/lib/utils";
+import { useHideOnScroll } from "@/hooks/use-scroll-direction";
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, Gauge, Timer,
   Repeat, Repeat1, Download, Loader2, HardDriveDownload, Trash2, WifiOff, ShieldCheck, Infinity as InfinityIcon, ListRestart
@@ -56,6 +58,7 @@ const AudioPlayer = ({
   playTrigger, onPlayingChange, surahName,
   onSurahEnd, autoplayOnLoad, onAutoplayConsumed,
 }: AudioPlayerProps) => {
+  const hidden = useHideOnScroll();
   const { setNowPlaying, registerControls } = useAudioPlayer();
   const [reciterId, setReciterId] = useState<number>(() => {
     const sess = getLastSession();
@@ -657,7 +660,10 @@ const AudioPlayer = ({
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
 
   return (
-    <div className="sticky bottom-16 z-40 bg-card border-t border-border p-2 sm:p-3">
+    <div className={cn(
+      "sticky bottom-16 z-40 bg-card border-t border-border p-2 sm:p-3 transition-transform duration-300 ease-out",
+      hidden ? "translate-y-full pointer-events-none" : "translate-y-0"
+    )}>
       <div className="max-w-3xl mx-auto space-y-1.5 sm:space-y-2">
         {/* Reciter selector */}
         <div className="flex items-center gap-2 sm:gap-3">
