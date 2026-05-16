@@ -660,7 +660,10 @@ const AudioPlayer = ({
     r.style ? `${r.reciter_name} (${r.style})` : r.reciter_name;
 
   return (
-    <div className="sticky bottom-16 z-40 bg-card border-t border-border p-2 sm:p-3">
+    <div className={cn(
+      "sticky bottom-16 z-40 bg-card border-t border-border p-2 sm:p-3 transition-transform duration-300 ease-out",
+      hidden ? "translate-y-full pointer-events-none" : "translate-y-0"
+    )}>
       <div className="max-w-3xl mx-auto space-y-1.5 sm:space-y-2">
         {/* Reciter selector */}
         <div className="flex items-center gap-2 sm:gap-3">
