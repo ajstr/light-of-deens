@@ -135,8 +135,9 @@ export async function findNearby(
 }
 
 export function formatDistance(m: number): string {
-  if (m < 1000) return `${Math.round(m)} m`;
-  return `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`;
+  const mi = m / 1609.344;
+  if (mi < 0.1) return `${Math.round(m)} m`;
+  return `${mi < 1 ? mi.toFixed(1) : mi.toFixed(0)} mi`;
 }
 
 export function mapsLink(p: NearbyPlace): string {
