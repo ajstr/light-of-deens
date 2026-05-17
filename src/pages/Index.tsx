@@ -12,6 +12,9 @@ import DuaPage from "@/components/DuaPage";
 import DailyDua from "@/components/DailyDua";
 import PrayerPage from "@/components/PrayerPage";
 import PrayerCard from "@/components/PrayerCard";
+import NearbyPage from "@/components/NearbyPage";
+import NearbyCard from "@/components/NearbyCard";
+import type { PlaceKind } from "@/lib/nearby-places";
 import ContinueReading from "@/components/ContinueReading";
 import ReadingProgress from "@/components/ReadingProgress";
 import BottomTabBar from "@/components/BottomTabBar";
@@ -32,6 +35,7 @@ const Index = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [autoplayPending, setAutoplayPending] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [nearbyKind, setNearbyKind] = useState<PlaceKind>("masjid");
   const [tutorialStep, setTutorialStep] = useState(0);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
@@ -138,6 +142,8 @@ const Index = () => {
         );
       case "prayer":
         return <PrayerPage />;
+      case "nearby":
+        return <NearbyPage initialKind={nearbyKind} />;
       case "duas":
         return <DuaPage />;
       case "downloads":
@@ -182,6 +188,12 @@ const Index = () => {
       {activeTab === "home" && (
         <>
           <PrayerCard onOpen={() => setActiveTab("prayer")} />
+          <NearbyCard
+            onOpen={(k) => {
+              setNearbyKind(k);
+              setActiveTab("nearby");
+            }}
+          />
           <DailyDua />
           <ReadingProgress />
           <ContinueReading
