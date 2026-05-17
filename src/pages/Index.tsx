@@ -35,6 +35,7 @@ const Index = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [autoplayPending, setAutoplayPending] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [nearbyKind, setNearbyKind] = useState<PlaceKind>("masjid");
   const [tutorialStep, setTutorialStep] = useState(0);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
