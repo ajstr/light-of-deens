@@ -22,10 +22,10 @@ import {
 } from "@/lib/nearby-places";
 
 const RADIUS_OPTIONS = [
-  { label: "2 km", value: 2000 },
-  { label: "5 km", value: 5000 },
-  { label: "10 km", value: 10000 },
-  { label: "25 km", value: 25000 },
+  { label: "1 mi", value: 1609 },
+  { label: "3 mi", value: 4828 },
+  { label: "6 mi", value: 9656 },
+  { label: "15 mi", value: 24140 },
 ];
 
 interface NearbyPageProps {
