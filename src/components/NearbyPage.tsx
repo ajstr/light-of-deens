@@ -186,9 +186,6 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="font-medium truncate">{p.name}</h2>
-                  <span className="text-[11px] text-muted-foreground shrink-0">
-                    {formatDistance(p.distanceM)}
-                  </span>
                 </div>
                 {p.address && (
                   <p className="text-xs text-muted-foreground truncate">{p.address}</p>
