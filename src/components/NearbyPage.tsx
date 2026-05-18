@@ -89,8 +89,8 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
   return (
     <div className="px-4 max-w-2xl mx-auto pb-8">
       <Helmet>
-        <title>Nearby Masjids & Halal Food — AJS Muslim Companion</title>
-        <meta name="description" content="Find the closest Sunni mosques and halal restaurants around you, with distance, phone and directions." />
+        <title>Nearby Masjids & Halal Food — Noor Al Deen</title>
+        <meta name="description" content="Find the closest Sunni mosques and halal restaurants around you, with phone and directions." />
       </Helmet>
 
       <header className="flex items-center justify-between mb-4">
