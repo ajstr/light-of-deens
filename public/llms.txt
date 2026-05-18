@@ -1,8 +1,8 @@
-# AJS Muslim Companion
+# Noor Al Deen
 
 > A beautiful, privacy-first Quran reader with audio recitation, tajweed coloring, word-by-word translation, tafsir, prayer times, Qibla compass, daily duas, and full offline support.
 
-AJS Muslim Companion (Light of Deens) is a free Quran reader and Muslim companion app available as a Progressive Web App and native iOS app. It works fully offline once content is downloaded, never collects personal data, and renders the Uthmani script with proper tajweed.
+Noor Al Deen (Light of Deens) is a free Quran reader and Muslim companion app available as a Progressive Web App and native iOS app. It works fully offline once content is downloaded, never collects personal data, and renders the Uthmani script with proper tajweed.
 
 ## Pages
 

@@ -1,9 +1,9 @@
 // Nearby page: find Sunni masjids and halal restaurants around the user.
 // Uses OpenStreetMap Overpass API (free, no key).
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { MapPin, RefreshCw, Phone, Globe, Navigation2, Loader2, Building2, UtensilsCrossed } from "lucide-react";
+import { MapPin, RefreshCw, Phone, Globe, Navigation2, Building2, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -15,17 +15,16 @@ import {
 } from "@/lib/prayer-times";
 import {
   findNearby,
-  formatDistance,
   mapsLink,
   NearbyPlace,
   PlaceKind,
 } from "@/lib/nearby-places";
 
 const RADIUS_OPTIONS = [
-  { label: "1 mi", value: 1609 },
-  { label: "3 mi", value: 4828 },
-  { label: "6 mi", value: 9656 },
-  { label: "15 mi", value: 24140 },
+  { label: "1", value: 1609 },
+  { label: "3", value: 4828 },
+  { label: "6", value: 9656 },
+  { label: "15", value: 24140 },
 ];
 
 interface NearbyPageProps {
@@ -90,8 +89,8 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
   return (
     <div className="px-4 max-w-2xl mx-auto pb-8">
       <Helmet>
-        <title>Nearby Masjids & Halal Food — AJS Muslim Companion</title>
-        <meta name="description" content="Find the closest Sunni mosques and halal restaurants around you, with distance, phone and directions." />
+        <title>Nearby Masjids & Halal Food — Noor Al Deen</title>
+        <meta name="description" content="Find the closest Sunni mosques and halal restaurants around you, with phone and directions." />
       </Helmet>
 
       <header className="flex items-center justify-between mb-4">
@@ -187,9 +186,6 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="font-medium truncate">{p.name}</h2>
-                  <span className="text-[11px] text-muted-foreground shrink-0">
-                    {formatDistance(p.distanceM)}
-                  </span>
                 </div>
                 {p.address && (
                   <p className="text-xs text-muted-foreground truncate">{p.address}</p>
