@@ -6,10 +6,10 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>Privacy Policy — AJS Muslim Companion</title>
-        <meta name="description" content="How AJS Muslim Companion handles your data: no tracking, no accounts, all reading progress and downloads stay on your device." />
+        <title>Privacy Policy — Noor Al Deen</title>
+        <meta name="description" content="How Noor Al Deen handles your data: no tracking, no accounts, all reading progress and downloads stay on your device." />
         <link rel="canonical" href="https://www.light-of-deens.com/privacy" />
-        <meta property="og:title" content="Privacy Policy — AJS Muslim Companion" />
+        <meta property="og:title" content="Privacy Policy — Noor Al Deen" />
         <meta property="og:description" content="No tracking, no accounts. All data stays on your device." />
         <meta property="og:url" content="https://www.light-of-deens.com/privacy" />
       </Helmet>
