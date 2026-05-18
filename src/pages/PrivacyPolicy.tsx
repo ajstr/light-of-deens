@@ -38,7 +38,7 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-2">Overview</h2>
             <p className="text-muted-foreground leading-relaxed">
-              AJS Muslim Companion ("the App") is a Quran reader designed with privacy as a
+              Noor Al Deen ("the App") is a Quran reader designed with privacy as a
               core principle. We do not collect, sell, or share personal information.
               The App functions almost entirely on your device.
             </p>

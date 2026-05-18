@@ -85,7 +85,7 @@ const InstallPrompt = () => {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-display font-semibold text-foreground text-sm">
-                Install AJS Muslim Companion
+                Install Noor Al Deen
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                 {isIOS
