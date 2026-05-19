@@ -20,12 +20,8 @@ import {
   PlaceKind,
 } from "@/lib/nearby-places";
 
-const RADIUS_OPTIONS = [
-  { label: "1", value: 1609 },
-  { label: "3", value: 4828 },
-  { label: "6", value: 9656 },
-  { label: "15", value: 24140 },
-];
+// Fixed search radius — show nearest results within ~6 miles.
+const SEARCH_RADIUS_M = 9656;
 
 interface NearbyPageProps {
   initialKind?: PlaceKind;
