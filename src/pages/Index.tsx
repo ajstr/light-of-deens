@@ -13,6 +13,7 @@ import DailyDua from "@/components/DailyDua";
 import PrayerPage from "@/components/PrayerPage";
 import PrayerCard from "@/components/PrayerCard";
 import NearbyPage from "@/components/NearbyPage";
+import HadithPage from "@/components/HadithPage";
 import NearbyCard from "@/components/NearbyCard";
 import type { PlaceKind } from "@/lib/nearby-places";
 import ContinueReading from "@/components/ContinueReading";
@@ -144,6 +145,8 @@ const Index = () => {
         return <PrayerPage />;
       case "nearby":
         return <NearbyPage initialKind={nearbyKind} />;
+      case "hadith":
+        return <HadithPage />;
       case "duas":
         return <DuaPage />;
       case "downloads":
