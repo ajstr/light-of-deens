@@ -1,4 +1,4 @@
-import { Home, BookOpen, Bookmark, Settings, HardDriveDownload, HandHeart, Sunrise } from "lucide-react";
+import { Home, BookOpen, Bookmark, Settings, HardDriveDownload, HandHeart, Sunrise, BookMarked } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHideOnScroll } from "@/hooks/use-scroll-direction";
 
@@ -10,6 +10,7 @@ interface BottomTabBarProps {
 const tabs = [
   { id: "home", label: "Home", icon: Home },
   { id: "read", label: "Read", icon: BookOpen },
+  { id: "hadith", label: "Hadith", icon: BookMarked },
   { id: "prayer", label: "Prayer", icon: Sunrise },
   { id: "duas", label: "Duas", icon: HandHeart },
   { id: "downloads", label: "Offline", icon: HardDriveDownload },
