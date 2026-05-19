@@ -31,7 +31,7 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
   const [kind, setKind] = useState<PlaceKind>(initialKind);
   const [loc, setLoc] = useState<PrayerLocation | null>(getPrayerLocation());
   const [locating, setLocating] = useState(false);
-  const [radius, setRadius] = useState(5000);
+  
   const [places, setPlaces] = useState<Record<PlaceKind, NearbyPlace[] | null>>({
     masjid: null,
     halal: null,
@@ -60,7 +60,7 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
     if (!here) return;
     setLoading(true);
     try {
-      const list = await findNearby(k, here.lat, here.lng, radius);
+      const list = await findNearby(k, here.lat, here.lng, SEARCH_RADIUS_M);
       setPlaces((p) => ({ ...p, [k]: list }));
     } catch (e) {
       console.error(e);
@@ -70,11 +70,11 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
     }
   };
 
-  // Auto-load when tab or radius changes
+  // Auto-load when tab changes
   useEffect(() => {
     void load(kind);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind, radius]);
+  }, [kind]);
 
   const list = places[kind];
 
@@ -129,22 +129,7 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
           <span>Locating…</span>
         )}
         <span className="mx-1">·</span>
-        <span>Within</span>
-        <div className="flex gap-1">
-          {RADIUS_OPTIONS.map((r) => (
-            <button
-              key={r.value}
-              onClick={() => setRadius(r.value)}
-              className={`px-2 py-0.5 rounded-md border text-[11px] ${
-                radius === r.value
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "border-border text-foreground/80 hover:bg-accent"
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
+        <span>Nearest results</span>
         <button
           onClick={() => ensureLocation(true)}
           className="ml-auto underline-offset-2 hover:underline"
@@ -170,8 +155,7 @@ const NearbyPage = ({ initialKind = "masjid" }: NearbyPageProps) => {
 
       {!loading && list && list.length === 0 && (
         <Card className="p-6 text-center text-sm text-muted-foreground">
-          No {kind === "masjid" ? "Sunni masjids" : "halal restaurants"} found within{" "}
-          {RADIUS_OPTIONS.find((r) => r.value === radius)?.label}. Try a larger radius.
+          No {kind === "masjid" ? "Sunni masjids" : "halal restaurants"} found nearby.
         </Card>
       )}
 
