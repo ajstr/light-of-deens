@@ -15,8 +15,6 @@ export const COLLECTIONS: HadithCollection[] = [
   { slug: "nasai",    name: "Sunan an-Nasa'i",   author: "Imam an-Nasa'i" },
   { slug: "ibnmajah", name: "Sunan Ibn Majah",   author: "Imam Ibn Majah" },
   { slug: "malik",    name: "Muwatta Malik",     author: "Imam Malik" },
-  { slug: "ahmad",    name: "Musnad Ahmad",      author: "Imam Ahmad ibn Hanbal" },
-  { slug: "darimi",   name: "Sunan al-Darimi",   author: "Imam ad-Darimi" },
 ];
 
 interface RawEdition {
