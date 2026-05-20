@@ -64,13 +64,19 @@ async function runOverpass(query: string): Promise<any> {
   let lastErr: unknown;
   for (const url of OVERPASS_ENDPOINTS) {
     try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 15000);
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "data=" + encodeURIComponent(query),
+        signal: ctrl.signal,
       });
+      clearTimeout(timer);
       if (!res.ok) { lastErr = new Error(`Overpass ${res.status}`); continue; }
-      return await res.json();
+      const json = await res.json();
+      if (!json || !Array.isArray(json.elements)) { lastErr = new Error("bad response"); continue; }
+      return json;
     } catch (e) {
       lastErr = e;
     }
