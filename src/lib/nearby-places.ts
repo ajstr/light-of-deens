@@ -64,13 +64,19 @@ async function runOverpass(query: string): Promise<any> {
   let lastErr: unknown;
   for (const url of OVERPASS_ENDPOINTS) {
     try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 15000);
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "data=" + encodeURIComponent(query),
+        signal: ctrl.signal,
       });
+      clearTimeout(timer);
       if (!res.ok) { lastErr = new Error(`Overpass ${res.status}`); continue; }
-      return await res.json();
+      const json = await res.json();
+      if (!json || !Array.isArray(json.elements)) { lastErr = new Error("bad response"); continue; }
+      return json;
     } catch (e) {
       lastErr = e;
     }
@@ -94,7 +100,13 @@ export async function findNearby(
   radiusM = 5000,
   limit = 30,
 ): Promise<NearbyPlace[]> {
-  const data = await runOverpass(buildQuery(kind, lat, lng, radiusM));
+  // Auto-expand radius until we find results (helps in sparse areas).
+  const tries = [radiusM, 16000, 40000, 80000];
+  let data: any = null;
+  for (const r of tries) {
+    data = await runOverpass(buildQuery(kind, lat, lng, r));
+    if ((data?.elements?.length ?? 0) > 0) break;
+  }
   const elements: any[] = data?.elements ?? [];
   const places: NearbyPlace[] = elements.map((el) => {
     const elLat = el.lat ?? el.center?.lat;
