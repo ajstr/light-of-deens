@@ -100,7 +100,13 @@ export async function findNearby(
   radiusM = 5000,
   limit = 30,
 ): Promise<NearbyPlace[]> {
-  const data = await runOverpass(buildQuery(kind, lat, lng, radiusM));
+  // Auto-expand radius until we find results (helps in sparse areas).
+  const tries = [radiusM, 16000, 40000, 80000];
+  let data: any = null;
+  for (const r of tries) {
+    data = await runOverpass(buildQuery(kind, lat, lng, r));
+    if ((data?.elements?.length ?? 0) > 0) break;
+  }
   const elements: any[] = data?.elements ?? [];
   const places: NearbyPlace[] = elements.map((el) => {
     const elLat = el.lat ?? el.center?.lat;
