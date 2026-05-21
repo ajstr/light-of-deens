@@ -1,18 +1,22 @@
 // Hadith collections browser: pick collection → book/section → hadiths.
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { ChevronLeft, BookMarked, Loader2 } from "lucide-react";
+import { ChevronLeft, BookMarked, Loader2, Download, Check, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/hooks/use-toast";
 import {
   COLLECTIONS,
   HadithCollection,
   HadithItem,
   HadithSection,
+  downloadCollectionForOffline,
   getHadithsForSection,
   getSections,
+  isCollectionCached,
+  removeCollectionCache,
 } from "@/lib/hadith-api";
 
 type View =
