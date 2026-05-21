@@ -31,6 +31,18 @@ const HadithPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [cached, setCached] = useState<Record<string, boolean>>({});
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(
+      COLLECTIONS.map(async (c) => [c.slug, await isCollectionCached(c.slug)] as const),
+    ).then((entries) => {
+      if (!cancelled) setCached(Object.fromEntries(entries));
+    });
+    return () => { cancelled = true; };
+  }, [downloading]);
 
   useEffect(() => {
     let cancelled = false;
