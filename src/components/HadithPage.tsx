@@ -110,21 +110,65 @@ const HadithPage = () => {
 
       {view.kind === "collections" && (
         <ul className="space-y-2">
-          {COLLECTIONS.map((c) => (
-            <li key={c.slug}>
-              <button
-                className="w-full text-left"
-                onClick={() => setView({ kind: "sections", collection: c })}
-              >
-                <Card className="p-3 hover:bg-accent transition-colors">
-                  <div className="font-medium">{c.name}</div>
-                  <div className="text-xs text-muted-foreground">{c.author}</div>
+          {COLLECTIONS.map((c) => {
+            const isCached = cached[c.slug];
+            const isDownloading = downloading === c.slug;
+            return (
+              <li key={c.slug}>
+                <Card className="p-3 hover:bg-accent transition-colors flex items-center gap-2">
+                  <button
+                    className="flex-1 text-left min-w-0"
+                    onClick={() => setView({ kind: "sections", collection: c })}
+                  >
+                    <div className="font-medium truncate">{c.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {c.author}{isCached ? " · Available offline" : ""}
+                    </div>
+                  </button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label={isCached ? "Remove offline copy" : "Download for offline"}
+                    disabled={isDownloading}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (isCached) {
+                        await removeCollectionCache(c.slug);
+                        setCached((m) => ({ ...m, [c.slug]: false }));
+                        toast({ title: `${c.name} removed from offline` });
+                        return;
+                      }
+                      setDownloading(c.slug);
+                      try {
+                        await downloadCollectionForOffline(c.slug);
+                        setCached((m) => ({ ...m, [c.slug]: true }));
+                        toast({ title: `${c.name} saved for offline` });
+                      } catch (err: any) {
+                        toast({
+                          title: "Download failed",
+                          description: String(err?.message ?? err),
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setDownloading(null);
+                      }
+                    }}
+                  >
+                    {isDownloading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : isCached ? (
+                      <Check className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Download className="w-4 h-4" />
+                    )}
+                  </Button>
                 </Card>
-              </button>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       )}
+
 
       {view.kind === "sections" && (
         <>
