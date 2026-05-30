@@ -244,6 +244,17 @@
   margin: 0 0.05em;
 }
 
+/* Sajda (prostration) sign U+06E9 ۩ — make it prominent so reciters notice it */
+.sajda-mark {
+  color: hsl(var(--primary));
+  background: hsl(var(--primary) / 0.15);
+  padding: 0 0.2em;
+  border-radius: 0.3em;
+  font-weight: 700;
+  margin: 0 0.08em;
+  border: 1px solid hsl(var(--primary) / 0.4);
+}
+
 /* Mini-player equalizer animation */
 @keyframes eq-bar {
   0%, 100% { height: 30%; }
