@@ -360,8 +360,8 @@ export async function fetchSurah(number: number, translationId: number = 0): Pro
     revelationType: s.type.charAt(0).toUpperCase() + s.type.slice(1),
     ayahs: s.verses.map((v, index) => ({
       number: index + 1,
-      // Preserve waqf signs (U+06D6–U+06DC); strip only ayah-end/ornament markers
-      text: (arabicAyahs[index] ?? v.text).replace(/[\u06DD\u06DE\u06DF-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "").replace(/\s{2,}/g, " ").trim(),
+      // Preserve waqf signs (U+06D6–U+06DC) and sajda sign (U+06E9); strip only ayah-end/ornament markers
+      text: (arabicAyahs[index] ?? v.text).replace(/[\u06DD\u06DE\u06DF-\u06E8\u06EA-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "").replace(/\s{2,}/g, " ").trim(),
       translation: translations?.[index] ?? v.translation.replace(/<[^>]*>/g, ""),
       numberInSurah: index + 1,
     })),
