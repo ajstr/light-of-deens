@@ -10,6 +10,9 @@ import TajweedLegend from "@/components/TajweedLegend";
 import SurahHeader from "@/components/SurahHeader";
 import ReaderToolbar from "@/components/ReaderToolbar";
 import VerseCard from "@/components/VerseCard";
+import SajdaLegend from "@/components/SajdaLegend";
+
+const SAJDA_SURAHS = new Set([7, 13, 16, 17, 19, 22, 25, 27, 32, 38, 41, 53, 84, 96]);
 import { addBookmark, removeBookmark, isBookmarked, saveLastRead, getSettings, saveSettings, markAyahRead } from "@/lib/storage";
 import { getFontClass } from "@/components/FontPreview";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
@@ -213,6 +216,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
       </div>
 
       {tajweedEnabled && <div className="mb-6"><TajweedLegend /></div>}
+      {SAJDA_SURAHS.has(surah.number) && <div className="mb-6"><SajdaLegend /></div>}
 
       <SurahHeader surah={surah} arabicFontClass={arabicFontClass} />
 
