@@ -216,6 +216,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
       </div>
 
       {tajweedEnabled && <div className="mb-6"><TajweedLegend /></div>}
+      {SAJDA_SURAHS.has(surah.number) && <div className="mb-6"><SajdaLegend /></div>}
 
       <SurahHeader surah={surah} arabicFontClass={arabicFontClass} />
 
