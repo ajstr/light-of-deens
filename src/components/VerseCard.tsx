@@ -3,13 +3,16 @@ import { motion } from "framer-motion";
 import { Play, Square, Bookmark, BookText } from "lucide-react";
 import DOMPurify from "dompurify";
 
-// Waqf (pause) signs U+06D6–U+06DC. Wrap each in a styled span so pause points stand out.
+// Waqf (pause) signs U+06D6–U+06DC and Sajda sign U+06E9. Wrap each in a styled span.
 const WAQF_REGEX = /([\u06D6-\u06DC])/g;
+const SAJDA_REGEX = /(\u06E9)/g;
 function highlightWaqf(text: string): string {
-  const wrapped = text.replace(WAQF_REGEX, '<span class="waqf-mark">$1</span>');
+  const wrapped = text
+    .replace(SAJDA_REGEX, '<span class="sajda-mark" title="Place of Sajda">$1</span>')
+    .replace(WAQF_REGEX, '<span class="waqf-mark">$1</span>');
   return DOMPurify.sanitize(wrapped, {
     ALLOWED_TAGS: ['span'],
-    ALLOWED_ATTR: ['class'],
+    ALLOWED_ATTR: ['class', 'title'],
   });
 }
 
