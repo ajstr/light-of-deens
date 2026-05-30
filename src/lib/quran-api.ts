@@ -109,8 +109,8 @@ async function fetchDisplayArabicAyahs(surahNumber: number): Promise<string[]> {
   const verses = (json.verses || []).map((verse: any) =>
     (verse.text_uthmani || "")
       // Strip end-of-ayah markers (۝), rub/hizb (۞), circles, and superscript alef/extras —
-      // BUT preserve waqf (pause) signs U+06D6–U+06DC so tajweed pause rulings render in the reader.
-      .replace(/[\u06DD\u06DE\u06DF-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "")
+      // BUT preserve waqf (pause) signs U+06D6–U+06DC AND sajda sign U+06E9 (۩).
+      .replace(/[\u06DD\u06DE\u06DF-\u06E8\u06EA-\u06ED\u0670\u08F0-\u08FF۝●⬤۞]/g, "")
       .replace(/\s{2,}/g, " ")
       .trim()
   );
