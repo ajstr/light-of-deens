@@ -18,6 +18,8 @@ import NearbyCard from "@/components/NearbyCard";
 import type { PlaceKind } from "@/lib/nearby-places";
 import ContinueReading from "@/components/ContinueReading";
 import ReadingProgress from "@/components/ReadingProgress";
+import QuranGoalCard from "@/components/QuranGoalCard";
+import DailyHadithCard from "@/components/DailyHadithCard";
 import BottomTabBar from "@/components/BottomTabBar";
 import AudioPlayer from "@/components/AudioPlayer";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -198,6 +200,8 @@ const Index = () => {
             }}
           />
           <DailyDua />
+          <QuranGoalCard />
+          <DailyHadithCard onOpen={() => setActiveTab("hadith")} />
           <ReadingProgress />
           <ContinueReading
             surahs={surahs ?? []}
