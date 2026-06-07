@@ -187,12 +187,6 @@ const Index = () => {
       {activeTab === "home" && (
         <>
           <PrayerCard onOpen={() => setActiveTab("prayer")} />
-          <NearbyCard
-            onOpen={(k) => {
-              setNearbyKind(k);
-              setActiveTab("nearby");
-            }}
-          />
           <DailyDua />
           <QuranGoalCard />
           <DailyHadithCard onOpen={() => setActiveTab("hadith")} />
