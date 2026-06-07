@@ -5,6 +5,7 @@ import { getAllCategories, type DuaCategory, type Dua } from "@/lib/dua-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import RuqyaSessionPlayer from "@/components/RuqyaSessionPlayer";
 
 const DuaCard = ({ dua }: { dua: Dua }) => (
   <motion.div
@@ -54,6 +55,7 @@ const DuaPage = () => {
           </h2>
         </div>
         <ScrollArea className="h-[calc(100vh-16rem)]">
+          {selectedCategory.id === "ruqya" && <RuqyaSessionPlayer />}
           <AnimatePresence>
             {selectedCategory.duas.map((dua) => (
               <DuaCard key={dua.id} dua={dua} />
