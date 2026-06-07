@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight, Shield, HelpCircle, PlayCircle, Youtube, Check } from "lucide-react";
+import { Settings, Sun, Moon, Type, Volume2, Home, BookOpen, Bookmark, Compass, Paintbrush, Languages, Palette, ChevronRight, Shield, HelpCircle, PlayCircle, Youtube, Check, Target, BellRing } from "lucide-react";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -17,6 +17,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { fetchReciters, fetchSurahs, Reciter, Surah, TRANSLATIONS } from "@/lib/quran-api";
 import { getSettings, saveSettings, AppSettings, getTutorialVideoId, setTutorialVideoId } from "@/lib/storage";
+import { getGoalSettings, saveGoalSettings, QuranGoalSettings } from "@/lib/quran-goals";
+import { getHadithReminderSettings, saveHadithReminderSettings, HadithReminderSettings } from "@/lib/hadith-reminder";
 import QuranNavigator from "@/components/QuranNavigator";
 import FontPreview, { FontId } from "@/components/FontPreview";
 
@@ -33,6 +35,15 @@ const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPa
   const [settings, setSettings] = useState<AppSettings>(getSettings);
   const [videoInput, setVideoInput] = useState<string>(() => getTutorialVideoId());
   const [videoSaved, setVideoSaved] = useState(false);
+  const [goal, setGoal] = useState<QuranGoalSettings>(getGoalSettings);
+  const [reminder, setReminder] = useState<HadithReminderSettings>(getHadithReminderSettings);
+
+  const updateGoal = (p: Partial<QuranGoalSettings>) => {
+    setGoal((prev) => { const next = { ...prev, ...p }; saveGoalSettings(next); return next; });
+  };
+  const updateReminder = (p: Partial<HadithReminderSettings>) => {
+    setReminder((prev) => { const next = { ...prev, ...p }; saveHadithReminderSettings(next); return next; });
+  };
 
   const saveVideoId = () => {
     const id = setTutorialVideoId(videoInput);
