@@ -82,28 +82,27 @@ const Index = () => {
     });
   }, [registerOpenReader, handleSurahChange]);
 
-  // Restore last session on first mount once surahs are loaded
+  // Surface a non-intrusive "Continue listening?" prompt if audio was playing
+  // last session — but always start on the home page, never auto-open the reader.
   useEffect(() => {
     if (!surahs || surahs.length === 0) return;
-    if (selectedSurah) return; // user already opened something
     const session = getLastSession();
-    if (!session) return;
+    if (!session || !session.wasPlaying) return;
     const target = surahs.find((s) => s.number === session.surahNumber);
     if (!target) return;
-    setInitialAyah(session.ayahIndex);
-    setSelectedSurah(target);
-    setActiveTab("read");
-    if (session.wasPlaying) {
-      // iOS blocks autoplay — surface a one-tap resume
-      toast("Continue listening?", {
-        description: `${target.englishName} • Ayah ${session.ayahIndex + 1}`,
-        action: {
-          label: "Resume",
-          onClick: () => setPlayTrigger(session.ayahIndex),
+    toast("Continue listening?", {
+      description: `${target.englishName} • Ayah ${session.ayahIndex + 1}`,
+      action: {
+        label: "Resume",
+        onClick: () => {
+          setInitialAyah(session.ayahIndex);
+          setSelectedSurah(target);
+          setActiveTab("read");
+          setPlayTrigger(session.ayahIndex);
         },
-        duration: 8000,
-      });
-    }
+      },
+      duration: 8000,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surahs]);
 
