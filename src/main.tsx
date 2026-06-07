@@ -3,6 +3,7 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 import { rescheduleAthan } from "./lib/athan-scheduler";
+import { rescheduleHadithReminder } from "./lib/hadith-reminder";
 
 // Premium dark is the default theme
 document.documentElement.classList.add("dark");
@@ -16,5 +17,5 @@ createRoot(document.getElementById("root")!).render(
 // Schedule today's Athan + native notifications (no-op if no location yet)
 if (typeof window !== "undefined") {
   // Defer to idle so it never blocks first paint
-  setTimeout(() => rescheduleAthan(), 1500);
+  setTimeout(() => { rescheduleAthan(); rescheduleHadithReminder(); }, 1500);
 }
