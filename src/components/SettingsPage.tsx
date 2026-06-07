@@ -250,6 +250,91 @@ const SettingsPage = ({ onTabChange, onSurahChange, onShowTutorial }: SettingsPa
             </Select>
           </div>
 
+          {/* Quran Reading Goals */}
+          <div className="bg-card rounded-lg p-4 border border-border space-y-4">
+            <div className="flex items-center gap-3">
+              <Target className="w-5 h-5 text-primary" />
+              <div>
+                <Label className="text-foreground font-medium">Quran Reading Goals</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Track ayahs, pages, or a khatm target with streaks
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-1">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Daily ayahs goal</Label>
+                <Switch checked={goal.ayahsEnabled} onCheckedChange={(v) => updateGoal({ ayahsEnabled: v })} />
+              </div>
+              {goal.ayahsEnabled && (
+                <div className="flex items-center gap-3 pl-2">
+                  <Slider
+                    value={[goal.dailyAyahs]} min={1} max={200} step={1}
+                    onValueChange={([v]) => updateGoal({ dailyAyahs: v })}
+                    className="flex-1"
+                  />
+                  <span className="text-sm w-12 text-right text-foreground font-medium">{goal.dailyAyahs}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2">
+                <Label className="text-sm">Daily pages goal</Label>
+                <Switch checked={goal.pagesEnabled} onCheckedChange={(v) => updateGoal({ pagesEnabled: v })} />
+              </div>
+              {goal.pagesEnabled && (
+                <div className="flex items-center gap-3 pl-2">
+                  <Slider
+                    value={[goal.dailyPages]} min={1} max={20} step={1}
+                    onValueChange={([v]) => updateGoal({ dailyPages: v })}
+                    className="flex-1"
+                  />
+                  <span className="text-sm w-12 text-right text-foreground font-medium">{goal.dailyPages}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2">
+                <Label className="text-sm">Khatm by date</Label>
+                <Switch checked={goal.khatmEnabled} onCheckedChange={(v) => updateGoal({ khatmEnabled: v })} />
+              </div>
+              {goal.khatmEnabled && (
+                <Input
+                  type="date"
+                  value={goal.khatmDate}
+                  onChange={(e) => updateGoal({ khatmDate: e.target.value })}
+                  className="h-9"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Daily Hadith Reminder */}
+          <div className="bg-card rounded-lg p-4 border border-border space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <BellRing className="w-5 h-5 text-primary" />
+                <div>
+                  <Label className="text-foreground font-medium">Daily Hadith Reminder</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Native push at your chosen time (mobile app)
+                  </p>
+                </div>
+              </div>
+              <Switch checked={reminder.enabled} onCheckedChange={(v) => updateReminder({ enabled: v })} />
+            </div>
+            {reminder.enabled && (
+              <Input
+                type="time"
+                value={`${String(reminder.hour).padStart(2, "0")}:${String(reminder.minute).padStart(2, "0")}`}
+                onChange={(e) => {
+                  const [h, m] = e.target.value.split(":").map(Number);
+                  updateReminder({ hour: h || 0, minute: m || 0 });
+                }}
+                className="h-9"
+              />
+            )}
+          </div>
+
           {/* Quick Links */}
           <div className="bg-card rounded-lg p-4 border border-border">
             <div className="flex items-center gap-3 mb-3">
