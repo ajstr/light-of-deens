@@ -12,10 +12,7 @@ import DuaPage from "@/components/DuaPage";
 import DailyDua from "@/components/DailyDua";
 import PrayerPage from "@/components/PrayerPage";
 import PrayerCard from "@/components/PrayerCard";
-import NearbyPage from "@/components/NearbyPage";
 import HadithPage from "@/components/HadithPage";
-import NearbyCard from "@/components/NearbyCard";
-import type { PlaceKind } from "@/lib/nearby-places";
 import ContinueReading from "@/components/ContinueReading";
 import ReadingProgress from "@/components/ReadingProgress";
 import QuranGoalCard from "@/components/QuranGoalCard";
@@ -38,7 +35,6 @@ const Index = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [autoplayPending, setAutoplayPending] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [nearbyKind, setNearbyKind] = useState<PlaceKind>("masjid");
   const [tutorialStep, setTutorialStep] = useState(0);
   const { registerOpenReader, nowPlaying } = useAudioPlayer();
 
@@ -86,28 +82,27 @@ const Index = () => {
     });
   }, [registerOpenReader, handleSurahChange]);
 
-  // Restore last session on first mount once surahs are loaded
+  // Surface a non-intrusive "Continue listening?" prompt if audio was playing
+  // last session — but always start on the home page, never auto-open the reader.
   useEffect(() => {
     if (!surahs || surahs.length === 0) return;
-    if (selectedSurah) return; // user already opened something
     const session = getLastSession();
-    if (!session) return;
+    if (!session || !session.wasPlaying) return;
     const target = surahs.find((s) => s.number === session.surahNumber);
     if (!target) return;
-    setInitialAyah(session.ayahIndex);
-    setSelectedSurah(target);
-    setActiveTab("read");
-    if (session.wasPlaying) {
-      // iOS blocks autoplay — surface a one-tap resume
-      toast("Continue listening?", {
-        description: `${target.englishName} • Ayah ${session.ayahIndex + 1}`,
-        action: {
-          label: "Resume",
-          onClick: () => setPlayTrigger(session.ayahIndex),
+    toast("Continue listening?", {
+      description: `${target.englishName} • Ayah ${session.ayahIndex + 1}`,
+      action: {
+        label: "Resume",
+        onClick: () => {
+          setInitialAyah(session.ayahIndex);
+          setSelectedSurah(target);
+          setActiveTab("read");
+          setPlayTrigger(session.ayahIndex);
         },
-        duration: 8000,
-      });
-    }
+      },
+      duration: 8000,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surahs]);
 
@@ -145,8 +140,6 @@ const Index = () => {
         );
       case "prayer":
         return <PrayerPage />;
-      case "nearby":
-        return <NearbyPage initialKind={nearbyKind} />;
       case "hadith":
         return <HadithPage />;
       case "duas":
@@ -193,12 +186,6 @@ const Index = () => {
       {activeTab === "home" && (
         <>
           <PrayerCard onOpen={() => setActiveTab("prayer")} />
-          <NearbyCard
-            onOpen={(k) => {
-              setNearbyKind(k);
-              setActiveTab("nearby");
-            }}
-          />
           <DailyDua />
           <QuranGoalCard />
           <DailyHadithCard onOpen={() => setActiveTab("hadith")} />
