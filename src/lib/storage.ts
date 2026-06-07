@@ -192,6 +192,8 @@ export function markAyahRead(surahNumber: number, ayahNumber: number): void {
   if (!progress[surahNumber].includes(ayahNumber)) {
     progress[surahNumber].push(ayahNumber);
     localStorage.setItem(READING_PROGRESS_KEY, JSON.stringify(progress));
+    // Track in daily goal log (async import to avoid cycle).
+    import("./quran-goals").then((m) => m.incrementToday(1)).catch(() => {});
     emitProgressChange();
   }
 }
