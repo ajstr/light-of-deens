@@ -244,7 +244,7 @@ const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
                     : "bg-card text-foreground border-gold"
                 )}
               >
-                ﷲ
+                كعبة
               </div>
               <div
                 className={cn(
