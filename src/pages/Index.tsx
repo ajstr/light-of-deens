@@ -141,8 +141,6 @@ const Index = () => {
         );
       case "prayer":
         return <PrayerPage />;
-      case "nearby":
-        return <NearbyPage initialKind={nearbyKind} />;
       case "hadith":
         return <HadithPage />;
       case "duas":
