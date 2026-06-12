@@ -20,7 +20,6 @@ jobs:
     env:
       XCODE_VERSION: "16.2"
       SCHEME: "App"
-      WORKSPACE: "ios/App/App.xcworkspace"
       PROJECT: "ios/App/App.xcodeproj"
       ARCHIVE_PATH: "build/App.xcarchive"
       EXPORT_PATH: "build/export"
@@ -33,23 +32,22 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          cache: "npm"
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Build web bundle
         env:
           APP_VERSION: ${{ github.event.inputs.version }}
           BUILD_NUMBER: ${{ github.run_number }}
-        run: npm run build
+        run: bun run build
 
       - name: Capacitor sync iOS
-        run: npx cap sync ios
+        run: bunx cap sync ios
 
       - name: Import signing certificate
         env:
