@@ -238,13 +238,14 @@ const QiblaCompass = ({ qiblaBearing }: QiblaCompassProps) => {
             >
               <div
                 className={cn(
-                  "w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-bold border-2",
+                  "w-8 h-8 rounded-md flex items-center justify-center text-base border-2",
                   aligned
                     ? "bg-accent text-accent-foreground border-accent shadow-[0_0_24px_hsl(var(--accent))]"
                     : "bg-card text-foreground border-gold"
                 )}
+                aria-label="Kaaba"
               >
-                كعبة
+                🕋
               </div>
               <div
                 className={cn(
