@@ -154,6 +154,12 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
     enabled: tajweedEnabled,
   });
 
+  const { data: somaliData } = useQuery({
+    queryKey: ["somali", surah.number],
+    queryFn: () => fetchSomaliTranslation(surah.number),
+    enabled: somaliEnabled,
+  });
+
   // After data loads, snap to the initial ayah from last session (runs once per surah load)
   useEffect(() => {
     if (!data?.ayahs?.length) return;
