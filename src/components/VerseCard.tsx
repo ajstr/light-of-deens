@@ -80,10 +80,22 @@ const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
       tajweedLoading,
       tajweedHtml,
       inActiveRange = false,
+      somaliEnabled = false,
+      somaliText,
     },
     ref
   ) => {
     const isCurrentlyPlaying = isAudioPlaying && currentAyah === index;
+
+    const speakSomali = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!somaliText || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(somaliText);
+      u.lang = "so";
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    };
 
     return (
       <motion.div
