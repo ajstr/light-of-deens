@@ -267,6 +267,8 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                 tajweedEnabled={tajweedEnabled}
                 tajweedLoading={tajweedLoading}
                 tajweedHtml={tajweedData?.[i]}
+                somaliEnabled={somaliEnabled}
+                somaliText={somaliData?.[i]}
                 inActiveRange={isInRange}
               />
             );
