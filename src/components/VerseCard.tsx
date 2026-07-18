@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { motion } from "framer-motion";
-import { Play, Square, Bookmark, BookText } from "lucide-react";
+import { Play, Square, Bookmark, BookText, Volume2 } from "lucide-react";
 import DOMPurify from "dompurify";
 
 // Waqf (pause) signs U+06D6–U+06DC and Sajda sign U+06E9. Wrap each in a styled span.
