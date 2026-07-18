@@ -203,6 +203,8 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
           onWbwChange={(v) => { setWbwEnabled(v); if (v) setTajweedEnabled(false); }}
           translationEnabled={translationEnabled}
           onTranslationChange={(v) => { setTranslationEnabled(v); saveSettings({ ...settings, showTranslation: v }); }}
+          somaliEnabled={somaliEnabled}
+          onSomaliChange={setSomaliEnabled}
         />
       </div>
 
