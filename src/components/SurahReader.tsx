@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
+import { fetchSurah, fetchWordByWord, fetchTajweedText, fetchSomaliTranslation, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowUp, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
