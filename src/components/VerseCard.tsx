@@ -50,6 +50,9 @@ interface VerseCardProps {
   tajweedEnabled: boolean;
   tajweedLoading: boolean;
   tajweedHtml?: string;
+  // Somali translation with TTS
+  somaliEnabled?: boolean;
+  somaliText?: string;
   // Range repeat
   inActiveRange?: boolean;
 }
