@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { motion } from "framer-motion";
-import { Play, Square, Bookmark, BookText, Volume2 } from "lucide-react";
+import { Play, Square, Bookmark, BookText } from "lucide-react";
 import DOMPurify from "dompurify";
 
 // Waqf (pause) signs U+06D6–U+06DC and Sajda sign U+06E9. Wrap each in a styled span.
@@ -86,16 +86,6 @@ const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
     ref
   ) => {
     const isCurrentlyPlaying = isAudioPlaying && currentAyah === index;
-
-    const speakSomali = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (!somaliText || typeof window === "undefined" || !("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(somaliText);
-      u.lang = "so";
-      u.rate = 0.95;
-      window.speechSynthesis.speak(u);
-    };
 
     return (
       <motion.div
@@ -206,19 +196,10 @@ const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
             )}
 
             {somaliEnabled && somaliText && (
-              <div className="border-t border-border/50 pt-3 flex items-start gap-2">
-                <button
-                  onClick={speakSomali}
-                  className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-accent/15 hover:bg-accent/25 text-accent transition-colors"
-                  title="Play Somali translation"
-                >
-                  <Volume2 className="w-3.5 h-3.5" />
-                </button>
-                <p className="text-foreground/90 text-sm leading-relaxed flex-1">
-                  <span className="text-[10px] uppercase tracking-wider text-accent mr-2">Somali</span>
-                  {somaliText}
-                </p>
-              </div>
+              <p className="text-foreground/90 text-sm leading-relaxed border-t border-border/50 pt-3">
+                <span className="text-[10px] uppercase tracking-wider text-accent mr-2">Somali</span>
+                {somaliText}
+              </p>
             )}
           </div>
         </div>
