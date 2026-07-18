@@ -204,6 +204,22 @@ const VerseCard = forwardRef<HTMLDivElement, VerseCardProps>(
                 {ayah.translation}
               </p>
             )}
+
+            {somaliEnabled && somaliText && (
+              <div className="border-t border-border/50 pt-3 flex items-start gap-2">
+                <button
+                  onClick={speakSomali}
+                  className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-accent/15 hover:bg-accent/25 text-accent transition-colors"
+                  title="Play Somali translation"
+                >
+                  <Volume2 className="w-3.5 h-3.5" />
+                </button>
+                <p className="text-foreground/90 text-sm leading-relaxed flex-1">
+                  <span className="text-[10px] uppercase tracking-wider text-accent mr-2">Somali</span>
+                  {somaliText}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>
