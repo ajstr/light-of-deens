@@ -248,6 +248,10 @@ const surahCache = new Map<string, SurahDetail>();
 const translationCache = new Map<string, string[]>();
 
 // Fetch translation text from Quran.com API
+export async function fetchSomaliTranslation(surahNumber: number): Promise<string[]> {
+  return fetchApiTranslation(surahNumber, 46);
+}
+
 async function fetchApiTranslation(surahNumber: number, translationId: number): Promise<string[]> {
   const key = `${translationId}-${surahNumber}`;
   if (translationCache.has(key)) return translationCache.get(key)!;
