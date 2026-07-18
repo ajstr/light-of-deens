@@ -35,6 +35,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [translationEnabled, setTranslationEnabled] = useState(settings.showTranslation);
+  const [somaliEnabled, setSomaliEnabled] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [activeAyahOffscreen, setActiveAyahOffscreen] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
