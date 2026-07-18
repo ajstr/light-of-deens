@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSurah, fetchWordByWord, fetchTajweedText, Surah } from "@/lib/quran-api";
+import { fetchSurah, fetchWordByWord, fetchTajweedText, fetchSomaliTranslation, Surah } from "@/lib/quran-api";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowUp, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
   const [wbwEnabled, setWbwEnabled] = useState(false);
   const [tajweedEnabled, setTajweedEnabled] = useState(false);
   const [translationEnabled, setTranslationEnabled] = useState(settings.showTranslation);
+  const [somaliEnabled, setSomaliEnabled] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [activeAyahOffscreen, setActiveAyahOffscreen] = useState(false);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
@@ -153,6 +154,12 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
     enabled: tajweedEnabled,
   });
 
+  const { data: somaliData } = useQuery({
+    queryKey: ["somali", surah.number],
+    queryFn: () => fetchSomaliTranslation(surah.number),
+    enabled: somaliEnabled,
+  });
+
   // After data loads, snap to the initial ayah from last session (runs once per surah load)
   useEffect(() => {
     if (!data?.ayahs?.length) return;
@@ -202,6 +209,8 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
           onWbwChange={(v) => { setWbwEnabled(v); if (v) setTajweedEnabled(false); }}
           translationEnabled={translationEnabled}
           onTranslationChange={(v) => { setTranslationEnabled(v); saveSettings({ ...settings, showTranslation: v }); }}
+          somaliEnabled={somaliEnabled}
+          onSomaliChange={setSomaliEnabled}
         />
       </div>
 
@@ -258,6 +267,8 @@ const SurahReader = ({ surah, onBack, onSurahChange, initialAyah = 0, currentAya
                 tajweedEnabled={tajweedEnabled}
                 tajweedLoading={tajweedLoading}
                 tajweedHtml={tajweedData?.[i]}
+                somaliEnabled={somaliEnabled}
+                somaliText={somaliData?.[i]}
                 inActiveRange={isInRange}
               />
             );

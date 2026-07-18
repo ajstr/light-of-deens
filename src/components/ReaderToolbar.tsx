@@ -1,4 +1,4 @@
-import { Palette, BookOpen, Languages } from "lucide-react";
+import { Palette, BookOpen, Languages, Globe } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -9,6 +9,8 @@ interface ReaderToolbarProps {
   onWbwChange: (v: boolean) => void;
   translationEnabled: boolean;
   onTranslationChange: (v: boolean) => void;
+  somaliEnabled: boolean;
+  onSomaliChange: (v: boolean) => void;
 }
 
 const ReaderToolbar = ({
@@ -18,6 +20,8 @@ const ReaderToolbar = ({
   onWbwChange,
   translationEnabled,
   onTranslationChange,
+  somaliEnabled,
+  onSomaliChange,
 }: ReaderToolbarProps) => (
   <div className="flex items-center gap-4 flex-wrap">
     <div className="flex items-center gap-2">
@@ -40,6 +44,13 @@ const ReaderToolbar = ({
         Translation
       </Label>
       <Switch id="translation-toggle" checked={translationEnabled} onCheckedChange={onTranslationChange} />
+    </div>
+    <div className="flex items-center gap-2">
+      <Globe className="w-4 h-4 text-muted-foreground" />
+      <Label htmlFor="somali-toggle" className="text-sm text-muted-foreground cursor-pointer">
+        Somali
+      </Label>
+      <Switch id="somali-toggle" checked={somaliEnabled} onCheckedChange={onSomaliChange} />
     </div>
   </div>
 );
